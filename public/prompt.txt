@@ -1,0 +1,524 @@
+Project Context
+
+You are helping build Trashure: Turn Trash Into Treasure.
+
+Trashure is an AI-powered circular economy platform that prevents materials from becoming waste by identifying discarded items and recommending their highest-value recovery pathway.
+
+The platform is not a simple recycling application.
+
+Instead of asking:
+
+"Where should I throw this?"
+
+Trashure asks:
+
+"What can this material become?"
+
+The system helps users:
+
+Identify materials
+Understand their value
+Choose circular actions:
+Reuse
+Sell
+Donate
+Recycle
+
+The platform also provides LGUs with anonymous waste intelligence.
+
+Technology Stack
+
+Build using:
+
+Frontend
+Next.js 15
+TypeScript
+Tailwind CSS
+Shadcn UI
+Lucide Icons
+Backend
+
+Use:
+
+Next.js App Router
+Server Actions/API Routes
+Database
+
+Use:
+
+Supabase
+PostgreSQL
+Supabase Storage
+Supabase Auth
+AI
+
+Use:
+
+OpenAI Vision API
+
+Purpose:
+
+Image recognition
+Material classification
+Circular recommendation generation
+Deployment
+
+Use:
+
+Vercel
+System Architecture
+
+The application flow:
+
+User
+ |
+ |
+Upload waste image
+ |
+ |
+Next.js Frontend
+ |
+ |
+API Route
+ |
+ |
+AI Vision API
+ |
+ |
+Material Analysis
+ |
+ |
+Supabase Database
+ |
+ |
+Circular Recommendation Engine
+ |
+ |
+Display Results
+ |
+ |
+Save Anonymous Data
+ |
+ |
+LGU Dashboard
+Main User Roles
+
+Implement four roles:
+
+1. Resident
+
+Can:
+
+Create account
+Upload waste image
+Receive AI analysis
+View recommendations
+Track environmental contribution
+2. School/Community Partner
+
+Can:
+
+Receive donated materials
+Create material requests
+Support sustainability projects
+3. Recycler/Junkshop Partner
+
+Can:
+
+Register accepted materials
+Provide estimated material value
+Receive recycling opportunities
+4. LGU Administrator
+
+Can:
+
+View waste analytics
+Monitor barangay participation
+Generate sustainability reports
+Database Design
+
+Create Supabase PostgreSQL tables:
+
+users
+id
+name
+email
+role
+barangay
+created_at
+materials
+
+Stores AI knowledge.
+
+Example:
+
+id
+material_name
+category
+recyclable
+reuse_options
+selling_information
+donation_options
+recycling_process
+
+Example:
+
+Material:
+
+PET Plastic
+
+Reuse:
+
+- Plant container
+- Eco project
+
+Sell:
+
+₱20/kg
+
+Recycle:
+
+Plastic recovery facility
+scans
+
+Stores AI analysis.
+
+id
+user_id
+image_url
+detected_object
+material_type
+confidence_score
+recommended_action
+created_at
+barangay
+impact_logs
+
+For dashboard:
+
+id
+material_type
+action_taken
+estimated_weight
+location
+created_at
+AI Integration Guide
+Objective
+
+When a user uploads an image:
+
+The AI should answer:
+
+What object is this?
+What material is it made of?
+Is it recyclable?
+What can it become?
+What action should the user take?
+AI Workflow
+Step 1
+
+User uploads image.
+
+Example:
+
+plastic_bottle.jpg
+Step 2
+
+Save image to:
+
+Supabase Storage
+
+Bucket:
+
+trashure-images
+
+Example:
+
+trashure-images/
+ |
+ |-- scans/
+      |
+      plastic001.jpg
+Step 3
+
+Send image to OpenAI Vision API.
+
+Create:
+
+app/api/analyze/route.ts
+
+The API receives:
+
+image_url
+
+Then sends:
+
+image
++
+system prompt
+
+to AI.
+
+AI System Prompt
+
+Use this:
+
+You are Trashure AI,
+a circular economy material intelligence assistant.
+
+Analyze the uploaded waste image.
+
+Your task:
+
+1. Identify the object.
+2. Identify the material type.
+3. Estimate recyclability.
+4. Suggest reuse possibilities.
+5. Suggest selling opportunities.
+6. Suggest donation opportunities.
+7. Suggest recycling instructions.
+
+Prioritize resource recovery.
+
+Do not simply recommend disposal.
+
+Return JSON format only.
+Expected AI Response
+
+Example:
+
+{
+"object":"Plastic Bottle",
+
+"material":"PET Plastic",
+
+"category":"Plastic",
+
+"confidence":95,
+
+"recyclable":true,
+
+"reuse":[
+"Plant holder",
+"Storage container"
+],
+
+"sell":{
+"estimated_value":"₱20/kg"
+},
+
+"donate":[
+"School projects",
+"Community activities"
+],
+
+"recycle_instruction":
+"Clean bottle and bring to recycling collection point"
+}
+Backend Processing
+
+After receiving AI response:
+
+Do:
+
+AI Result
+
+↓
+
+Find material in Supabase
+
+↓
+
+Combine:
+
+AI Detection
++
+Database Knowledge
+
+↓
+
+Return final recommendation
+Frontend Result Page
+
+Display:
+
+TRASHURE RESULT
+
+
+Detected:
+
+PET Plastic Bottle
+
+
+Confidence:
+
+95%
+
+
+Circular Options:
+
+
+🌱 REUSE
+
+Make plant holders
+
+
+💰 SELL
+
+Estimated value:
+₱20/kg
+
+
+🤝 DONATE
+
+School projects
+
+
+♻ RECYCLE
+
+Proper recycling method
+
+Development Roadmap
+Day 1
+
+Setup:
+
+Next.js
+Supabase
+Authentication
+Database
+Day 2
+
+Build:
+
+Landing page
+Dashboard layout
+User interface
+Day 3
+
+AI Integration:
+
+Upload image
+Connect Vision API
+Receive JSON response
+Day 4
+
+Recommendation Engine:
+
+Material database
+Circular actions
+Day 5
+
+LGU Dashboard:
+
+Charts
+Analytics
+Reports
+Day 6
+
+Testing:
+
+Test materials:
+
+Plastic bottle
+Tin can
+Cardboard
+Glass bottle
+Electronics
+Day 7
+
+Presentation:
+
+Prepare:
+
+Demo flow
+Pitch
+Impact story
+Important Development Rules
+
+When writing code:
+
+Use TypeScript.
+Use reusable components.
+Use clean folder structure.
+Do not hardcode AI results.
+Store AI results in Supabase.
+Validate uploaded images.
+Handle AI errors gracefully.
+Keep user privacy protected.
+Store only anonymous waste analytics.
+Design for future LGU adoption.
+Recommended Folder Structure
+trashure/
+
+app/
+
+├── page.tsx
+├── scan/
+│   └── page.tsx
+├── result/
+│   └── page.tsx
+├── dashboard/
+│   └── page.tsx
+
+├── api/
+│   └── analyze/
+│       └── route.ts
+
+
+components/
+
+├── ui/
+
+├── scanner/
+│   ├── UploadBox.tsx
+│   ├── AIResult.tsx
+
+├── dashboard/
+│   ├── StatsCard.tsx
+│   ├── Charts.tsx
+
+
+lib/
+
+├── supabase.ts
+├── openai.ts
+├── aiPrompt.ts
+
+Final Goal
+
+The final demo should show:
+
+A user picks up a plastic bottle.
+
+They scan it.
+
+Trashure says:
+
+"This is PET Plastic. It still has value."
+
+Then shows:
+
+Reuse.
+Sell.
+Donate.
+Recycle.
+
+The LGU dashboard updates:
+
+"Plastic recovery increased by community participation."
+
+This demonstrates a complete circular economy system, not just an AI scanner.
+
+
+===============
+
+The partner network is more important than the AI
+
+The scanner creates initial interest, but the platform becomes useful only when it can answer:
+
+Which nearby junkshop accepts this?
+Which school currently needs this material?
+Where is the nearest collection point?
+How much is the local estimated value?
+What condition must the material be in?
