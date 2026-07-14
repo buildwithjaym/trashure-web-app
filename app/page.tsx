@@ -14,6 +14,7 @@ import {
   ScanLine,
   Sparkles,
   Upload,
+  
 } from "lucide-react";
 
 import Link from "next/link";
@@ -963,7 +964,276 @@ md:flex
 
       </section>
 
+            {/* Features Section */}
 
+<section
+  id="features"
+  className="
+  py-28
+  bg-white
+  "
+>
+
+  <div
+    className="
+    mx-auto
+    max-w-7xl
+    px-5
+    sm:px-8
+    "
+  >
+
+    {/* Header */}
+
+    <div className="mx-auto max-w-3xl text-center">
+
+      <Badge
+        className="
+        rounded-full
+        bg-green-100
+        px-4
+        py-2
+        text-green-700
+        "
+      >
+        Powerful Features
+      </Badge>
+
+
+      <h2
+        className="
+        mt-6
+        text-4xl
+        font-bold
+        tracking-tight
+        sm:text-5xl
+        "
+      >
+
+        Turning everyday waste
+
+        <br />
+
+        into intelligent decisions.
+
+      </h2>
+
+
+      <p
+        className="
+        mt-5
+        text-lg
+        leading-relaxed
+        text-zinc-600
+        "
+      >
+
+        Trashure combines artificial intelligence and circular economy
+        intelligence to help people discover the hidden value of materials
+        before they become waste.
+
+      </p>
+
+    </div>
+
+
+
+    {/* Feature Cards */}
+
+
+    <div
+      className="
+      mt-14
+      grid
+      gap-6
+      md:grid-cols-2
+      lg:grid-cols-4
+      "
+    >
+
+
+      {[
+        {
+          title: "AI Material Scanner",
+          description:
+            "Identify materials instantly through AI-powered recognition and understand their recovery potential.",
+          value:
+            "Know what you have.",
+          icon: Brain,
+        },
+
+
+        {
+          title: "Smart Recovery Paths",
+          description:
+            "Receive recommendations whether materials should be reused, sold, donated, or recycled.",
+          value:
+            "Know what to do next.",
+          icon: Recycle,
+        },
+
+
+        {
+          title: "Material Value Discovery",
+          description:
+            "Reveal the economic and environmental value hidden inside discarded materials.",
+          value:
+            "Waste becomes opportunity.",
+          icon: Coins,
+        },
+
+
+        {
+          title: "Impact Intelligence",
+          description:
+            "Transform community actions into sustainability insights through meaningful data.",
+          value:
+            "Measure real impact.",
+          icon: BarChart3,
+        },
+
+
+      ].map((feature) => (
+
+        <Card
+          key={feature.title}
+          className="
+          group
+          relative
+          overflow-hidden
+          rounded-[32px]
+          border
+          border-green-100
+          bg-white
+          p-8
+          shadow-lg
+          shadow-green-900/5
+          transition
+          duration-300
+          hover:-translate-y-2
+          hover:border-green-200
+          hover:shadow-xl
+          "
+        >
+
+
+          {/* Background Glow */}
+
+          <div
+            className="
+            absolute
+            -right-10
+            -top-10
+            h-32
+            w-32
+            rounded-full
+            bg-green-100
+            opacity-60
+            blur-3xl
+            transition
+            group-hover:bg-emerald-200
+            "
+          />
+
+
+
+          <div
+            className="
+            relative
+            "
+          >
+
+
+            {/* Icon */}
+
+            <div
+              className="
+              flex
+              h-14
+              w-14
+              items-center
+              justify-center
+              rounded-2xl
+              bg-gradient-to-br
+              from-green-100
+              to-emerald-50
+              "
+            >
+
+              <feature.icon
+                className="
+                h-7
+                w-7
+                text-green-600
+                "
+              />
+
+            </div>
+
+
+
+            <h3
+              className="
+              mt-7
+              text-xl
+              font-bold
+              "
+            >
+
+              {feature.title}
+
+            </h3>
+
+
+
+            <p
+              className="
+              mt-4
+              leading-relaxed
+              text-zinc-600
+              "
+            >
+
+              {feature.description}
+
+            </p>
+
+
+
+            {/* Bottom Value */}
+
+            <div
+              className="
+              mt-6
+              rounded-2xl
+              bg-green-50
+              px-4
+              py-3
+              text-sm
+              font-semibold
+              text-green-700
+              "
+            >
+
+              {feature.value}
+
+            </div>
+
+
+          </div>
+
+
+        </Card>
+
+      ))}
+
+
+    </div>
+
+
+  </div>
+
+</section>
 
 
 
