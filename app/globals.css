@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-
 :root {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
@@ -34,16 +33,13 @@
   --radius: 1rem;
 }
 
-
 * {
   border-color: hsl(var(--border));
 }
 
-
 html {
   scroll-behavior: smooth;
 }
-
 
 body {
   background:
@@ -67,7 +63,6 @@ body {
     sans-serif;
 }
 
-
 /* Premium glass effect */
 
 .glass {
@@ -84,7 +79,6 @@ body {
     0 20px 50px rgba(0,0,0,0.05);
 }
 
-
 /* Trashure gradient */
 
 .trashure-gradient {
@@ -98,7 +92,6 @@ linear-gradient(
 );
 
 }
-
 
 .trashure-button {
 
@@ -114,7 +107,6 @@ color:white;
 transition:all .3s ease;
 
 }
-
 
 .trashure-button:hover {
 
@@ -138,7 +130,6 @@ box-shadow:
   color: transparent;
 }
 
-
 .premium-card {
 
 background:
@@ -154,7 +145,6 @@ backdrop-filter:
 blur(20px);
 
 }
-
 
 .primary-button {
 
@@ -174,7 +164,6 @@ box-shadow:
 
 }
 
-
 .primary-button:hover {
 
 background:
@@ -189,7 +178,6 @@ translateY(-2px);
 
 }
 
-
 .soft-border {
 
 border:
@@ -199,4 +187,13 @@ border:
 
 html {
   scroll-behavior: smooth;
+}
+
+@layer base {
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
 }
