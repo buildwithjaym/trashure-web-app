@@ -158,3 +158,14 @@ using
 bucket_id = 'avatars'
 and auth.uid()::text = (storage.foldername(name))[1]
 );
+
+alter table scans
+add column estimated_weight numeric default 0;
+
+alter table scans
+add column estimated_value numeric default 0;
+
+alter table scans
+add column if not exists category text;
+alter table scans
+add column if not exists action_taken text;
