@@ -16,6 +16,7 @@ import {
   Upload,
 } from "lucide-react";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -99,6 +100,7 @@ export default function Home() {
         >
 
           <div className="flex items-center gap-3">
+            {/* Logo */}
             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-green-50 shadow-sm">
               <img
                 src="/logo.png"
@@ -107,8 +109,15 @@ export default function Home() {
               />
             </div>
 
-            <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-700 bg-clip-text text-2xl font-black tracking-tight text-transparent">
-              TRASHURE
+            {/* Text */}
+            <div className="flex flex-col">
+              <h1 className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-700 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+                TRASHURE
+              </h1>
+
+              <p className="text-sm text-zinc-500">
+                Turn Trash into Treasure
+              </p>
             </div>
           </div>
 
@@ -2192,12 +2201,43 @@ md:flex
 
 
           <div>
-            <h3 className="font-bold text-white">Resources</h3>
+            <h3 className="font-bold text-white">
+              Resources
+            </h3>
+
             <div className="mt-5 space-y-3 text-sm">
-              <p>Documentation</p>
-              <p>Privacy</p>
-              <p>Terms</p>
-              <p>Contact</p>
+
+              <Link
+                href="/documentation"
+                className="block transition hover:text-green-400"
+              >
+                Documentation
+              </Link>
+
+
+              <Link
+                href="/privacy"
+                className="block transition hover:text-green-400"
+              >
+                Privacy
+              </Link>
+
+
+              <Link
+                href="/terms"
+                className="block transition hover:text-green-400"
+              >
+                Terms
+              </Link>
+
+
+              <Link
+                href="/contact"
+                className="block transition hover:text-green-400"
+              >
+                Contact
+              </Link>
+
             </div>
           </div>
 
