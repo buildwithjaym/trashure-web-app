@@ -169,3 +169,70 @@ alter table scans
 add column if not exists category text;
 alter table scans
 add column if not exists action_taken text;
+
+create policy "Users can upload their own scan images"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'trashure-images'
+  AND
+  (storage.foldername(name))[1] = 'scans'
+  AND
+  (storage.foldername(name))[2] = auth.uid()::text
+);
+
+
+create policy "Users can view their own scan images"
+on storage.objects
+for select
+to authenticated
+using (
+
+bucket_id = 'trashure-images'
+
+AND
+
+(
+(storage.foldername(name))[2] = auth.uid()::text
+)
+
+);
+
+create policy "Public can view Trashure images"
+on storage.objects
+for select
+to public
+using (
+
+bucket_id = 'trashure-images'
+
+);
+
+create policy "Users can delete their own scan images"
+on storage.objects
+for delete
+to authenticated
+using (
+
+bucket_id = 'trashure-images'
+
+AND
+
+(storage.foldername(name))[2] = auth.uid()::text
+
+);
+
+create policy "Users can update their own scan images"
+on storage.objects
+for update
+to authenticated
+using (
+
+bucket_id = 'trashure-images'
+
+AND
+
+(storage.foldername(name))[2] = auth.uid()::text
+
+);
