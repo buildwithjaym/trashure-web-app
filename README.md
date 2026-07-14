@@ -8,7 +8,6 @@
 <p align="center">
   <svg width="700" height="220" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
 
-```
 <defs>
   <linearGradient id="green" x1="0" x2="1">
     <stop offset="0%" stop-color="#22c55e"/>
@@ -79,7 +78,7 @@
            dur="4s"
            repeatCount="indefinite"/>
 </circle>
-```
+
 
   </svg>
 </p>
