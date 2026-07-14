@@ -68,6 +68,62 @@ export default function Home() {
   ];
 
 
+  const processSteps = [
+    {
+      number: "01",
+      label: "Capture",
+      title: "Scan the Item",
+      description:
+        "Take a photo or upload an image of the material you want to recover.",
+      detail: "Fast visual input",
+      icon: Camera,
+      numberStyle:
+        "from-emerald-950 via-emerald-700 to-emerald-400 shadow-emerald-950/20",
+      iconStyle: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+      accentStyle: "from-emerald-500 to-teal-400",
+    },
+    {
+      number: "02",
+      label: "Analyze",
+      title: "Identify the Material",
+      description:
+        "Trashure AI detects the item, material type, condition, and recovery potential.",
+      detail: "AI material profile",
+      icon: Brain,
+      numberStyle:
+        "from-slate-950 via-teal-900 to-teal-500 shadow-teal-950/20",
+      iconStyle: "bg-teal-50 text-teal-700 ring-teal-100",
+      accentStyle: "from-teal-500 to-cyan-400",
+    },
+    {
+      number: "03",
+      label: "Decide",
+      title: "Choose the Best Value Path",
+      description:
+        "Receive practical options to reuse, sell, donate, or recycle the material.",
+      detail: "Clear next actions",
+      icon: Coins,
+      numberStyle:
+        "from-amber-800 via-amber-500 to-yellow-300 shadow-amber-900/20",
+      iconStyle: "bg-amber-50 text-amber-700 ring-amber-100",
+      accentStyle: "from-amber-500 to-yellow-300",
+    },
+    {
+      number: "04",
+      label: "Recover",
+      title: "Return It to Circulation",
+      description:
+        "Connect the material to people, partners, or programs that can use it again.",
+      detail: "Less waste, more value",
+      icon: Recycle,
+      numberStyle:
+        "from-green-950 via-green-700 to-lime-500 shadow-green-950/20",
+      iconStyle: "bg-lime-50 text-green-700 ring-lime-100",
+      accentStyle: "from-green-600 to-lime-400",
+    },
+  ];
+
+
   return (
 
     <main className="min-h-screen overflow-hidden bg-white text-zinc-900">
@@ -1080,155 +1136,103 @@ md:flex
 
 
 
+
       {/* How Trashure Works */}
 
-
-
       <section
-        id="works"
-        className="
-        bg-zinc-50
-        py-28
-        "
+        id="how-it-works"
+        className="relative overflow-hidden bg-zinc-950 py-28 text-white"
       >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.10),transparent_28%)]" />
+        <div className="absolute left-1/2 top-0 h-px w-[82%] -translate-x-1/2 bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
 
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div className="text-center">
-
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-              Simple Process
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <Badge className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-emerald-300 shadow-sm shadow-emerald-950/40">
+              <Sparkles className="mr-2 h-4 w-4" />
+              How Trashure Works
             </Badge>
 
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              From a simple scan
-
-              <br />
-
-              to a circular action.
-
+            <h2 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
+              Four clear steps from discarded item
+              <span className="block bg-gradient-to-r from-emerald-300 via-lime-200 to-amber-200 bg-clip-text text-transparent">
+                to recovered value.
+              </span>
             </h2>
 
-
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-300">
+              Trashure identifies what an item is, reveals what value remains,
+              and recommends the most useful circular action so fewer materials
+              are treated as waste.
+            </p>
           </div>
 
+          <div className="relative mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {processSteps.map((item, index) => (
+              <div key={item.number} className="relative">
+                <Card className="group relative h-full overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.06] p-7 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-2 hover:border-white/20 hover:bg-white/[0.09]">
+                  <div
+                    className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accentStyle}`}
+                  />
+                  <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/[0.05] blur-2xl transition duration-300 group-hover:bg-white/[0.09]" />
 
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div
+                      className={`flex h-[74px] w-[74px] shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${item.numberStyle} text-white shadow-xl ring-1 ring-white/20`}
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">
+                        Step
+                      </span>
+                      <span className="mt-0.5 text-3xl font-black leading-none tracking-tight">
+                        {item.number}
+                      </span>
+                    </div>
 
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl ring-1 ${item.iconStyle}`}
+                    >
+                      <item.icon className="h-6 w-6" />
+                    </div>
+                  </div>
 
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            md:grid-cols-4
-            "
-          >
+                  <p className="relative mt-7 text-xs font-bold uppercase tracking-[0.22em] text-emerald-300">
+                    {item.label}
+                  </p>
 
+                  <h3 className="relative mt-3 text-2xl font-bold leading-tight">
+                    {item.title}
+                  </h3>
 
+                  <p className="relative mt-4 leading-relaxed text-zinc-300">
+                    {item.description}
+                  </p>
 
-            {[
-              ["01", "Scan", "Upload a photo of your material."],
-              ["02", "Analyze", "AI identifies the object and material."],
-              ["03", "Discover", "Receive the best recovery options."],
-              ["04", "Recover", "Create environmental impact."]
-            ].map(([number, title, text]) => (
+                  <div className="relative mt-7 flex items-center gap-2 border-t border-white/10 pt-5 text-sm font-medium text-zinc-200">
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full bg-gradient-to-r ${item.accentStyle}`}
+                    />
+                    {item.detail}
+                  </div>
+                </Card>
 
-
-              <Card
-                key={number}
-                className="
-                rounded-[30px]
-                border-none
-                bg-white
-                p-8
-                "
-              >
-
-
-                <span
-                  className="
-                  text-5xl
-                  font-black
-                  text-green-100
-                  "
-                >
-
-                  {number}
-
-                </span>
-
-
-
-                <h3
-                  className="
-                  mt-5
-                  text-xl
-                  font-bold
-                  "
-                >
-
-                  {title}
-
-                </h3>
-
-
-                <p
-                  className="
-                  mt-3
-                  text-zinc-600
-                  "
-                >
-
-                  {text}
-
-                </p>
-
-
-              </Card>
-
-
+                {index < processSteps.length - 1 && (
+                  <div className="absolute -right-4 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-emerald-300/20 bg-zinc-900 text-emerald-300 shadow-lg xl:flex">
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
             ))}
-
-
-
           </div>
 
-
+          <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-400/[0.07] px-6 py-5 text-center sm:flex-row sm:text-left">
+            <Recycle className="h-6 w-6 shrink-0 text-emerald-300" />
+            <p className="text-sm leading-relaxed text-zinc-300">
+              Each completed action keeps useful materials moving through the
+              economy instead of ending their journey in a landfill.
+            </p>
+          </div>
         </div>
-
-
       </section>
-
-
-
 
 
       {/* Circular Economy Actions */}
