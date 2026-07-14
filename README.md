@@ -1,34 +1,127 @@
+
 # ♻️ Trashure: Turn Trash Into Treasure
 
-```{=html}
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/AI-Circular%20Economy-16a34a?style=for-the-badge" />`{=html}
-`<img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" />`{=html}
-`<img src="https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=for-the-badge&logo=supabase" />`{=html}
-`<img src="https://img.shields.io/badge/OpenAI-Vision%20API-412991?style=for-the-badge&logo=openai" />`{=html}
-```{=html}
+  <img src="https://readme-typing-svg.demolab.com?font=Poppins&size=28&duration=3000&pause=800&color=16A34A&center=true&vCenter=true&width=700&lines=AI-Powered+Circular+Economy+Platform;Turning+Waste+Into+Resources;Trash+Still+Has+Value+%F0%9F%8C%B1" alt="Trashure Animated Title"/>
 </p>
-```
-```{=html}
+
 <p align="center">
+  <svg width="700" height="220" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+
 ```
-```{=html}
-<svg width="120" height="120" viewBox="0 0 120 120">
+<defs>
+  <linearGradient id="green" x1="0" x2="1">
+    <stop offset="0%" stop-color="#22c55e"/>
+    <stop offset="100%" stop-color="#15803d"/>
+  </linearGradient>
+
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="4"/>
+  </filter>
+</defs>
+
+<!-- Background -->
+<rect width="700" height="220" rx="30" fill="#f0fdf4"/>
+
+<!-- Animated Earth -->
+<circle cx="350" cy="110" r="65" fill="#dcfce7"/>
+
+<circle cx="350" cy="110" r="50"
+        fill="none"
+        stroke="url(#green)"
+        stroke-width="8"
+        stroke-dasharray="90 20">
+  <animateTransform
+    attributeName="transform"
+    type="rotate"
+    from="0 350 110"
+    to="360 350 110"
+    dur="8s"
+    repeatCount="indefinite"/>
+</circle>
+
+<!-- Trash Bin -->
+<g transform="translate(310 70)">
+  <rect x="15" y="25" width="50" height="65" rx="8" fill="#16a34a"/>
+  <rect x="8" y="18" width="65" height="8" rx="4" fill="#166534"/>
+  <line x1="28" y1="40" x2="28" y2="75" stroke="white" stroke-width="4"/>
+  <line x1="50" y1="40" x2="50" y2="75" stroke="white" stroke-width="4"/>
+</g>
+
+<!-- Leaves -->
+<path d="M250 120 C210 70 160 90 190 140 C220 160 250 120 250 120"
+      fill="#22c55e">
+  <animate attributeName="opacity"
+           values="0.4;1;0.4"
+           dur="3s"
+           repeatCount="indefinite"/>
+</path>
+
+<path d="M450 120 C490 70 540 90 510 140 C480 160 450 120 450 120"
+      fill="#22c55e">
+  <animate attributeName="opacity"
+           values="1;0.4;1"
+           dur="3s"
+           repeatCount="indefinite"/>
+</path>
+
+<!-- Floating particles -->
+<circle cx="150" cy="60" r="5" fill="#86efac">
+  <animate attributeName="cy"
+           values="60;35;60"
+           dur="3s"
+           repeatCount="indefinite"/>
+</circle>
+
+<circle cx="560" cy="70" r="5" fill="#86efac">
+  <animate attributeName="cy"
+           values="70;40;70"
+           dur="4s"
+           repeatCount="indefinite"/>
+</circle>
 ```
-`<circle cx="60" cy="60" r="55" fill="#dcfce7"/>`{=html}
-`<path d="M45 35h30l-5 55H50z" fill="#16a34a"/>`{=html}
-`<path d="M50 35h20M40 30h40" stroke="#166534" stroke-width="6"/>`{=html}
-`<path d="M60 20c10 8 14 15 14 25-14-2-24-10-14-25z" fill="#22c55e"/>`{=html}
-```{=html}
-</svg>
-```
-```{=html}
+
+  </svg>
 </p>
-```
-> **Trashure is an AI-powered circular economy platform that prevents
-> materials from becoming waste by identifying discarded items and
-> recommending their highest-value recovery pathway.**
+
+<p align="center">
+  <b>AI-powered material intelligence platform that discovers the hidden value of discarded materials.</b>
+</p>
+
+<p align="center">
+Instead of asking:
+<br/>
+<b>"Where should I throw this?"</b>
+<br/><br/>
+Trashure asks:
+<br/>
+<b>"What can this material become?"</b>
+</p>
+
+<p align="center">
+<img src="https://img.shields.io/badge/AI-Circular%20Economy-16a34a?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js"/>
+<img src="https://img.shields.io/badge/Supabase-Database-3ecf8e?style=for-the-badge&logo=supabase"/>
+<img src="https://img.shields.io/badge/OpenAI-Vision%20API-412991?style=for-the-badge&logo=openai"/>
+</p>
+
+---
+
+## 🌱 About Trashure
+
+Trashure transforms waste management from a disposal system into a **circular recovery ecosystem**.
+
+The platform uses AI vision technology to identify discarded materials and connect them with the highest-value pathway:
+
+♻️ **Recycle**
+🌱 **Reuse**
+💰 **Sell**
+🤝 **Donate**
+
+Trashure does not simply identify trash.
+
+It discovers what the material can become.
+
 
 ------------------------------------------------------------------------
 
