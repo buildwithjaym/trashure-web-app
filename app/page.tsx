@@ -1,4 +1,8 @@
+
+"use client"
 import {
+  Menu,
+  X,
   ArrowRight,
   BarChart3,
   Brain,
@@ -13,11 +17,14 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 
 export default function Home() {
+
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const problems = [
     {
@@ -91,20 +98,18 @@ export default function Home() {
           "
         >
 
-          <div
-            className="
-            bg-gradient-to-r
-            from-green-500
-            via-emerald-500
-            to-green-700
-            bg-clip-text
-            text-2xl
-            font-black
-            tracking-tight
-            text-transparent
-            "
-          >
-            TRASHURE
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-green-50 shadow-sm">
+              <img
+                src="/logo.png"
+                alt="Trashure Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+
+            <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-700 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+              TRASHURE
+            </div>
           </div>
 
 
@@ -153,23 +158,50 @@ md:flex
           </div>
 
 
-          <Button
-            className="
-            rounded-full
-            bg-gradient-to-r
-            from-green-500
-            to-emerald-700
-            px-8
-            py-6
-            text-white
-            shadow-xl
-            shadow-green-500/30
-            transition
-            hover:-translate-y-1
-            "
-          >
-            Scan Material
-          </Button>
+          <div className="flex items-center gap-3">
+
+            <Button
+              className="
+              hidden
+              rounded-full
+              bg-gradient-to-r
+              from-green-500
+              to-emerald-700
+              px-8
+              py-6
+              text-white
+              shadow-xl
+              shadow-green-500/30
+              transition
+              hover:-translate-y-1
+              sm:flex
+              "
+            >
+              Scan Material
+            </Button>
+
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="rounded-xl p-2 text-green-700 md:hidden"
+            >
+              {mobileOpen ? <X /> : <Menu />}
+            </button>
+
+          </div>
+
+          {mobileOpen && (
+            <div className="absolute left-0 top-full w-full border-t bg-white p-6 shadow-xl md:hidden">
+              <div className="flex flex-col gap-5 text-zinc-700">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#about">About</a>
+                <Button className="rounded-full bg-green-600 text-white">
+                  Scan Material
+                </Button>
+              </div>
+            </div>
+          )}
 
 
         </div>
@@ -387,6 +419,7 @@ md:flex
 
           <Card
             className="
+            animate-[float_6s_ease-in-out_infinite]
             rounded-[32px]
             border-none
             bg-white/80
@@ -2109,98 +2142,82 @@ md:flex
 
       {/* Footer */}
 
-
-
       <footer
         id="about"
-        className="
-        py-14
-        "
+        className="bg-zinc-950 py-16 text-zinc-300"
       >
 
+        <div className="mx-auto grid max-w-7xl gap-12 px-5 md:grid-cols-4 sm:px-8">
 
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          text-center
-          "
-        >
+          <div>
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.png"
+                alt="Trashure"
+                className="h-12 w-12 rounded-xl object-contain bg-white p-1"
+              />
 
+              <h2 className="text-3xl font-black text-green-400">
+                TRASHURE
+              </h2>
+            </div>
 
-          <div
-            className="
-            bg-gradient-to-r
-            from-green-500
-            via-emerald-500
-            to-green-700
-            bg-clip-text
-            text-3xl
-            font-black
-            text-transparent
-            "
-          >
-
-            TRASHURE
-
+            <p className="mt-5 text-sm leading-relaxed text-zinc-400">
+              AI-powered circular economy platform turning discarded materials
+              into valuable resources.
+            </p>
           </div>
 
 
-
-          <p
-            className="
-            mt-4
-            text-zinc-500
-            "
-          >
-
-            Turn Trash Into Treasure
-
-          </p>
+          <div>
+            <h3 className="font-bold text-white">Platform</h3>
+            <div className="mt-5 space-y-3 text-sm">
+              <p>AI Scanner</p>
+              <p>Material Intelligence</p>
+              <p>Partner Network</p>
+              <p>LGU Dashboard</p>
+            </div>
+          </div>
 
 
-
-          <p
-            className="
-            mt-6
-            text-sm
-            text-zinc-400
-            "
-          >
-
-            Designed and Developed by
-
-            <span
-              className="
-              font-semibold
-              text-green-700
-              "
-            >
-
-              {" "}Trashure Innovation Team
-
-            </span>
-
-          </p>
+          <div>
+            <h3 className="font-bold text-white">Community</h3>
+            <div className="mt-5 space-y-3 text-sm">
+              <p>Residents</p>
+              <p>Schools</p>
+              <p>Recyclers</p>
+              <p>LGU Partners</p>
+            </div>
+          </div>
 
 
-
-          <p
-            className="
-            mt-3
-            text-xs
-            text-zinc-400
-            "
-          >
-
-            © 2026 Trashure. AI-powered circular economy platform.
-
-          </p>
-
+          <div>
+            <h3 className="font-bold text-white">Resources</h3>
+            <div className="mt-5 space-y-3 text-sm">
+              <p>Documentation</p>
+              <p>Privacy</p>
+              <p>Terms</p>
+              <p>Contact</p>
+            </div>
+          </div>
 
         </div>
 
+
+        <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-4 border-t border-zinc-800 px-5 pt-8 text-sm sm:px-8 md:flex-row">
+
+          <p>
+            © 2026 Trashure. All rights reserved.
+          </p>
+
+          <p>
+            Developed by
+            <span className="ml-1 font-semibold text-green-400">
+              Jaymar Maruji
+            </span>
+          </p>
+
+        </div>
 
       </footer>
 
