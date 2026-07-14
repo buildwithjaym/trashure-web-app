@@ -14,7 +14,7 @@ import {
   ScanLine,
   Sparkles,
   Upload,
-  
+
 } from "lucide-react";
 
 import Link from "next/link";
@@ -226,25 +226,35 @@ md:flex
 
           <div className="flex items-center gap-3">
 
-            <Button
-              className="
-              hidden
-              rounded-full
-              bg-gradient-to-r
-              from-green-500
-              to-emerald-700
-              px-8
-              py-6
-              text-white
-              shadow-xl
-              shadow-green-500/30
-              transition
-              hover:-translate-y-1
-              sm:flex
-              "
-            >
-              Scan Material
-            </Button>
+            <Link href="/login">
+
+              <Button
+                className="
+hidden
+rounded-full
+bg-gradient-to-r
+from-green-500
+to-emerald-700
+px-8
+py-6
+text-white
+shadow-xl
+shadow-green-500/40
+transition
+hover:-translate-y-1
+hover:shadow-green-500/60
+sm:flex
+"
+              >
+
+                Start Your Journey
+
+                <ArrowRight className="ml-2 h-4 w-4" />
+
+              </Button>
+
+            </Link>
+
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -256,15 +266,64 @@ md:flex
           </div>
 
           {mobileOpen && (
-            <div className="absolute left-0 top-full w-full border-t bg-white p-6 shadow-xl md:hidden">
-              <div className="flex flex-col gap-5 text-zinc-700">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#dashboard">Dashboard</a>
-                <a href="#about">About</a>
-                <Button className="rounded-full bg-green-600 text-white">
-                  Scan Material
-                </Button>
+            <div className="absolute left-0 top-full w-full border-t border-green-100 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:hidden">
+              <div className="flex flex-col gap-6 text-zinc-700">
+                <Link
+                  href="#features"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-base font-medium transition hover:text-green-600"
+                >
+                  Features
+                </Link>
+
+
+                <Link
+                  href="/how-it-works"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-base font-medium transition hover:text-green-600"
+                >
+                  How It Works
+                </Link>
+
+
+                <Link
+                  href="#dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-base font-medium transition hover:text-green-600"
+                >
+                  Dashboard
+                </Link>
+
+
+                <Link
+                  href="#about"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-base font-medium transition hover:text-green-600"
+                >
+                  About
+                </Link>
+                <Link href="/login">
+
+                  <Button
+                    className="
+w-full
+rounded-full
+bg-gradient-to-r
+from-green-500
+to-emerald-700
+py-6
+text-white
+shadow-lg
+shadow-green-500/30
+transition
+hover:-translate-y-1
+"
+                  >
+                    Start Your Journey
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+
+                </Link>
               </div>
             </div>
           )}
@@ -425,50 +484,21 @@ md:flex
             >
 
 
-              <Button
-                className="
-                rounded-full
-                bg-gradient-to-r
-                from-green-500
-                to-emerald-700
-                px-10
-                py-7
-                text-base
-                text-white
-                shadow-xl
-                shadow-green-500/30
-                transition
-                hover:-translate-y-1
-                "
-              >
-
-                <ScanLine className="mr-2" />
-
-                Discover Material Value
-
-              </Button>
+              <Link href="/login">
+  <Button className="group w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-7 py-5 text-sm font-semibold text-white shadow-xl shadow-green-500/30 transition duration-300 hover:-translate-y-1 hover:shadow-green-500/50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
+    <ScanLine className="mr-2 h-4 w-4 transition group-hover:scale-110" />
+    Start Scanning Materials
+  </Button>
+</Link>
 
 
 
-              <Button
-                variant="outline"
-                className="
-                rounded-full
-                border-green-200
-                px-10
-                py-7
-                text-base
-                text-green-700
-                hover:bg-green-50
-                "
-              >
-
-                How It Works
-
-                <ArrowRight className="ml-2" />
-
-              </Button>
-
+              <Link href="/how-it-works">
+  <Button className="group w-full rounded-full border border-green-200 bg-white px-7 py-5 text-sm font-semibold text-green-700 transition duration-300 hover:-translate-y-1 hover:border-green-300 hover:bg-green-50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
+    How It Works
+    <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
+  </Button>
+</Link>
 
             </div>
 
@@ -964,140 +994,140 @@ md:flex
 
       </section>
 
-            {/* Features Section */}
+      {/* Features Section */}
 
-<section
-  id="features"
-  className="
+      <section
+        id="features"
+        className="
   py-28
   bg-white
   "
->
+      >
 
-  <div
-    className="
+        <div
+          className="
     mx-auto
     max-w-7xl
     px-5
     sm:px-8
     "
-  >
+        >
 
-    {/* Header */}
+          {/* Header */}
 
-    <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-3xl text-center">
 
-      <Badge
-        className="
+            <Badge
+              className="
         rounded-full
         bg-green-100
         px-4
         py-2
         text-green-700
         "
-      >
-        Powerful Features
-      </Badge>
+            >
+              Powerful Features
+            </Badge>
 
 
-      <h2
-        className="
+            <h2
+              className="
         mt-6
         text-4xl
         font-bold
         tracking-tight
         sm:text-5xl
         "
-      >
+            >
 
-        Turning everyday waste
+              Turning everyday waste
 
-        <br />
+              <br />
 
-        into intelligent decisions.
+              into intelligent decisions.
 
-      </h2>
+            </h2>
 
 
-      <p
-        className="
+            <p
+              className="
         mt-5
         text-lg
         leading-relaxed
         text-zinc-600
         "
-      >
+            >
 
-        Trashure combines artificial intelligence and circular economy
-        intelligence to help people discover the hidden value of materials
-        before they become waste.
+              Trashure combines artificial intelligence and circular economy
+              intelligence to help people discover the hidden value of materials
+              before they become waste.
 
-      </p>
+            </p>
 
-    </div>
-
-
-
-    {/* Feature Cards */}
+          </div>
 
 
-    <div
-      className="
+
+          {/* Feature Cards */}
+
+
+          <div
+            className="
       mt-14
       grid
       gap-6
       md:grid-cols-2
       lg:grid-cols-4
       "
-    >
+          >
 
 
-      {[
-        {
-          title: "AI Material Scanner",
-          description:
-            "Identify materials instantly through AI-powered recognition and understand their recovery potential.",
-          value:
-            "Know what you have.",
-          icon: Brain,
-        },
+            {[
+              {
+                title: "AI Material Scanner",
+                description:
+                  "Identify materials instantly through AI-powered recognition and understand their recovery potential.",
+                value:
+                  "Know what you have.",
+                icon: Brain,
+              },
 
 
-        {
-          title: "Smart Recovery Paths",
-          description:
-            "Receive recommendations whether materials should be reused, sold, donated, or recycled.",
-          value:
-            "Know what to do next.",
-          icon: Recycle,
-        },
+              {
+                title: "Smart Recovery Paths",
+                description:
+                  "Receive recommendations whether materials should be reused, sold, donated, or recycled.",
+                value:
+                  "Know what to do next.",
+                icon: Recycle,
+              },
 
 
-        {
-          title: "Material Value Discovery",
-          description:
-            "Reveal the economic and environmental value hidden inside discarded materials.",
-          value:
-            "Waste becomes opportunity.",
-          icon: Coins,
-        },
+              {
+                title: "Material Value Discovery",
+                description:
+                  "Reveal the economic and environmental value hidden inside discarded materials.",
+                value:
+                  "Waste becomes opportunity.",
+                icon: Coins,
+              },
 
 
-        {
-          title: "Impact Intelligence",
-          description:
-            "Transform community actions into sustainability insights through meaningful data.",
-          value:
-            "Measure real impact.",
-          icon: BarChart3,
-        },
+              {
+                title: "Impact Intelligence",
+                description:
+                  "Transform community actions into sustainability insights through meaningful data.",
+                value:
+                  "Measure real impact.",
+                icon: BarChart3,
+              },
 
 
-      ].map((feature) => (
+            ].map((feature) => (
 
-        <Card
-          key={feature.title}
-          className="
+              <Card
+                key={feature.title}
+                className="
           group
           relative
           overflow-hidden
@@ -1114,13 +1144,13 @@ md:flex
           hover:border-green-200
           hover:shadow-xl
           "
-        >
+              >
 
 
-          {/* Background Glow */}
+                {/* Background Glow */}
 
-          <div
-            className="
+                <div
+                  className="
             absolute
             -right-10
             -top-10
@@ -1133,21 +1163,21 @@ md:flex
             transition
             group-hover:bg-emerald-200
             "
-          />
+                />
 
 
 
-          <div
-            className="
+                <div
+                  className="
             relative
             "
-          >
+                >
 
 
-            {/* Icon */}
+                  {/* Icon */}
 
-            <div
-              className="
+                  <div
+                    className="
               flex
               h-14
               w-14
@@ -1158,52 +1188,52 @@ md:flex
               from-green-100
               to-emerald-50
               "
-            >
+                  >
 
-              <feature.icon
-                className="
+                    <feature.icon
+                      className="
                 h-7
                 w-7
                 text-green-600
                 "
-              />
+                    />
 
-            </div>
+                  </div>
 
 
 
-            <h3
-              className="
+                  <h3
+                    className="
               mt-7
               text-xl
               font-bold
               "
-            >
+                  >
 
-              {feature.title}
+                    {feature.title}
 
-            </h3>
+                  </h3>
 
 
 
-            <p
-              className="
+                  <p
+                    className="
               mt-4
               leading-relaxed
               text-zinc-600
               "
-            >
+                  >
 
-              {feature.description}
+                    {feature.description}
 
-            </p>
+                  </p>
 
 
 
-            {/* Bottom Value */}
+                  {/* Bottom Value */}
 
-            <div
-              className="
+                  <div
+                    className="
               mt-6
               rounded-2xl
               bg-green-50
@@ -1213,27 +1243,27 @@ md:flex
               font-semibold
               text-green-700
               "
-            >
+                  >
 
-              {feature.value}
+                    {feature.value}
 
-            </div>
+                  </div>
+
+
+                </div>
+
+
+              </Card>
+
+            ))}
 
 
           </div>
 
 
-        </Card>
+        </div>
 
-      ))}
-
-
-    </div>
-
-
-  </div>
-
-</section>
+      </section>
 
 
 
@@ -2493,7 +2523,7 @@ md:flex
                 href="/privacy"
                 className="block transition hover:text-green-400"
               >
-                Privacy
+                Privacy Policy
               </Link>
 
 
