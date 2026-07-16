@@ -50,26 +50,29 @@ interface RecyclerProfile {
 const navigation = [
     {
         name: "Home",
+        mobileName: "Home",
         href: "/profiles/recycler",
         icon: Home,
     },
     {
         name: "Materials",
+        mobileName: "Materials",
         href: "/profiles/recycler/materials",
         icon: PackageSearch,
     },
     {
         name: "Opportunities",
+        mobileName: "Offers",
         href: "/profiles/recycler/opportunities",
         icon: HandCoins,
     },
     {
         name: "Profile",
+        mobileName: "Profile",
         href: "/profiles/recycler/profile",
         icon: User,
     },
 ];
-
 
 function getInitials(name: string) {
     return name
@@ -275,50 +278,16 @@ export default function RecyclerLayout({
 
 
     const profileMenu = (
-    <DropdownMenu>
-        <DropdownMenuTrigger
-            type="button"
-            aria-label="Open account menu"
-            className="flex items-center gap-3 rounded-full border border-green-100 bg-white p-1.5 shadow-sm transition hover:border-green-200 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 lg:pr-3"
-        >
-            {profileLoading ? (
-                <div className="h-10 w-10 animate-pulse rounded-full bg-green-100" />
-            ) : (
-                <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                    <AvatarImage
-                        src={profile?.avatar_url ?? undefined}
-                        alt={profileName}
-                        className="object-cover"
-                    />
-
-                    <AvatarFallback className="bg-gradient-to-br from-green-500 to-emerald-700 text-sm font-bold text-white">
-                        {getInitials(profileName)}
-                    </AvatarFallback>
-                </Avatar>
-            )}
-
-            <div className="hidden min-w-0 text-left lg:block">
-                <p className="max-w-36 truncate text-sm font-bold text-zinc-900">
-                    {profileName}
-                </p>
-
-                <p className="max-w-36 truncate text-xs text-zinc-500">
-                    {profileBarangay}
-                </p>
-            </div>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent
-            align="end"
-            side="bottom"
-            sideOffset={10}
-            className="z-[100] w-64 max-w-[calc(100vw-1rem)] rounded-2xl border border-green-100 bg-white p-2 text-zinc-900 shadow-2xl"
-        >
-            {/* User information */}
-
-            <div className="rounded-xl bg-green-50 p-3">
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-11 w-11 shrink-0 border-2 border-white shadow-sm">
+        <DropdownMenu>
+            <DropdownMenuTrigger
+                type="button"
+                aria-label="Open account menu"
+                className="flex items-center gap-3 rounded-full border border-green-100 bg-white p-1.5 shadow-sm transition hover:border-green-200 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 lg:pr-3"
+            >
+                {profileLoading ? (
+                    <div className="h-10 w-10 animate-pulse rounded-full bg-green-100" />
+                ) : (
+                    <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                         <AvatarImage
                             src={profile?.avatar_url ?? undefined}
                             alt={profileName}
@@ -329,58 +298,92 @@ export default function RecyclerLayout({
                             {getInitials(profileName)}
                         </AvatarFallback>
                     </Avatar>
-
-                    <div className="min-w-0">
-                        <p className="truncate text-sm font-black text-zinc-900">
-                            {profileName}
-                        </p>
-
-                        <p className="mt-0.5 truncate text-xs text-zinc-500">
-                            {profileBarangay}
-                        </p>
-
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-green-600">
-                            Junkshop Partner
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <DropdownMenuSeparator className="my-2" />
-
-            <DropdownMenuItem
-                onClick={() => {
-                    router.push("/profiles/recycler/profile/");
-                }}
-                className="cursor-pointer rounded-xl px-3 py-3 text-sm font-medium text-zinc-700 focus:bg-green-50 focus:text-green-700"
-            >
-                <Store className="mr-3 h-4 w-4 text-green-600" />
-
-                Junkshop profile
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator className="my-2" />
-
-            <DropdownMenuItem
-                disabled={isLoggingOut}
-                onClick={() => {
-                    void logout();
-                }}
-                className="cursor-pointer rounded-xl px-3 py-3 text-sm font-medium text-red-600 focus:bg-red-50 focus:text-red-700"
-            >
-                {isLoggingOut ? (
-                    <Loader2 className="mr-3 h-4 w-4 animate-spin" />
-                ) : (
-                    <LogOut className="mr-3 h-4 w-4" />
                 )}
 
-                {isLoggingOut ? "Logging out..." : "Logout"}
-            </DropdownMenuItem>
-        </DropdownMenuContent>
-    </DropdownMenu>
-);
+                <div className="hidden min-w-0 text-left lg:block">
+                    <p className="max-w-36 truncate text-sm font-bold text-zinc-900">
+                        {profileName}
+                    </p>
+
+                    <p className="max-w-36 truncate text-xs text-zinc-500">
+                        {profileBarangay}
+                    </p>
+                </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent
+                align="end"
+                side="bottom"
+                sideOffset={10}
+                className="z-[100] w-64 max-w-[calc(100vw-1rem)] rounded-2xl border border-green-100 bg-white p-2 text-zinc-900 shadow-2xl"
+            >
+                {/* User information */}
+
+                <div className="rounded-xl bg-green-50 p-3">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-11 w-11 shrink-0 border-2 border-white shadow-sm">
+                            <AvatarImage
+                                src={profile?.avatar_url ?? undefined}
+                                alt={profileName}
+                                className="object-cover"
+                            />
+
+                            <AvatarFallback className="bg-gradient-to-br from-green-500 to-emerald-700 text-sm font-bold text-white">
+                                {getInitials(profileName)}
+                            </AvatarFallback>
+                        </Avatar>
+
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-black text-zinc-900">
+                                {profileName}
+                            </p>
+
+                            <p className="mt-0.5 truncate text-xs text-zinc-500">
+                                {profileBarangay}
+                            </p>
+
+                            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-green-600">
+                                Junkshop Partner
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <DropdownMenuSeparator className="my-2" />
+
+                <DropdownMenuItem
+                    onClick={() => {
+                        router.push("/profiles/recycler/profile/");
+                    }}
+                    className="cursor-pointer rounded-xl px-3 py-3 text-sm font-medium text-zinc-700 focus:bg-green-50 focus:text-green-700"
+                >
+                    <Store className="mr-3 h-4 w-4 text-green-600" />
+
+                    Junkshop profile
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="my-2" />
+
+                <DropdownMenuItem
+                    disabled={isLoggingOut}
+                    onClick={() => {
+                        void logout();
+                    }}
+                    className="cursor-pointer rounded-xl px-3 py-3 text-sm font-medium text-red-600 focus:bg-red-50 focus:text-red-700"
+                >
+                    {isLoggingOut ? (
+                        <Loader2 className="mr-3 h-4 w-4 animate-spin" />
+                    ) : (
+                        <LogOut className="mr-3 h-4 w-4" />
+                    )}
+
+                    {isLoggingOut ? "Logging out..." : "Logout"}
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
     return (
-        <div className="min-h-screen bg-green-50">
+        <div className="min-h-screen w-full overflow-x-hidden bg-green-50">
             {/* Desktop top bar */}
 
             <header className="sticky top-0 z-40 hidden border-b border-green-100 bg-white/85 backdrop-blur-xl md:block">
@@ -437,11 +440,10 @@ export default function RecyclerLayout({
                                                 ? "page"
                                                 : undefined
                                         }
-                                        className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition ${
-                                            active
+                                        className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition ${active
                                                 ? "bg-green-600 text-white shadow-sm shadow-green-600/20"
                                                 : "text-zinc-600 hover:bg-green-50 hover:text-green-700"
-                                        }`}
+                                            }`}
                                     >
                                         <Icon
                                             size={
@@ -500,137 +502,83 @@ export default function RecyclerLayout({
 
             {/* Page content */}
 
-            <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 md:px-8 md:pb-10">
+            <main className="mx-auto w-full min-w-0 max-w-7xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] pt-5 sm:px-6 sm:pt-6 md:px-8 md:pb-10">
                 {children}
             </main>
 
 
             {/* Mobile bottom navigation */}
 
-            <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-green-100 bg-white/95 px-3 py-3 backdrop-blur-xl md:hidden">
-                <div className="mx-auto flex max-w-md items-center justify-between">
-                    {navigation
-                        .slice(
-                            0,
-                            2
-                        )
-                        .map(
-                            (
-                                item
-                            ) => {
-                                const Icon =
-                                    item.icon;
+            <nav
+                aria-label="Recycler mobile navigation"
+                className="fixed inset-x-0 bottom-0 z-50 border-t border-green-100 bg-white/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.07)] backdrop-blur-xl md:hidden"
+            >
+                <div className="mx-auto grid w-full max-w-md grid-cols-5 items-end">
+                    {navigation.slice(0, 2).map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.href);
 
-                                const active =
-                                    isActive(
-                                        item.href
-                                    );
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                aria-current={active ? "page" : undefined}
+                                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 transition active:scale-95 ${active
+                                        ? "bg-green-50 text-green-700"
+                                        : "text-zinc-500"
+                                    }`}
+                            >
+                                <Icon
+                                    className="h-5 w-5 shrink-0"
+                                    strokeWidth={active ? 2.5 : 2}
+                                />
 
+                                <span className="w-full truncate text-center text-[10px] font-semibold leading-tight">
+                                    {item.mobileName}
+                                </span>
+                            </Link>
+                        );
+                    })}
 
-                                return (
-                                    <Link
-                                        key={
-                                            item.href
-                                        }
-                                        href={
-                                            item.href
-                                        }
-                                        aria-current={
-                                            active
-                                                ? "page"
-                                                : undefined
-                                        }
-                                        className={`flex min-w-16 flex-col items-center gap-1 text-[11px] font-medium transition ${
-                                            active
-                                                ? "text-green-600"
-                                                : "text-zinc-500"
-                                        }`}
-                                    >
-                                        <Icon
-                                            size={
-                                                22
-                                            }
-                                            strokeWidth={
-                                                active
-                                                    ? 2.5
-                                                    : 2
-                                            }
-                                        />
+                    <div className="flex min-w-0 flex-col items-center justify-end">
+                        <Link
+                            href="/profiles/recycler/materials?action=add"
+                            aria-label="Add accepted material"
+                            className="-mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-700 text-white shadow-lg shadow-green-500/30 ring-4 ring-white transition active:scale-95 min-[380px]:h-16 min-[380px]:w-16"
+                        >
+                            <Plus className="h-7 w-7" />
+                        </Link>
 
-                                        {
-                                            item.name
-                                        }
-                                    </Link>
-                                );
-                            }
-                        )}
+                        <span className="mt-1 text-[10px] font-semibold leading-tight text-green-700">
+                            Add
+                        </span>
+                    </div>
 
+                    {navigation.slice(2).map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.href);
 
-                    <Link
-                        href="/profiles/recycler/materials?action=add"
-                        aria-label="Add accepted material"
-                        className="relative -mt-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-700 text-white shadow-xl shadow-green-500/40 transition active:scale-95"
-                    >
-                        <Plus
-                            size={
-                                29
-                            }
-                        />
-                    </Link>
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                aria-current={active ? "page" : undefined}
+                                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 transition active:scale-95 ${active
+                                        ? "bg-green-50 text-green-700"
+                                        : "text-zinc-500"
+                                    }`}
+                            >
+                                <Icon
+                                    className="h-5 w-5 shrink-0"
+                                    strokeWidth={active ? 2.5 : 2}
+                                />
 
-
-                    {navigation
-                        .slice(2)
-                        .map(
-                            (
-                                item
-                            ) => {
-                                const Icon =
-                                    item.icon;
-
-                                const active =
-                                    isActive(
-                                        item.href
-                                    );
-
-
-                                return (
-                                    <Link
-                                        key={
-                                            item.href
-                                        }
-                                        href={
-                                            item.href
-                                        }
-                                        aria-current={
-                                            active
-                                                ? "page"
-                                                : undefined
-                                        }
-                                        className={`flex min-w-16 flex-col items-center gap-1 text-[11px] font-medium transition ${
-                                            active
-                                                ? "text-green-600"
-                                                : "text-zinc-500"
-                                        }`}
-                                    >
-                                        <Icon
-                                            size={
-                                                22
-                                            }
-                                            strokeWidth={
-                                                active
-                                                    ? 2.5
-                                                    : 2
-                                            }
-                                        />
-
-                                        {
-                                            item.name
-                                        }
-                                    </Link>
-                                );
-                            }
-                        )}
+                                <span className="w-full truncate text-center text-[10px] font-semibold leading-tight">
+                                    {item.mobileName}
+                                </span>
+                            </Link>
+                        );
+                    })}
                 </div>
             </nav>
         </div>
