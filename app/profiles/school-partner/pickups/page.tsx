@@ -1,8 +1,8 @@
 "use client";
 
-import type { ComponentType, FormEvent } from "react";
+import type { ComponentType, Dispatch, FormEvent, SetStateAction } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   AlertCircle, ArrowRight, BadgeCheck, CalendarDays, Check, CheckCircle2,
   Clock3, Handshake, Inbox, Loader2, MapPin, Phone, RefreshCcw, School,
@@ -90,10 +90,35 @@ const pickupFilters: Array<{ value: PickupFilter; label: string }> = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+function toLocalDateInput(date: Date) {
+  const localDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60_000
+  );
+
+  return localDate.toISOString().slice(0, 10);
+}
+
 function dateAfter(days: number) {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return toLocalDateInput(date);
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message?: unknown }).message === "string"
+  ) {
+    return (error as { message: string }).message;
+  }
+
+  return fallback;
 }
 function emptyPickupForm(partner: SchoolPartner | null): PickupForm {
   return {
@@ -136,7 +161,6 @@ function statusDetails(status: PickupStatus) {
 
 export default function SchoolPartnerPickupsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -146,6 +170,7 @@ export default function SchoolPartnerPickupsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
+  const [responseWarning, setResponseWarning] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<PickupFilter>("all");
   const [createOpen, setCreateOpen] = useState(false);
@@ -154,11 +179,16 @@ export default function SchoolPartnerPickupsPage() {
   const [responsesOpen, setResponsesOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<PickupRequestView | null>(null);
   const [changingId, setChangingId] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{
+    kind: "cancel" | "complete";
+    request: PickupRequestView;
+  } | null>(null);
   const actionHandled = useRef(false);
 
   const loadPage = useCallback(async (silent = false) => {
     silent ? setRefreshing(true) : setLoading(true);
     setPageError(null);
+    setResponseWarning(null);
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) { router.replace("/login"); return; }
@@ -249,10 +279,23 @@ export default function SchoolPartnerPickupsPage() {
             .in("pickup_request_id", requestIds)
             .order("created_at", { ascending: false }),
         ]);
-        if (itemsResult.error) throw itemsResult.error;
-        if (responsesResult.error) throw responsesResult.error;
+        if (itemsResult.error) {
+          throw itemsResult.error;
+        }
+
         itemRows = (itemsResult.data ?? []) as PickupItemRow[];
-        responseRows = (responsesResult.data ?? []) as PickupResponseRow[];
+
+        if (responsesResult.error) {
+          console.warn("Pickup responses could not be loaded:", responsesResult.error);
+          setResponseWarning(
+            getErrorMessage(
+              responsesResult.error,
+              "Recycler responses are temporarily unavailable."
+            )
+          );
+        } else {
+          responseRows = (responsesResult.data ?? []) as PickupResponseRow[];
+        }
       }
 
       const junkshopIds = Array.from(new Set([
@@ -264,8 +307,17 @@ export default function SchoolPartnerPickupsPage() {
         const { data, error } = await supabase.from("junkshops")
           .select("id,junkshop_name,photo_url,barangay,city,province,contact_number,verification_status,is_active")
           .in("id", junkshopIds);
-        if (error) throw error;
-        junkshops = (data ?? []) as Junkshop[];
+        if (error) {
+          console.warn("Recycler profiles could not be loaded:", error);
+          setResponseWarning(
+            getErrorMessage(
+              error,
+              "Recycler profile details are temporarily unavailable."
+            )
+          );
+        } else {
+          junkshops = (data ?? []) as Junkshop[];
+        }
       }
 
       const driveMap = new Map(normalizedDrives.map((d) => [d.id, d]));
@@ -296,7 +348,8 @@ export default function SchoolPartnerPickupsPage() {
       });
       setRequests(normalizedRequests);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to load pickup requests.";
+      const message = getErrorMessage(error, "Unable to load pickup requests.");
+      console.error("Pickup page loading failed:", error);
       setPageError(message);
       if (silent) toast.error(message);
     } finally {
@@ -338,17 +391,31 @@ export default function SchoolPartnerPickupsPage() {
   }, [eligibleDrives, partner, router]);
 
   useEffect(() => {
-    if (loading || actionHandled.current) return;
-    if (searchParams.get("action") === "create") {
-      actionHandled.current = true;
+    if (
+      loading ||
+      actionHandled.current ||
+      typeof window === "undefined"
+    ) {
+      return;
+    }
+
+    actionHandled.current = true;
+
+    const parameters = new URLSearchParams(window.location.search);
+    const action = parameters.get("action");
+
+    if (action === "create") {
       openCreateDialog();
       router.replace("/profiles/school-partner/pickups");
     }
-  }, [loading, openCreateDialog, router, searchParams]);
+  }, [loading, openCreateDialog, router]);
 
   const validateForm = () => {
     if (!selectedDrive) { toast.error("Select a collection drive."); return false; }
     if (!form.preferred_pickup_date) { toast.error("Select the preferred pickup date."); return false; }
+    if (form.preferred_pickup_date < toLocalDateInput(new Date())) {
+      toast.error("The preferred pickup date cannot be in the past."); return false;
+    }
     if (form.preferred_time_start && form.preferred_time_end && form.preferred_time_end <= form.preferred_time_start) {
       toast.error("The end time must be later than the start time."); return false;
     }
@@ -407,7 +474,7 @@ export default function SchoolPartnerPickupsPage() {
     toast.promise(promise, {
       loading: "Publishing pickup request...",
       success: "Pickup request published.",
-      error: (error) => error instanceof Error ? error.message : "Unable to create the pickup request.",
+      error: (error) => getErrorMessage(error, "Unable to create the pickup request."),
     });
 
     try {
@@ -446,7 +513,7 @@ export default function SchoolPartnerPickupsPage() {
     toast.promise(promise, {
       loading: "Selecting recycler...",
       success: "Recycler selected for pickup.",
-      error: (error) => error instanceof Error ? error.message : "Unable to accept the response.",
+      error: (error) => getErrorMessage(error, "Unable to accept the response."),
     });
 
     try {
@@ -477,7 +544,7 @@ export default function SchoolPartnerPickupsPage() {
     toast.promise(promise, {
       loading: "Cancelling pickup request...",
       success: "Pickup request cancelled.",
-      error: (error) => error instanceof Error ? error.message : "Unable to cancel the request.",
+      error: (error) => getErrorMessage(error, "Unable to cancel the request."),
     });
 
     try { await promise; await loadPage(true); }
@@ -497,7 +564,7 @@ export default function SchoolPartnerPickupsPage() {
     toast.promise(promise, {
       loading: "Confirming completed pickup...",
       success: "Pickup marked completed.",
-      error: (error) => error instanceof Error ? error.message : "Unable to complete the pickup.",
+      error: (error) => getErrorMessage(error, "Unable to complete the pickup."),
     });
 
     try { await promise; await loadPage(true); }
@@ -641,12 +708,57 @@ export default function SchoolPartnerPickupsPage() {
           </section>
         )}
 
+        {responseWarning && (
+          <section className="pickup-motion animate-[pickupFadeUp_.38s_ease-out_.12s_both] flex flex-col gap-4 rounded-[24px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+              <Inbox className="h-6 w-6" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-black text-zinc-900">Recycler response data is limited</h2>
+              <p className="mt-1 text-sm leading-6 text-zinc-600">{responseWarning}</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void loadPage(true)}
+              className="w-fit rounded-full border-amber-200 bg-white text-amber-700 hover:bg-amber-100"
+            >
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              Retry
+            </Button>
+          </section>
+        )}
+
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryCard title="Pending" value={pendingCount} description="Requests waiting for recyclers" icon={Clock3} delay={0} />
           <SummaryCard title="Responses" value={responseCount} description="Recycler offers awaiting review" icon={Inbox} delay={50} />
           <SummaryCard title="Accepted" value={acceptedCount} description="Scheduled or confirmed pickups" icon={Handshake} delay={100} />
           <SummaryCard title="Completed" value={completedCount} description="Successful recovery handoffs" icon={CheckCircle2} delay={150} />
         </section>
+
+        {eligibleDrives.length > 0 && (
+          <section className="pickup-motion animate-[pickupFadeUp_.4s_ease-out_.18s_both] flex flex-col gap-4 rounded-[24px] border border-green-200 bg-green-50 p-5 sm:flex-row sm:items-center">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-green-700 shadow-sm">
+              <Weight className="h-6 w-6" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-black text-zinc-900">
+                {eligibleDrives.length} collected batch{eligibleDrives.length === 1 ? "" : "es"} ready
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-zinc-600">
+                {eligibleDrives[0]?.title} has {formatWeight(eligibleDrives[0]?.collected_weight_kg ?? 0)} kg available for pickup coordination.
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={openCreateDialog}
+              className="w-fit rounded-full bg-green-600 hover:bg-green-700"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Create request
+            </Button>
+          </section>
+        )}
 
         <section className="pickup-motion animate-[pickupFadeUp_.4s_ease-out_.2s_both] rounded-[26px] border border-green-100 bg-white p-4 shadow-sm sm:p-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -700,8 +812,8 @@ export default function SchoolPartnerPickupsPage() {
                   animationDelay={`${Math.min(index * 45, 270)}ms`}
                   changing={changingId === request.id}
                   onResponses={() => openResponses(request)}
-                  onCancel={() => void cancelRequest(request)}
-                  onComplete={() => void completeRequest(request)}
+                  onCancel={() => setConfirmAction({ kind: "cancel", request })}
+                  onComplete={() => setConfirmAction({ kind: "complete", request })}
                 />
               ))}
             </div>
@@ -732,6 +844,24 @@ export default function SchoolPartnerPickupsPage() {
           if (selectedRequest) void acceptResponse(selectedRequest, response);
         }}
       />
+
+      <ActionConfirmationDialog
+        action={confirmAction}
+        changing={Boolean(changingId)}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => {
+          if (!confirmAction) return;
+
+          const pendingAction = confirmAction;
+          setConfirmAction(null);
+
+          if (pendingAction.kind === "cancel") {
+            void cancelRequest(pendingAction.request);
+          } else {
+            void completeRequest(pendingAction.request);
+          }
+        }}
+      />
     </>
   );
 }
@@ -742,7 +872,7 @@ function CreatePickupDialog({
   open: boolean;
   saving: boolean;
   form: PickupForm;
-  setForm: React.Dispatch<React.SetStateAction<PickupForm>>;
+  setForm: Dispatch<SetStateAction<PickupForm>>;
   drives: DriveView[];
   selectedDrive: DriveView | null;
   onOpenChange: (open: boolean) => void;
@@ -960,6 +1090,119 @@ function ResponsesDialog({
   );
 }
 
+
+function ActionConfirmationDialog({
+  action,
+  changing,
+  onClose,
+  onConfirm,
+}: {
+  action: {
+    kind: "cancel" | "complete";
+    request: PickupRequestView;
+  } | null;
+  changing: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const isCancel = action?.kind === "cancel";
+
+  return (
+    <Dialog
+      open={Boolean(action)}
+      onOpenChange={(open) => {
+        if (!open && !changing) {
+          onClose();
+        }
+      }}
+    >
+      <DialogContent className="!w-[calc(100vw-1rem)] !max-w-none rounded-[26px] border border-green-200 !bg-white p-0 text-zinc-900 shadow-[0_28px_100px_rgba(0,0,0,0.35)] sm:!w-[min(92vw,520px)]">
+        <DialogHeader className="sr-only">
+          <DialogTitle>
+            {isCancel ? "Cancel pickup request" : "Confirm completed pickup"}
+          </DialogTitle>
+          <DialogDescription>
+            Review this action before applying it to the pickup request.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="p-6 sm:p-7">
+          <div
+            className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
+              isCancel
+                ? "bg-red-50 text-red-600"
+                : "bg-green-50 text-green-700"
+            }`}
+          >
+            {isCancel ? (
+              <XCircle className="h-7 w-7" />
+            ) : (
+              <CheckCircle2 className="h-7 w-7" />
+            )}
+          </div>
+
+          <h2 className="mt-5 text-xl font-black text-zinc-900">
+            {isCancel
+              ? "Cancel this pickup request?"
+              : "Confirm that pickup is complete?"}
+          </h2>
+
+          <p className="mt-2 text-sm leading-6 text-zinc-500">
+            {isCancel
+              ? "The request will stop accepting recycler responses. This keeps the record but changes its status to cancelled."
+              : "Use this only after the selected recycler has collected the materials. The completed weight will be included in the impact report."}
+          </p>
+
+          {action?.request && (
+            <div className="mt-5 rounded-2xl border border-zinc-100 bg-zinc-50 p-4">
+              <p className="font-black text-zinc-900">
+                {action.request.drive?.title ?? "Collection drive"}
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                {formatWeight(action.request.total_weight_kg)} kg · Pickup{" "}
+                {formatDate(action.request.preferred_pickup_date)}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2 border-t border-zinc-100 bg-white px-6 py-4 sm:px-7">
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={changing}
+            onClick={onClose}
+            className="rounded-full"
+          >
+            Keep request
+          </Button>
+
+          <Button
+            type="button"
+            disabled={changing}
+            onClick={onConfirm}
+            className={`rounded-full ${
+              isCancel
+                ? "bg-red-600 hover:bg-red-700"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {changing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : isCancel ? (
+              <XCircle className="mr-2 h-4 w-4" />
+            ) : (
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+            )}
+
+            {isCancel ? "Cancel request" : "Confirm completed"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function SummaryCard({
   title, value, description, icon: Icon, delay,
 }: {
@@ -1025,7 +1268,7 @@ function PickupRequestCard({
       </div>
 
       <div className="p-5">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <InformationRow
             icon={CalendarDays}
             label="Preferred schedule"
@@ -1035,6 +1278,11 @@ function PickupRequestCard({
             icon={MapPin}
             label="Pickup location"
             value={[request.address_line, request.barangay, request.city, request.province].filter(Boolean).join(", ")}
+          />
+          <InformationRow
+            icon={Phone}
+            label="Pickup contact"
+            value={`${request.contact_person} · ${request.contact_number}`}
           />
         </div>
 
@@ -1068,6 +1316,12 @@ function PickupRequestCard({
               <p className="mt-1 truncate text-xs text-zinc-500">
                 {[request.selected_junkshop.barangay, request.selected_junkshop.city].filter(Boolean).join(", ")}
               </p>
+              {request.selected_junkshop.contact_number && (
+                <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-blue-700">
+                  <Phone className="h-3.5 w-3.5" />
+                  {request.selected_junkshop.contact_number}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -1232,6 +1486,7 @@ function TextInput({
       <Input
         id={id}
         type={type}
+        min={type === "date" ? toLocalDateInput(new Date()) : undefined}
         inputMode={inputMode}
         value={value}
         onChange={(event) => onChange(event.target.value)}
