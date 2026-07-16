@@ -51,9 +51,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-/* =========================================================
-   TYPES
-========================================================= */
 
 interface Profile {
     id: string;
@@ -223,9 +220,7 @@ interface PriorityAlert {
 }
 
 
-/* =========================================================
-   FORMATTERS
-========================================================= */
+
 
 const pesoFormatter =
     new Intl.NumberFormat(
@@ -479,9 +474,7 @@ function getFulfillmentLabel(
 }
 
 
-/* =========================================================
-   PRIORITY ALERT
-========================================================= */
+
 
 function getPriorityAlert(
     junkshop: Junkshop,
