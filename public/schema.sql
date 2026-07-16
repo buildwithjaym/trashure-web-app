@@ -3572,3 +3572,982 @@ join pg_namespace as namespace
   on namespace.oid = procedure.pronamespace
 where namespace.nspname = 'public'
   and procedure.proname = 'accept_opportunity_response';
+
+  ----------------------
+
+
+  begin;
+
+create index if not exists material_opportunities_recycler_feed_index
+on public.material_opportunities (
+  material_id,
+  status,
+  created_at desc
+);
+
+create index if not exists opportunity_responses_junkshop_status_index
+on public.opportunity_responses (
+  junkshop_id,
+  status,
+  updated_at desc
+);
+
+
+drop function if exists public.get_recycler_opportunity_dashboard();
+
+create function public.get_recycler_opportunity_dashboard()
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $function$
+declare
+  v_profile_id uuid;
+  v_junkshop public.junkshops%rowtype;
+  v_accepted_material_count integer;
+  v_payload jsonb;
+begin
+  select profile.id
+  into v_profile_id
+  from public.profiles as profile
+  where profile.auth_id = auth.uid()
+    and profile.role = 'recycler_partner'
+  limit 1;
+
+  if v_profile_id is null then
+    raise exception 'Recycler account was not found.'
+      using errcode = '42501';
+  end if;
+
+  select junkshop.*
+  into v_junkshop
+  from public.junkshops as junkshop
+  where junkshop.profile_id = v_profile_id
+  limit 1;
+
+  if not found then
+    return jsonb_build_object(
+      'ready', false,
+      'reason', 'missing_junkshop',
+      'junkshop', null,
+      'accepted_material_count', 0,
+      'stats', jsonb_build_object(
+        'available', 0,
+        'interested', 0,
+        'accepted', 0,
+        'completed', 0
+      ),
+      'opportunities', '[]'::jsonb
+    );
+  end if;
+
+  if v_junkshop.verification_status <> 'approved'
+     or v_junkshop.is_active is not true then
+    return jsonb_build_object(
+      'ready', false,
+      'reason', 'junkshop_unavailable',
+      'junkshop', jsonb_build_object(
+        'id', v_junkshop.id,
+        'junkshop_name', v_junkshop.junkshop_name,
+        'barangay', v_junkshop.barangay,
+        'city', v_junkshop.city,
+        'province', v_junkshop.province,
+        'verification_status', v_junkshop.verification_status,
+        'is_active', v_junkshop.is_active
+      ),
+      'accepted_material_count', 0,
+      'stats', jsonb_build_object(
+        'available', 0,
+        'interested', 0,
+        'accepted', 0,
+        'completed', 0
+      ),
+      'opportunities', '[]'::jsonb
+    );
+  end if;
+
+  select count(*)::integer
+  into v_accepted_material_count
+  from public.junkshop_materials as junkshop_material
+  where junkshop_material.junkshop_id = v_junkshop.id
+    and junkshop_material.is_accepting = true;
+
+  if v_accepted_material_count = 0 then
+    return jsonb_build_object(
+      'ready', false,
+      'reason', 'missing_materials',
+      'junkshop', jsonb_build_object(
+        'id', v_junkshop.id,
+        'junkshop_name', v_junkshop.junkshop_name,
+        'barangay', v_junkshop.barangay,
+        'city', v_junkshop.city,
+        'province', v_junkshop.province,
+        'verification_status', v_junkshop.verification_status,
+        'is_active', v_junkshop.is_active
+      ),
+      'accepted_material_count', 0,
+      'stats', jsonb_build_object(
+        'available', 0,
+        'interested', 0,
+        'accepted', 0,
+        'completed', 0
+      ),
+      'opportunities', '[]'::jsonb
+    );
+  end if;
+
+  with feed as (
+    select
+      opportunity.id,
+      opportunity.resident_profile_id,
+      opportunity.material_id,
+      opportunity.scan_id,
+      material.material_name,
+      material.category,
+      opportunity.estimated_weight_kg,
+      opportunity.material_condition,
+      opportunity.fulfillment_method,
+      opportunity.barangay,
+      opportunity.city,
+      opportunity.province,
+      opportunity.status,
+      opportunity.selected_junkshop_id,
+      opportunity.created_at,
+      opportunity.updated_at,
+
+      junkshop_material.price_per_kg as listed_price_per_kg,
+      junkshop_material.minimum_weight_kg,
+      junkshop_material.accepted_condition,
+      junkshop_material.preparation_instructions,
+
+      response.id as response_id,
+      response.offered_price_per_kg,
+      response.pickup_available,
+      response.message,
+      response.status as response_status,
+      response.created_at as response_created_at,
+      response.updated_at as response_updated_at,
+
+      case
+        when nullif(trim(opportunity.barangay), '') is not null
+         and lower(trim(opportunity.barangay)) =
+             lower(trim(coalesce(v_junkshop.barangay, '')))
+          then 3
+
+        when nullif(trim(opportunity.city), '') is not null
+         and lower(trim(opportunity.city)) =
+             lower(trim(coalesce(v_junkshop.city, '')))
+          then 2
+
+        when nullif(trim(coalesce(opportunity.province, '')), '') is not null
+         and lower(trim(opportunity.province)) =
+             lower(trim(coalesce(v_junkshop.province, '')))
+          then 1
+
+        else 0
+      end as location_score,
+
+      case
+        when opportunity.status = 'completed'
+         and opportunity.selected_junkshop_id = v_junkshop.id
+          then 'completed'
+
+        when opportunity.status = 'accepted'
+         and opportunity.selected_junkshop_id = v_junkshop.id
+          then 'accepted'
+
+        when opportunity.status = 'open'
+         and response.status = 'interested'
+          then 'interested'
+
+        when opportunity.status = 'open'
+          then 'available'
+
+        else null
+      end as bucket,
+
+      case
+        when opportunity.status = 'open'
+         and response.status = 'interested'
+          then 2
+
+        when opportunity.status = 'open'
+          then 1
+
+        when opportunity.status = 'accepted'
+          then 3
+
+        when opportunity.status = 'completed'
+          then 4
+
+        else 5
+      end as sort_group
+
+    from public.material_opportunities as opportunity
+
+    join public.materials as material
+      on material.id = opportunity.material_id
+
+    join public.junkshop_materials as junkshop_material
+      on junkshop_material.material_id = opportunity.material_id
+     and junkshop_material.junkshop_id = v_junkshop.id
+     and junkshop_material.is_accepting = true
+
+    left join public.opportunity_responses as response
+      on response.opportunity_id = opportunity.id
+     and response.junkshop_id = v_junkshop.id
+
+    where
+      opportunity.status = 'open'
+      or (
+        opportunity.selected_junkshop_id = v_junkshop.id
+        and opportunity.status in ('accepted', 'completed')
+      )
+  )
+
+  select jsonb_build_object(
+    'ready', true,
+    'reason', null,
+
+    'junkshop', jsonb_build_object(
+      'id', v_junkshop.id,
+      'junkshop_name', v_junkshop.junkshop_name,
+      'barangay', v_junkshop.barangay,
+      'city', v_junkshop.city,
+      'province', v_junkshop.province,
+      'verification_status', v_junkshop.verification_status,
+      'is_active', v_junkshop.is_active
+    ),
+
+    'accepted_material_count',
+      v_accepted_material_count,
+
+    'stats', jsonb_build_object(
+      'available',
+        (
+          select count(*)::integer
+          from feed
+          where bucket = 'available'
+        ),
+
+      'interested',
+        (
+          select count(*)::integer
+          from feed
+          where bucket = 'interested'
+        ),
+
+      'accepted',
+        (
+          select count(*)::integer
+          from feed
+          where bucket = 'accepted'
+        ),
+
+      'completed',
+        (
+          select count(*)::integer
+          from feed
+          where bucket = 'completed'
+        )
+    ),
+
+    'opportunities',
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', feed.id,
+              'resident_profile_id', feed.resident_profile_id,
+              'material_id', feed.material_id,
+              'scan_id', feed.scan_id,
+              'material_name', feed.material_name,
+              'category', feed.category,
+              'image_url',
+                case
+                  when feed.scan_id is not null
+                    then '/api/opportunities/' ||
+                         feed.id::text ||
+                         '/image'
+                  else null
+                end,
+              'estimated_weight_kg', feed.estimated_weight_kg,
+              'material_condition', feed.material_condition,
+              'fulfillment_method', feed.fulfillment_method,
+              'barangay', feed.barangay,
+              'city', feed.city,
+              'province', feed.province,
+              'status', feed.status,
+              'selected_junkshop_id', feed.selected_junkshop_id,
+              'created_at', feed.created_at,
+              'updated_at', feed.updated_at,
+              'listed_price_per_kg', feed.listed_price_per_kg,
+              'minimum_weight_kg', feed.minimum_weight_kg,
+              'accepted_condition', feed.accepted_condition,
+              'preparation_instructions', feed.preparation_instructions,
+              'location_score', feed.location_score,
+              'match_label',
+                case feed.location_score
+                  when 3 then 'Same barangay'
+                  when 2 then 'Same city'
+                  when 1 then 'Same province'
+                  else 'Other area'
+                end,
+              'estimated_listed_value',
+                feed.estimated_weight_kg *
+                feed.listed_price_per_kg,
+              'bucket', feed.bucket,
+              'response',
+                case
+                  when feed.response_id is null
+                    then null
+                  else jsonb_build_object(
+                    'id', feed.response_id,
+                    'offered_price_per_kg', feed.offered_price_per_kg,
+                    'pickup_available', feed.pickup_available,
+                    'message', feed.message,
+                    'status', feed.response_status,
+                    'created_at', feed.response_created_at,
+                    'updated_at', feed.response_updated_at
+                  )
+                end
+            )
+            order by
+              feed.sort_group,
+              feed.location_score desc,
+              feed.created_at desc
+          )
+          from feed
+          where feed.bucket is not null
+        ),
+        '[]'::jsonb
+      )
+  )
+  into v_payload;
+
+  return v_payload;
+end;
+$function$;
+
+
+drop function if exists public.upsert_recycler_opportunity_response(
+  uuid,
+  numeric,
+  boolean,
+  text
+);
+
+create function public.upsert_recycler_opportunity_response(
+  p_opportunity_id uuid,
+  p_offered_price_per_kg numeric,
+  p_pickup_available boolean,
+  p_message text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $function$
+declare
+  v_profile_id uuid;
+  v_junkshop public.junkshops%rowtype;
+  v_opportunity public.material_opportunities%rowtype;
+  v_material_listing public.junkshop_materials%rowtype;
+  v_response public.opportunity_responses%rowtype;
+begin
+  if p_offered_price_per_kg is null
+     or p_offered_price_per_kg <= 0 then
+    raise exception 'The offered price must be greater than zero.';
+  end if;
+
+  if length(coalesce(p_message, '')) > 250 then
+    raise exception 'The message cannot exceed 250 characters.';
+  end if;
+
+  select profile.id
+  into v_profile_id
+  from public.profiles as profile
+  where profile.auth_id = auth.uid()
+    and profile.role = 'recycler_partner'
+  limit 1;
+
+  if v_profile_id is null then
+    raise exception 'Recycler account was not found.'
+      using errcode = '42501';
+  end if;
+
+  select junkshop.*
+  into v_junkshop
+  from public.junkshops as junkshop
+  where junkshop.profile_id = v_profile_id
+    and junkshop.verification_status = 'approved'
+    and junkshop.is_active = true
+  limit 1;
+
+  if not found then
+    raise exception 'An approved and active junkshop is required.'
+      using errcode = '42501';
+  end if;
+
+  select opportunity.*
+  into v_opportunity
+  from public.material_opportunities as opportunity
+  where opportunity.id = p_opportunity_id
+  for update;
+
+  if not found then
+    raise exception 'Opportunity was not found.'
+      using errcode = 'P0002';
+  end if;
+
+  if v_opportunity.status <> 'open' then
+    raise exception 'Only an open opportunity can receive an offer.';
+  end if;
+
+  select listing.*
+  into v_material_listing
+  from public.junkshop_materials as listing
+  where listing.junkshop_id = v_junkshop.id
+    and listing.material_id = v_opportunity.material_id
+    and listing.is_accepting = true
+  limit 1;
+
+  if not found then
+    raise exception 'Your junkshop does not currently accept this material.'
+      using errcode = '42501';
+  end if;
+
+  if v_opportunity.fulfillment_method = 'pickup'
+     and p_pickup_available is not true then
+    raise exception 'This resident requires pickup. Enable pickup availability before sending the offer.';
+  end if;
+
+  insert into public.opportunity_responses (
+    opportunity_id,
+    junkshop_id,
+    offered_price_per_kg,
+    pickup_available,
+    message,
+    status,
+    created_at,
+    updated_at
+  )
+  values (
+    v_opportunity.id,
+    v_junkshop.id,
+    p_offered_price_per_kg,
+    coalesce(p_pickup_available, false),
+    nullif(trim(coalesce(p_message, '')), ''),
+    'interested',
+    now(),
+    now()
+  )
+  on conflict (
+    opportunity_id,
+    junkshop_id
+  )
+  do update
+  set
+    offered_price_per_kg = excluded.offered_price_per_kg,
+    pickup_available = excluded.pickup_available,
+    message = excluded.message,
+    status = 'interested',
+    updated_at = now()
+  returning *
+  into v_response;
+
+  return jsonb_build_object(
+    'id', v_response.id,
+    'opportunity_id', v_response.opportunity_id,
+    'junkshop_id', v_response.junkshop_id,
+    'offered_price_per_kg', v_response.offered_price_per_kg,
+    'pickup_available', v_response.pickup_available,
+    'message', v_response.message,
+    'status', v_response.status,
+    'created_at', v_response.created_at,
+    'updated_at', v_response.updated_at
+  );
+end;
+$function$;
+
+
+drop function if exists public.withdraw_recycler_opportunity_response(uuid);
+
+create function public.withdraw_recycler_opportunity_response(
+  p_opportunity_id uuid
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $function$
+declare
+  v_profile_id uuid;
+  v_junkshop_id uuid;
+  v_opportunity_status text;
+  v_response public.opportunity_responses%rowtype;
+begin
+  select profile.id
+  into v_profile_id
+  from public.profiles as profile
+  where profile.auth_id = auth.uid()
+    and profile.role = 'recycler_partner'
+  limit 1;
+
+  if v_profile_id is null then
+    raise exception 'Recycler account was not found.'
+      using errcode = '42501';
+  end if;
+
+  select junkshop.id
+  into v_junkshop_id
+  from public.junkshops as junkshop
+  where junkshop.profile_id = v_profile_id
+    and junkshop.verification_status = 'approved'
+    and junkshop.is_active = true
+  limit 1;
+
+  if v_junkshop_id is null then
+    raise exception 'An approved and active junkshop is required.'
+      using errcode = '42501';
+  end if;
+
+  select opportunity.status
+  into v_opportunity_status
+  from public.material_opportunities as opportunity
+  where opportunity.id = p_opportunity_id
+  for update;
+
+  if not found then
+    raise exception 'Opportunity was not found.'
+      using errcode = 'P0002';
+  end if;
+
+  if v_opportunity_status <> 'open' then
+    raise exception 'Only responses to open opportunities can be withdrawn.';
+  end if;
+
+  update public.opportunity_responses
+  set
+    status = 'withdrawn',
+    updated_at = now()
+  where opportunity_id = p_opportunity_id
+    and junkshop_id = v_junkshop_id
+    and status = 'interested'
+  returning *
+  into v_response;
+
+  if not found then
+    raise exception 'No active response was found.'
+      using errcode = 'P0002';
+  end if;
+
+  return jsonb_build_object(
+    'id', v_response.id,
+    'opportunity_id', v_response.opportunity_id,
+    'status', v_response.status,
+    'updated_at', v_response.updated_at
+  );
+end;
+$function$;
+
+
+revoke all
+on function public.get_recycler_opportunity_dashboard()
+from public;
+
+revoke all
+on function public.upsert_recycler_opportunity_response(
+  uuid,
+  numeric,
+  boolean,
+  text
+)
+from public;
+
+revoke all
+on function public.withdraw_recycler_opportunity_response(uuid)
+from public;
+
+
+grant execute
+on function public.get_recycler_opportunity_dashboard()
+to authenticated;
+
+grant execute
+on function public.upsert_recycler_opportunity_response(
+  uuid,
+  numeric,
+  boolean,
+  text
+)
+to authenticated;
+
+grant execute
+on function public.withdraw_recycler_opportunity_response(uuid)
+to authenticated;
+
+commit;
+
+notify pgrst, 'reload schema';
+
+
+--------------------------=====-====-=-=-=-=========-
+begin;
+
+/*
+ * Replace only the recycler dashboard feed.
+ * Existing response RPC functions can remain unchanged.
+ *
+ * The feed now returns every open resident opportunity.
+ * Exact material matches are still the only records that can receive an offer.
+ */
+
+drop function if exists public.get_recycler_opportunity_dashboard();
+
+create function public.get_recycler_opportunity_dashboard()
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $function$
+declare
+  v_profile_id uuid;
+  v_junkshop public.junkshops%rowtype;
+  v_accepted_material_count integer;
+  v_payload jsonb;
+begin
+  select profile.id
+  into v_profile_id
+  from public.profiles as profile
+  where profile.auth_id = auth.uid()
+    and profile.role = 'recycler_partner'
+  limit 1;
+
+  if v_profile_id is null then
+    raise exception 'Recycler account was not found.'
+      using errcode = '42501';
+  end if;
+
+  select junkshop.*
+  into v_junkshop
+  from public.junkshops as junkshop
+  where junkshop.profile_id = v_profile_id
+  limit 1;
+
+  if not found then
+    return jsonb_build_object(
+      'ready', false,
+      'reason', 'missing_junkshop',
+      'junkshop', null,
+      'accepted_material_count', 0,
+      'stats', jsonb_build_object(
+        'available', 0,
+        'interested', 0,
+        'accepted', 0,
+        'completed', 0
+      ),
+      'opportunities', '[]'::jsonb
+    );
+  end if;
+
+  if v_junkshop.verification_status <> 'approved'
+     or v_junkshop.is_active is not true then
+    return jsonb_build_object(
+      'ready', false,
+      'reason', 'junkshop_unavailable',
+      'junkshop', jsonb_build_object(
+        'id', v_junkshop.id,
+        'junkshop_name', v_junkshop.junkshop_name,
+        'barangay', v_junkshop.barangay,
+        'city', v_junkshop.city,
+        'province', v_junkshop.province,
+        'verification_status', v_junkshop.verification_status,
+        'is_active', v_junkshop.is_active
+      ),
+      'accepted_material_count', 0,
+      'stats', jsonb_build_object(
+        'available', 0,
+        'interested', 0,
+        'accepted', 0,
+        'completed', 0
+      ),
+      'opportunities', '[]'::jsonb
+    );
+  end if;
+
+  select count(*)::integer
+  into v_accepted_material_count
+  from public.junkshop_materials as junkshop_material
+  where junkshop_material.junkshop_id = v_junkshop.id
+    and junkshop_material.is_accepting = true;
+
+  with feed as (
+    select
+      opportunity.id,
+      opportunity.resident_profile_id,
+      opportunity.material_id,
+      opportunity.scan_id,
+      material.material_name,
+      material.category,
+      opportunity.estimated_weight_kg,
+      opportunity.material_condition,
+      opportunity.fulfillment_method,
+      opportunity.barangay,
+      opportunity.city,
+      opportunity.province,
+      opportunity.status,
+      opportunity.selected_junkshop_id,
+      opportunity.created_at,
+      opportunity.updated_at,
+
+      exact_listing.price_per_kg as listed_price_per_kg,
+      exact_listing.minimum_weight_kg,
+      exact_listing.accepted_condition,
+      exact_listing.preparation_instructions,
+
+      response.id as response_id,
+      response.offered_price_per_kg,
+      response.pickup_available,
+      response.message,
+      response.status as response_status,
+      response.created_at as response_created_at,
+      response.updated_at as response_updated_at,
+
+      (exact_listing.id is not null) as exact_material_match,
+
+      exists (
+        select 1
+        from public.junkshop_materials as category_listing
+        join public.materials as accepted_material
+          on accepted_material.id = category_listing.material_id
+        where category_listing.junkshop_id = v_junkshop.id
+          and category_listing.is_accepting = true
+          and lower(trim(accepted_material.category)) =
+              lower(trim(material.category))
+      ) as same_category_match,
+
+      case
+        when exact_listing.id is not null then 'exact'
+        when exists (
+          select 1
+          from public.junkshop_materials as category_listing
+          join public.materials as accepted_material
+            on accepted_material.id = category_listing.material_id
+          where category_listing.junkshop_id = v_junkshop.id
+            and category_listing.is_accepting = true
+            and lower(trim(accepted_material.category)) =
+                lower(trim(material.category))
+        ) then 'category'
+        else 'unconfigured'
+      end as match_type,
+
+      case
+        when exact_listing.id is not null
+         and opportunity.status = 'open'
+          then true
+        else false
+      end as can_respond,
+
+      case
+        when nullif(trim(opportunity.barangay), '') is not null
+         and lower(trim(opportunity.barangay)) =
+             lower(trim(coalesce(v_junkshop.barangay, '')))
+          then 3
+        when nullif(trim(opportunity.city), '') is not null
+         and lower(trim(opportunity.city)) =
+             lower(trim(coalesce(v_junkshop.city, '')))
+          then 2
+        when nullif(trim(coalesce(opportunity.province, '')), '') is not null
+         and lower(trim(opportunity.province)) =
+             lower(trim(coalesce(v_junkshop.province, '')))
+          then 1
+        else 0
+      end as location_score,
+
+      case
+        when opportunity.status = 'completed'
+         and opportunity.selected_junkshop_id = v_junkshop.id
+          then 'completed'
+        when opportunity.status = 'accepted'
+         and opportunity.selected_junkshop_id = v_junkshop.id
+          then 'accepted'
+        when opportunity.status = 'open'
+         and response.status = 'interested'
+          then 'interested'
+        when opportunity.status = 'open'
+          then 'available'
+        else null
+      end as bucket,
+
+      case
+        when exact_listing.id is not null then 3
+        when exists (
+          select 1
+          from public.junkshop_materials as category_listing
+          join public.materials as accepted_material
+            on accepted_material.id = category_listing.material_id
+          where category_listing.junkshop_id = v_junkshop.id
+            and category_listing.is_accepting = true
+            and lower(trim(accepted_material.category)) =
+                lower(trim(material.category))
+        ) then 2
+        else 1
+      end as material_match_score
+
+    from public.material_opportunities as opportunity
+
+    join public.materials as material
+      on material.id = opportunity.material_id
+
+    left join public.junkshop_materials as exact_listing
+      on exact_listing.material_id = opportunity.material_id
+     and exact_listing.junkshop_id = v_junkshop.id
+     and exact_listing.is_accepting = true
+
+    left join public.opportunity_responses as response
+      on response.opportunity_id = opportunity.id
+     and response.junkshop_id = v_junkshop.id
+
+    where
+      opportunity.status = 'open'
+      or (
+        opportunity.selected_junkshop_id = v_junkshop.id
+        and opportunity.status in ('accepted', 'completed')
+      )
+  )
+
+  select jsonb_build_object(
+    'ready', true,
+    'reason', null,
+
+    'junkshop', jsonb_build_object(
+      'id', v_junkshop.id,
+      'junkshop_name', v_junkshop.junkshop_name,
+      'barangay', v_junkshop.barangay,
+      'city', v_junkshop.city,
+      'province', v_junkshop.province,
+      'verification_status', v_junkshop.verification_status,
+      'is_active', v_junkshop.is_active
+    ),
+
+    'accepted_material_count', v_accepted_material_count,
+
+    'stats', jsonb_build_object(
+      'available', (
+        select count(*)::integer
+        from feed
+        where bucket = 'available'
+      ),
+      'interested', (
+        select count(*)::integer
+        from feed
+        where bucket = 'interested'
+      ),
+      'accepted', (
+        select count(*)::integer
+        from feed
+        where bucket = 'accepted'
+      ),
+      'completed', (
+        select count(*)::integer
+        from feed
+        where bucket = 'completed'
+      )
+    ),
+
+    'opportunities', coalesce(
+      (
+        select jsonb_agg(
+          jsonb_build_object(
+            'id', feed.id,
+            'resident_profile_id', feed.resident_profile_id,
+            'material_id', feed.material_id,
+            'scan_id', feed.scan_id,
+            'material_name', feed.material_name,
+            'category', feed.category,
+            'image_url', case
+              when feed.scan_id is not null
+                then '/api/opportunities/' || feed.id::text || '/image'
+              else null
+            end,
+            'estimated_weight_kg', feed.estimated_weight_kg,
+            'material_condition', feed.material_condition,
+            'fulfillment_method', feed.fulfillment_method,
+            'barangay', feed.barangay,
+            'city', feed.city,
+            'province', feed.province,
+            'status', feed.status,
+            'selected_junkshop_id', feed.selected_junkshop_id,
+            'created_at', feed.created_at,
+            'updated_at', feed.updated_at,
+
+            'listed_price_per_kg', feed.listed_price_per_kg,
+            'minimum_weight_kg', feed.minimum_weight_kg,
+            'accepted_condition', feed.accepted_condition,
+            'preparation_instructions', feed.preparation_instructions,
+
+            'exact_material_match', feed.exact_material_match,
+            'same_category_match', feed.same_category_match,
+            'match_type', feed.match_type,
+            'material_match_score', feed.material_match_score,
+            'can_respond', feed.can_respond,
+
+            'location_score', feed.location_score,
+            'match_label', case feed.location_score
+              when 3 then 'Same barangay'
+              when 2 then 'Same city'
+              when 1 then 'Same province'
+              else 'Other area'
+            end,
+
+            'estimated_listed_value', case
+              when feed.listed_price_per_kg is null then null
+              else feed.estimated_weight_kg * feed.listed_price_per_kg
+            end,
+
+            'bucket', feed.bucket,
+
+            'response', case
+              when feed.response_id is null then null
+              else jsonb_build_object(
+                'id', feed.response_id,
+                'offered_price_per_kg', feed.offered_price_per_kg,
+                'pickup_available', feed.pickup_available,
+                'message', feed.message,
+                'status', feed.response_status,
+                'created_at', feed.response_created_at,
+                'updated_at', feed.response_updated_at
+              )
+            end
+          )
+          order by
+            feed.material_match_score desc,
+            feed.location_score desc,
+            feed.created_at desc
+        )
+        from feed
+        where feed.bucket is not null
+      ),
+      '[]'::jsonb
+    )
+  )
+  into v_payload;
+
+  return v_payload;
+end;
+$function$;
+
+revoke all
+on function public.get_recycler_opportunity_dashboard()
+from public;
+
+grant execute
+on function public.get_recycler_opportunity_dashboard()
+to authenticated;
+
+commit;
+
+notify pgrst, 'reload schema';
