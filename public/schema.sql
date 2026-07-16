@@ -1618,3 +1618,779 @@ do update set
 
 
 commit;
+
+
+---------------------
+
+create table if not exists public.schools (
+    id uuid primary key default gen_random_uuid(),
+
+    profile_id uuid not null unique
+        references public.profiles(id)
+        on delete cascade,
+
+    school_name text not null,
+    school_type text,
+    school_id_number text,
+    description text,
+    photo_url text,
+
+    address_line text not null,
+    barangay text,
+    city text,
+    province text,
+    postal_code text,
+
+    contact_number text,
+    contact_email text,
+
+    recycling_coordinator text,
+    program_contact_number text,
+    collection_area text,
+    collection_days text[] not null default '{}',
+
+    verification_status text not null default 'pending'
+        check (
+            verification_status in (
+                'pending',
+                'approved',
+                'rejected',
+                'suspended'
+            )
+        ),
+
+    is_active boolean not null default true,
+
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+
+alter table public.schools enable row level security;
+
+grant select, insert, update
+on public.schools
+to authenticated;
+
+
+create policy "School partners read own school"
+on public.schools
+for select
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where profiles.id = schools.profile_id
+          and profiles.auth_id = auth.uid()
+          and profiles.role = 'school_partner'
+    )
+);
+
+
+create policy "School partners create own school"
+on public.schools
+for insert
+to authenticated
+with check (
+    exists (
+        select 1
+        from public.profiles
+        where profiles.id = schools.profile_id
+          and profiles.auth_id = auth.uid()
+          and profiles.role = 'school_partner'
+    )
+);
+
+
+create policy "School partners update own school"
+on public.schools
+for update
+to authenticated
+using (
+    exists (
+        select 1
+        from public.profiles
+        where profiles.id = schools.profile_id
+          and profiles.auth_id = auth.uid()
+          and profiles.role = 'school_partner'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.profiles
+        where profiles.id = schools.profile_id
+          and profiles.auth_id = auth.uid()
+          and profiles.role = 'school_partner'
+    )
+);
+
+
+create policy "Authenticated users view approved schools"
+on public.schools
+for select
+to authenticated
+using (
+    verification_status = 'approved'
+    and is_active = true
+);
+
+-- Allow authenticated school partners to upload only inside:
+-- partner-images/school-partners/{their-auth-id}/file.webp
+
+drop policy if exists
+"School partners upload own organization images"
+on storage.objects;
+
+create policy
+"School partners upload own organization images"
+on storage.objects
+for insert
+to authenticated
+with check (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] = 'school-partners'
+    and (storage.foldername(name))[2] = auth.uid()::text
+);
+
+
+drop policy if exists
+"School partners view own organization images"
+on storage.objects;
+
+create policy
+"School partners view own organization images"
+on storage.objects
+for select
+to authenticated
+using (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] = 'school-partners'
+    and (storage.foldername(name))[2] = auth.uid()::text
+);
+
+
+drop policy if exists
+"School partners delete own organization images"
+on storage.objects;
+
+create policy
+"School partners delete own organization images"
+on storage.objects
+for delete
+to authenticated
+using (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] = 'school-partners'
+    and (storage.foldername(name))[2] = auth.uid()::text
+);
+
+create table public.school_drives (
+    id uuid primary key default gen_random_uuid(),
+
+    school_partner_id uuid not null
+        references public.school_partners(id)
+        on delete cascade,
+
+    title text not null,
+    description text,
+
+    start_date date not null,
+    end_date date not null,
+
+    target_weight_kg numeric(10,2)
+        check (
+            target_weight_kg is null
+            or target_weight_kg > 0
+        ),
+
+    collection_location text not null,
+    photo_url text,
+
+    status text not null default 'draft'
+        check (
+            status in (
+                'draft',
+                'active',
+                'completed',
+                'cancelled'
+            )
+        ),
+
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+
+    constraint school_drives_date_check
+        check (end_date >= start_date)
+);
+
+create index school_drives_partner_status_index
+on public.school_drives (
+    school_partner_id,
+    status
+);
+
+create table public.school_drive_materials (
+    id uuid primary key default gen_random_uuid(),
+
+    drive_id uuid not null
+        references public.school_drives(id)
+        on delete cascade,
+
+    material_id uuid not null
+        references public.materials(id)
+        on delete restrict,
+
+    created_at timestamptz not null default now(),
+
+    unique (
+        drive_id,
+        material_id
+    )
+);
+
+create index school_drive_materials_drive_index
+on public.school_drive_materials (
+    drive_id
+);
+
+create table public.school_collection_entries (
+    id uuid primary key default gen_random_uuid(),
+
+    drive_id uuid not null
+        references public.school_drives(id)
+        on delete cascade,
+
+    material_id uuid not null
+        references public.materials(id)
+        on delete restrict,
+
+    source_name text not null,
+
+    weight_kg numeric(10,2) not null
+        check (weight_kg > 0),
+
+    notes text,
+    photo_url text,
+
+    collected_at timestamptz not null default now(),
+
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
+create index school_collection_entries_drive_index
+on public.school_collection_entries (
+    drive_id,
+    collected_at desc
+);
+
+alter table public.school_drives
+enable row level security;
+
+alter table public.school_drive_materials
+enable row level security;
+
+alter table public.school_collection_entries
+enable row level security;
+
+
+grant select, insert, update, delete
+on public.school_drives
+to authenticated;
+
+grant select, insert, update, delete
+on public.school_drive_materials
+to authenticated;
+
+grant select, insert, update, delete
+on public.school_collection_entries
+to authenticated;
+
+
+create policy "School partners manage own drives"
+on public.school_drives
+for all
+to authenticated
+using (
+    exists (
+        select 1
+        from public.school_partners sp
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sp.id = school_drives.school_partner_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.school_partners sp
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sp.id = school_drives.school_partner_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+);
+
+
+
+
+create policy "School partners manage materials in own drives"
+on public.school_drive_materials
+for all
+to authenticated
+using (
+    exists (
+        select 1
+        from public.school_drives sd
+        join public.school_partners sp
+            on sp.id = sd.school_partner_id
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sd.id = school_drive_materials.drive_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.school_drives sd
+        join public.school_partners sp
+            on sp.id = sd.school_partner_id
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sd.id = school_drive_materials.drive_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+);
+
+create policy "School partners manage entries in own drives"
+on public.school_collection_entries
+for all
+to authenticated
+using (
+    exists (
+        select 1
+        from public.school_drives sd
+        join public.school_partners sp
+            on sp.id = sd.school_partner_id
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sd.id = school_collection_entries.drive_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+)
+with check (
+    exists (
+        select 1
+        from public.school_drives sd
+        join public.school_partners sp
+            on sp.id = sd.school_partner_id
+        join public.profiles p
+            on p.id = sp.profile_id
+        where sd.id = school_collection_entries.drive_id
+          and p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+);
+
+
+
+drop policy if exists "School partners upload drive images"
+on storage.objects;
+
+create policy "School partners upload drive images"
+on storage.objects
+for insert
+to authenticated
+with check (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] in ('school-drives', 'school-collections')
+    and (storage.foldername(name))[2] = auth.uid()::text
+    and exists (
+        select 1
+        from public.profiles p
+        where p.auth_id = auth.uid()
+          and p.role = 'school_partner'
+    )
+);
+
+-- Read own files through authenticated Storage API calls.
+drop policy if exists "School partners read own drive images"
+on storage.objects;
+
+create policy "School partners read own drive images"
+on storage.objects
+for select
+to authenticated
+using (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] in ('school-drives', 'school-collections')
+    and (storage.foldername(name))[2] = auth.uid()::text
+);
+
+-- Remove replaced images.
+drop policy if exists "School partners delete own drive images"
+on storage.objects;
+
+create policy "School partners delete own drive images"
+on storage.objects
+for delete
+to authenticated
+using (
+    bucket_id = 'partner-images'
+    and (storage.foldername(name))[1] in ('school-drives', 'school-collections')
+    and (storage.foldername(name))[2] = auth.uid()::text
+);
+
+
+
+------------------------
+
+
+begin;
+
+create table if not exists public.school_pickup_requests (
+    id uuid primary key default gen_random_uuid(),
+    school_partner_id uuid not null references public.school_partners(id) on delete cascade,
+    drive_id uuid not null references public.school_drives(id) on delete restrict,
+    preferred_pickup_date date not null,
+    preferred_time_start time,
+    preferred_time_end time,
+    address_line text not null,
+    barangay text not null,
+    city text not null,
+    province text,
+    postal_code text,
+    contact_person text not null,
+    contact_number text not null,
+    notes text,
+    status text not null default 'pending'
+      check (status in ('pending','accepted','completed','cancelled')),
+    selected_junkshop_id uuid references public.junkshops(id) on delete set null,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    constraint school_pickup_time_check check (
+      preferred_time_start is null
+      or preferred_time_end is null
+      or preferred_time_end > preferred_time_start
+    )
+);
+
+create table if not exists public.school_pickup_items (
+    id uuid primary key default gen_random_uuid(),
+    pickup_request_id uuid not null references public.school_pickup_requests(id) on delete cascade,
+    material_id uuid not null references public.materials(id) on delete restrict,
+    estimated_weight_kg numeric(10,2) not null check (estimated_weight_kg > 0),
+    created_at timestamptz not null default now(),
+    unique (pickup_request_id, material_id)
+);
+
+create table if not exists public.school_pickup_responses (
+    id uuid primary key default gen_random_uuid(),
+    pickup_request_id uuid not null references public.school_pickup_requests(id) on delete cascade,
+    junkshop_id uuid not null references public.junkshops(id) on delete cascade,
+    proposed_pickup_date date,
+    pickup_available boolean not null default true,
+    message text,
+    status text not null default 'interested'
+      check (status in ('interested','accepted','declined','withdrawn')),
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    unique (pickup_request_id, junkshop_id)
+);
+
+create index if not exists school_pickup_requests_partner_status_index
+on public.school_pickup_requests (school_partner_id, status, created_at desc);
+
+create index if not exists school_pickup_requests_selected_junkshop_index
+on public.school_pickup_requests (selected_junkshop_id, status);
+
+create index if not exists school_pickup_items_request_index
+on public.school_pickup_items (pickup_request_id);
+
+create index if not exists school_pickup_items_material_index
+on public.school_pickup_items (material_id);
+
+create index if not exists school_pickup_responses_request_index
+on public.school_pickup_responses (pickup_request_id, status);
+
+create index if not exists school_pickup_responses_junkshop_index
+on public.school_pickup_responses (junkshop_id, status);
+
+alter table public.school_pickup_requests enable row level security;
+alter table public.school_pickup_items enable row level security;
+alter table public.school_pickup_responses enable row level security;
+
+grant select, insert, update on public.school_pickup_requests to authenticated;
+grant select, insert on public.school_pickup_items to authenticated;
+grant select, insert, update on public.school_pickup_responses to authenticated;
+
+-- School partner request policies
+
+drop policy if exists "School partners view own pickup requests" on public.school_pickup_requests;
+create policy "School partners view own pickup requests"
+on public.school_pickup_requests for select to authenticated
+using (
+  exists (
+    select 1
+    from public.school_partners sp
+    join public.profiles p on p.id = sp.profile_id
+    where sp.id = school_pickup_requests.school_partner_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+drop policy if exists "School partners create own pickup requests" on public.school_pickup_requests;
+create policy "School partners create own pickup requests"
+on public.school_pickup_requests for insert to authenticated
+with check (
+  status = 'pending'
+  and selected_junkshop_id is null
+  and exists (
+    select 1
+    from public.school_partners sp
+    join public.profiles p on p.id = sp.profile_id
+    where sp.id = school_pickup_requests.school_partner_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+drop policy if exists "School partners update own pickup requests" on public.school_pickup_requests;
+create policy "School partners update own pickup requests"
+on public.school_pickup_requests for update to authenticated
+using (
+  exists (
+    select 1
+    from public.school_partners sp
+    join public.profiles p on p.id = sp.profile_id
+    where sp.id = school_pickup_requests.school_partner_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+)
+with check (
+  status in ('pending','accepted','completed','cancelled')
+  and exists (
+    select 1
+    from public.school_partners sp
+    join public.profiles p on p.id = sp.profile_id
+    where sp.id = school_pickup_requests.school_partner_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+-- School partner item policies
+
+drop policy if exists "School partners view own pickup items" on public.school_pickup_items;
+create policy "School partners view own pickup items"
+on public.school_pickup_items for select to authenticated
+using (
+  exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.school_partners sp on sp.id = spr.school_partner_id
+    join public.profiles p on p.id = sp.profile_id
+    where spr.id = school_pickup_items.pickup_request_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+drop policy if exists "School partners create own pickup items" on public.school_pickup_items;
+create policy "School partners create own pickup items"
+on public.school_pickup_items for insert to authenticated
+with check (
+  exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.school_partners sp on sp.id = spr.school_partner_id
+    join public.profiles p on p.id = sp.profile_id
+    where spr.id = school_pickup_items.pickup_request_id
+      and spr.status = 'pending'
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+-- School partner response policies
+
+drop policy if exists "School partners view responses to own pickups" on public.school_pickup_responses;
+create policy "School partners view responses to own pickups"
+on public.school_pickup_responses for select to authenticated
+using (
+  exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.school_partners sp on sp.id = spr.school_partner_id
+    join public.profiles p on p.id = sp.profile_id
+    where spr.id = school_pickup_responses.pickup_request_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+drop policy if exists "School partners decide pickup responses" on public.school_pickup_responses;
+create policy "School partners decide pickup responses"
+on public.school_pickup_responses for update to authenticated
+using (
+  exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.school_partners sp on sp.id = spr.school_partner_id
+    join public.profiles p on p.id = sp.profile_id
+    where spr.id = school_pickup_responses.pickup_request_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+)
+with check (
+  status in ('accepted','declined')
+  and exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.school_partners sp on sp.id = spr.school_partner_id
+    join public.profiles p on p.id = sp.profile_id
+    where spr.id = school_pickup_responses.pickup_request_id
+      and p.auth_id = auth.uid()
+      and p.role = 'school_partner'
+  )
+);
+
+-- Recycler request visibility
+
+drop policy if exists "Recyclers view matching school pickup requests" on public.school_pickup_requests;
+create policy "Recyclers view matching school pickup requests"
+on public.school_pickup_requests for select to authenticated
+using (
+  exists (
+    select 1
+    from public.junkshops j
+    join public.profiles p on p.id = j.profile_id
+    where p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+      and j.is_active = true
+      and (
+        (
+          school_pickup_requests.status = 'pending'
+          and exists (
+            select 1
+            from public.school_pickup_items spi
+            join public.junkshop_materials jm on jm.material_id = spi.material_id
+            where spi.pickup_request_id = school_pickup_requests.id
+              and jm.junkshop_id = j.id
+              and jm.is_accepting = true
+          )
+        )
+        or school_pickup_requests.selected_junkshop_id = j.id
+      )
+  )
+);
+
+drop policy if exists "Recyclers view matching school pickup items" on public.school_pickup_items;
+create policy "Recyclers view matching school pickup items"
+on public.school_pickup_items for select to authenticated
+using (
+  exists (
+    select 1
+    from public.school_pickup_requests spr
+    join public.junkshops j on true
+    join public.profiles p on p.id = j.profile_id
+    where spr.id = school_pickup_items.pickup_request_id
+      and p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+      and j.is_active = true
+      and (
+        (
+          spr.status = 'pending'
+          and exists (
+            select 1
+            from public.junkshop_materials jm
+            where jm.junkshop_id = j.id
+              and jm.material_id = school_pickup_items.material_id
+              and jm.is_accepting = true
+          )
+        )
+        or spr.selected_junkshop_id = j.id
+      )
+  )
+);
+
+-- Recycler response policies
+
+drop policy if exists "Recyclers view own school pickup responses" on public.school_pickup_responses;
+create policy "Recyclers view own school pickup responses"
+on public.school_pickup_responses for select to authenticated
+using (
+  exists (
+    select 1
+    from public.junkshops j
+    join public.profiles p on p.id = j.profile_id
+    where j.id = school_pickup_responses.junkshop_id
+      and p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+  )
+);
+
+drop policy if exists "Recyclers create school pickup responses" on public.school_pickup_responses;
+create policy "Recyclers create school pickup responses"
+on public.school_pickup_responses for insert to authenticated
+with check (
+  status = 'interested'
+  and exists (
+    select 1
+    from public.junkshops j
+    join public.profiles p on p.id = j.profile_id
+    join public.school_pickup_requests spr on spr.id = school_pickup_responses.pickup_request_id
+    where j.id = school_pickup_responses.junkshop_id
+      and p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+      and j.is_active = true
+      and spr.status = 'pending'
+      and exists (
+        select 1
+        from public.school_pickup_items spi
+        join public.junkshop_materials jm on jm.material_id = spi.material_id
+        where spi.pickup_request_id = spr.id
+          and jm.junkshop_id = j.id
+          and jm.is_accepting = true
+      )
+  )
+);
+
+drop policy if exists "Recyclers update own school pickup responses" on public.school_pickup_responses;
+create policy "Recyclers update own school pickup responses"
+on public.school_pickup_responses for update to authenticated
+using (
+  exists (
+    select 1
+    from public.junkshops j
+    join public.profiles p on p.id = j.profile_id
+    where j.id = school_pickup_responses.junkshop_id
+      and p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+  )
+)
+with check (
+  status in ('interested','withdrawn')
+  and exists (
+    select 1
+    from public.junkshops j
+    join public.profiles p on p.id = j.profile_id
+    where j.id = school_pickup_responses.junkshop_id
+      and p.auth_id = auth.uid()
+      and p.role = 'recycler_partner'
+  )
+);
+
+commit;
