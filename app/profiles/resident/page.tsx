@@ -49,9 +49,7 @@ const RESIDENT_BASE_PATH =
     "/profiles/resident";
 
 
-/* =========================================================
-   TYPES
-========================================================= */
+
 
 interface ResidentProfile {
     id: string;
@@ -78,9 +76,9 @@ interface ScanRow {
     detected_object: string;
     material_type: string;
     confidence_score:
-        | number
-        | string
-        | null;
+    | number
+    | string
+    | null;
     recommended_action: unknown;
     barangay: string | null;
     created_at: string;
@@ -103,10 +101,10 @@ interface Junkshop {
     province: string | null;
     contact_number: string | null;
     verification_status:
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "suspended";
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "suspended";
     is_active: boolean;
 }
 
@@ -119,10 +117,10 @@ interface SchoolPartner {
     city: string | null;
     province: string | null;
     verification_status:
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "suspended";
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "suspended";
     is_active: boolean;
 }
 
@@ -137,10 +135,10 @@ interface SchoolDriveRow {
     collection_location: string;
     photo_url: string | null;
     status:
-        | "draft"
-        | "active"
-        | "completed"
-        | "cancelled";
+    | "draft"
+    | "active"
+    | "completed"
+    | "cancelled";
 }
 
 
@@ -247,15 +245,15 @@ function formatRelativeDate(
         Math.max(
             0,
             Date.now() -
-                new Date(
-                    value
-                ).getTime()
+            new Date(
+                value
+            ).getTime()
         );
 
     const minutes =
         Math.floor(
             difference /
-                60_000
+            60_000
         );
 
     if (
@@ -275,35 +273,33 @@ function formatRelativeDate(
     const hours =
         Math.floor(
             minutes /
-                60
+            60
         );
 
     if (
         hours <
         24
     ) {
-        return `${hours} hr${
-            hours === 1
+        return `${hours} hr${hours === 1
                 ? ""
                 : "s"
-        } ago`;
+            } ago`;
     }
 
     const days =
         Math.floor(
             hours /
-                24
+            24
         );
 
     if (
         days <
         7
     ) {
-        return `${days} day${
-            days === 1
+        return `${days} day${days === 1
                 ? ""
                 : "s"
-        } ago`;
+            } ago`;
     }
 
     return new Date(
@@ -327,9 +323,9 @@ function formatConfidence(
 ) {
     const percentage =
         value <=
-        1
+            1
             ? value *
-              100
+            100
             : value;
 
     return `${Math.max(
@@ -398,7 +394,7 @@ function isSameArea(
         profileBarangay &&
         targetBarangay &&
         profileBarangay ===
-            targetBarangay
+        targetBarangay
     ) {
         return 3;
     }
@@ -407,7 +403,7 @@ function isSameArea(
         profileCity &&
         targetCity &&
         profileCity ===
-            targetCity
+        targetCity
     ) {
         return 2;
     }
@@ -416,7 +412,7 @@ function isSameArea(
         profileProvince &&
         targetProvince &&
         profileProvince ===
-            targetProvince
+        targetProvince
     ) {
         return 1;
     }
@@ -475,9 +471,9 @@ function parseRecommendedAction(
 
     if (
         typeof normalized ===
-            "object" &&
+        "object" &&
         normalized !==
-            null
+        null
     ) {
         const record =
             normalized as Record<
@@ -506,9 +502,9 @@ function parseRecommendedAction(
                     item
                 ) =>
                     typeof item ===
-                        "string" &&
+                    "string" &&
                     item.trim().length >
-                        0
+                    0
             );
 
         const description =
@@ -517,21 +513,21 @@ function parseRecommendedAction(
                     item
                 ) =>
                     typeof item ===
-                        "string" &&
+                    "string" &&
                     item.trim().length >
-                        0
+                    0
             );
 
         return {
             label:
                 typeof label ===
-                "string"
+                    "string"
                     ? label
                     : "Review recommendation",
 
             description:
                 typeof description ===
-                "string"
+                    "string"
                     ? description
                     : null,
         };
@@ -697,7 +693,7 @@ export default function ResidentDashboardPage() {
                             user,
                         },
                         error:
-                            authError,
+                        authError,
                     } =
                         await supabase.auth.getUser();
 
@@ -715,9 +711,9 @@ export default function ResidentDashboardPage() {
 
                     const {
                         data:
-                            profileData,
+                        profileData,
                         error:
-                            profileError,
+                        profileError,
                     } =
                         await supabase
                             .from(
@@ -776,9 +772,9 @@ export default function ResidentDashboardPage() {
 
                     const {
                         data:
-                            scanRows,
+                        scanRows,
                         error:
-                            scanError,
+                        scanError,
                     } =
                         await supabase
                             .from(
@@ -861,9 +857,9 @@ export default function ResidentDashboardPage() {
 
                     const {
                         data:
-                            junkshopRows,
+                        junkshopRows,
                         error:
-                            junkshopError,
+                        junkshopError,
                     } =
                         await supabase
                             .from(
@@ -939,9 +935,9 @@ export default function ResidentDashboardPage() {
 
                     const {
                         data:
-                            driveRows,
+                        driveRows,
                         error:
-                            driveError,
+                        driveError,
                     } =
                         await supabase
                             .from(
@@ -1159,9 +1155,9 @@ export default function ResidentDashboardPage() {
                                     (
                                         partner
                                     ) => [
-                                        partner.id,
-                                        partner,
-                                    ]
+                                            partner.id,
+                                            partner,
+                                        ]
                                 )
                             );
 
@@ -1171,9 +1167,9 @@ export default function ResidentDashboardPage() {
                                     (
                                         material
                                     ) => [
-                                        material.id,
-                                        material,
-                                    ]
+                                            material.id,
+                                            material,
+                                        ]
                                 )
                             );
 
@@ -1306,7 +1302,7 @@ export default function ResidentDashboardPage() {
                         );
                     }
                 } catch (
-                    error
+                error
                 ) {
                     const message =
                         getErrorMessage(
@@ -1374,9 +1370,9 @@ export default function ResidentDashboardPage() {
 
                         return (
                             date.getMonth() ===
-                                now.getMonth() &&
+                            now.getMonth() &&
                             date.getFullYear() ===
-                                now.getFullYear()
+                            now.getFullYear()
                         );
                     }
                 ).length;
@@ -1419,10 +1415,10 @@ export default function ResidentDashboardPage() {
                     ) => {
                         const normalized =
                             scan.confidence <=
-                            1
+                                1
                                 ? scan.confidence
                                 : scan.confidence /
-                                  100;
+                                100;
 
                         return (
                             normalized >=
@@ -1587,17 +1583,17 @@ export default function ResidentDashboardPage() {
             `}</style>
 
 
-            <div className="space-y-7">
+            <div className="box-border w-full min-w-0 max-w-full space-y-7 overflow-x-clip">
                 {/* HEADER */}
 
-                <section className="resident-motion animate-[residentFadeUp_.35s_ease-out_both]">
-                    <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-                        <div>
+                <section className="resident-motion w-full min-w-0 animate-[residentFadeUp_.35s_ease-out_both]">
+                    <div className="flex w-full min-w-0 flex-col justify-between gap-5 sm:flex-row sm:items-end">
+                        <div className="min-w-0 flex-1">
                             <p className="text-sm font-bold text-green-600">
                                 Personal recovery workspace
                             </p>
 
-                            <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900">
+                            <h1 className="mt-1 break-words text-3xl font-black tracking-tight text-zinc-900">
                                 {greeting},{" "}
                                 {firstName(
                                     profile.full_name
@@ -1612,26 +1608,20 @@ export default function ResidentDashboardPage() {
                         </div>
 
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap">
                             <Button
                                 type="button"
                                 variant="outline"
-                                disabled={
-                                    refreshing
-                                }
+                                disabled={refreshing}
                                 onClick={() =>
-                                    void loadDashboard(
-                                        true
-                                    )
+                                    void loadDashboard(true)
                                 }
-                                className="rounded-full border-green-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50 hover:text-green-700"
-                            >
+                               className="min-w-0 rounded-full border-green-200 bg-white px-3 text-xs text-green-700 transition-all duration-200 hover:bg-green-50 hover:text-green-800 sm:px-4 sm:text-sm">
                                 <RefreshCcw
-                                    className={`mr-2 h-4 w-4 ${
-                                        refreshing
+                                    className={`mr-2 h-4 w-4 shrink-0 ${refreshing
                                             ? "animate-spin"
                                             : ""
-                                    }`}
+                                        }`}
                                 />
 
                                 Refresh
@@ -1644,9 +1634,9 @@ export default function ResidentDashboardPage() {
                                         `${RESIDENT_BASE_PATH}/scan`
                                     )
                                 }
-                                className="rounded-full bg-green-600 px-6 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-700"
+                                className="min-w-0 rounded-full bg-green-600 px-3 text-xs transition-all duration-200 hover:bg-green-700 sm:px-6 sm:text-sm"
                             >
-                                <ScanLine className="mr-2 h-4 w-4" />
+                                <ScanLine className="mr-2 h-4 w-4 shrink-0" />
 
                                 Scan item
                             </Button>
@@ -1657,16 +1647,16 @@ export default function ResidentDashboardPage() {
 
                 {/* HERO */}
 
-                <section className="resident-motion animate-[residentScaleIn_.4s_ease-out_.04s_both] overflow-hidden rounded-[32px] border border-green-100 bg-white shadow-sm">
-                    <div className="relative min-h-64 overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-emerald-800 p-6 text-white sm:p-8">
+               <section className="resident-motion w-full min-w-0 max-w-full animate-[residentScaleIn_.4s_ease-out_.04s_both] overflow-hidden rounded-[24px] border border-green-100 bg-white shadow-sm sm:rounded-[32px]">
+                    <div className="relative w-full min-w-0 overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-emerald-800 p-5 text-white sm:min-h-64 sm:p-8">
                         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10" />
 
                         <div className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-white/5" />
 
 
-                        <div className="relative flex min-h-48 flex-col justify-between gap-8 lg:flex-row lg:items-end">
-                            <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-                                <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28px] border-4 border-white bg-white shadow-xl">
+                        <div className="relative flex w-full min-w-0 flex-col justify-between gap-7 lg:min-h-48 lg:flex-row lg:items-end">
+                            <div className="flex min-w-0 flex-1 flex-col gap-5 sm:flex-row sm:items-end">
+                                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[24px] border-4 border-white bg-white shadow-xl min-[380px]:h-24 min-[380px]:w-24 min-[380px]:rounded-[28px]">
                                     {profile.avatar_url ? (
                                         <img
                                             src={
@@ -1687,7 +1677,7 @@ export default function ResidentDashboardPage() {
                                 </div>
 
 
-                                <div>
+                             <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap gap-2">
                                         <Badge className="border-white/20 bg-white/15 text-white hover:bg-white/15">
                                             <UserRound className="mr-1.5 h-3.5 w-3.5" />
@@ -1703,7 +1693,7 @@ export default function ResidentDashboardPage() {
                                             </Badge>
                                         )}
 
-                                        <Badge className="border-white/20 bg-black/20 text-white hover:bg-black/20">
+                                        <Badge className="max-w-full border-white/20 bg-black/20 text-white hover:bg-black/20">
                                             <MapPin className="mr-1.5 h-3.5 w-3.5" />
 
                                             {[
@@ -1721,9 +1711,9 @@ export default function ResidentDashboardPage() {
                                     </div>
 
 
-                                    <h2 className="mt-4 text-3xl font-black sm:text-4xl">
-                                        Scan. Understand. Recover.
-                                    </h2>
+                                    <h2 className="mt-4 break-words text-3xl font-black leading-tight sm:text-4xl">
+    Scan. Understand. Recover.
+</h2>
 
                                     <p className="mt-2 max-w-2xl text-sm leading-7 text-green-50/85">
                                         A single clear photo can become a
@@ -1734,7 +1724,7 @@ export default function ResidentDashboardPage() {
                             </div>
 
 
-                            <div className="flex flex-wrap gap-2">
+                            <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap">
                                 <Button
                                     type="button"
                                     onClick={() =>
@@ -1742,9 +1732,9 @@ export default function ResidentDashboardPage() {
                                             `${RESIDENT_BASE_PATH}/scan`
                                         )
                                     }
-                                    className="rounded-full bg-white text-green-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50"
+                                    className="min-w-0 rounded-full bg-white px-3 text-xs text-green-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50 sm:px-4 sm:text-sm"
                                 >
-                                    <Camera className="mr-2 h-4 w-4" />
+                                    <Camera className="mr-2 h-4 w-4 shrink-0" />
 
                                     Open scanner
                                 </Button>
@@ -1756,9 +1746,9 @@ export default function ResidentDashboardPage() {
                                             `${RESIDENT_BASE_PATH}/history`
                                         )
                                     }
-                                    className="rounded-full border border-white/30 bg-white/15 text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/25"
+                                    className="min-w-0 rounded-full border border-white/30 bg-white/15 px-3 text-xs text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/25 sm:px-4 sm:text-sm"
                                 >
-                                    <History className="mr-2 h-4 w-4" />
+                                    <History className="mr-2 h-4 w-4 shrink-0" />
 
                                     View history
                                 </Button>
@@ -1769,12 +1759,12 @@ export default function ResidentDashboardPage() {
 
 
                 {networkNotice && (
-                    <section className="resident-motion animate-[residentFadeUp_.38s_ease-out_.08s_both] flex flex-col gap-4 rounded-[24px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center">
+                    <section className="resident-motion flex w-full min-w-0 flex-col gap-4 overflow-hidden rounded-[24px] border border-amber-200 bg-amber-50 p-5 animate-[residentFadeUp_.38s_ease-out_.08s_both] sm:flex-row sm:items-center">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
                             <AlertCircle className="h-6 w-6" />
                         </div>
 
-                        <div className="flex-1">
+                        <div className="min-w-0 flex-1">
                             <h2 className="font-black text-zinc-900">
                                 Some recovery connections are unavailable
                             </h2>
@@ -1812,7 +1802,7 @@ export default function ResidentDashboardPage() {
 
                 {/* STATS */}
 
-                <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <section className="grid w-full min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <SummaryCard
                         title="Total scans"
                         value={
@@ -1873,7 +1863,7 @@ export default function ResidentDashboardPage() {
 
                 {/* RECENT SCANS + QUICK ACTIONS */}
 
-                <section className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+                <section className="grid w-full min-w-0 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
                     <DashboardSection
                         title="Recent scans"
                         description="Your newest item identifications and recommendations."
@@ -1886,7 +1876,7 @@ export default function ResidentDashboardPage() {
                         }
                     >
                         {scans.length ===
-                        0 ? (
+                            0 ? (
                             <DashboardEmptyState
                                 icon={
                                     ScanLine
@@ -1901,7 +1891,7 @@ export default function ResidentDashboardPage() {
                                 }
                             />
                         ) : (
-                            <div className="space-y-3">
+                            <div className="w-full min-w-0 space-y-3">
                                 {scans
                                     .slice(
                                         0,
@@ -1936,7 +1926,7 @@ export default function ResidentDashboardPage() {
                         description="Move from an item to a recovery option."
                         animationDelay="250ms"
                     >
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                        <div className="grid w-full min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-1">
                             <QuickAction
                                 icon={
                                     Camera
@@ -2007,7 +1997,7 @@ export default function ResidentDashboardPage() {
                     }
                 >
                     {junkshops.length ===
-                    0 ? (
+                        0 ? (
                         <DashboardEmptyState
                             icon={
                                 Store
@@ -2022,7 +2012,7 @@ export default function ResidentDashboardPage() {
                             }
                         />
                     ) : (
-                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid w-full min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
                             {junkshops
                                 .slice(
                                     0,
@@ -2061,7 +2051,7 @@ export default function ResidentDashboardPage() {
                     }
                 >
                     {nearbyDrives.length ===
-                    0 ? (
+                        0 ? (
                         <DashboardEmptyState
                             icon={
                                 School
@@ -2076,7 +2066,7 @@ export default function ResidentDashboardPage() {
                             }
                         />
                     ) : (
-                        <div className="grid gap-4 lg:grid-cols-2">
+                        <div className="grid w-full min-w-0 gap-4 lg:grid-cols-2">
                             {nearbyDrives.map(
                                 (
                                     drive
@@ -2098,9 +2088,9 @@ export default function ResidentDashboardPage() {
 
                 {/* CLOSING CTA */}
 
-                <section className="resident-motion animate-[residentFadeUp_.4s_ease-out_.4s_both] overflow-hidden rounded-[28px] border border-green-100 bg-white shadow-sm">
-                    <div className="grid lg:grid-cols-[1fr_auto]">
-                        <div className="p-6 sm:p-8">
+                <section className="resident-motion w-full min-w-0 max-w-full animate-[residentFadeUp_.4s_ease-out_.4s_both] overflow-hidden rounded-[28px] border border-green-100 bg-white shadow-sm">
+                    <div className="grid w-full min-w-0 lg:grid-cols-[minmax(0,1fr)_auto]">
+                        <div className="min-w-0 p-6 sm:p-8">
                             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50 text-green-600">
                                 <Leaf className="h-6 w-6" />
                             </div>
@@ -2134,7 +2124,7 @@ export default function ResidentDashboardPage() {
                         </div>
 
 
-                        <div className="flex min-w-72 items-center justify-center bg-gradient-to-br from-green-600 to-emerald-800 p-8 text-white">
+                        <div className="flex w-full min-w-0 items-center justify-center bg-gradient-to-br from-green-600 to-emerald-800 p-8 text-white lg:w-auto lg:min-w-72">
                             <div className="text-center">
                                 <ScanLine className="mx-auto h-10 w-10 text-green-100" />
 
@@ -2157,9 +2147,7 @@ export default function ResidentDashboardPage() {
 }
 
 
-/* =========================================================
-   COMPONENTS
-========================================================= */
+
 
 function PriorityAction({
     icon: Icon,
@@ -2169,21 +2157,21 @@ function PriorityAction({
     onAction,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
     title: string;
     description: string;
     actionLabel: string;
     onAction: () => void;
 }) {
     return (
-        <section className="resident-motion animate-[residentFadeUp_.38s_ease-out_.1s_both] flex flex-col gap-4 rounded-[24px] border border-green-200 bg-green-50 p-5 sm:flex-row sm:items-center">
+        <section className="resident-motion flex w-full min-w-0 flex-col gap-4 overflow-hidden rounded-[24px] border border-green-200 bg-green-50 p-5 animate-[residentFadeUp_.38s_ease-out_.1s_both] sm:flex-row sm:items-center">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-green-700">
                 <Icon className="h-6 w-6" />
             </div>
 
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
                 <h2 className="font-black text-zinc-900">
                     {title}
                 </h2>
@@ -2199,7 +2187,7 @@ function PriorityAction({
                 onClick={
                     onAction
                 }
-                className="w-fit rounded-full border-green-200 bg-white text-green-700 hover:bg-green-100"
+                className="w-full rounded-full border-green-200 bg-white text-green-700 hover:bg-green-100 sm:w-fit"
             >
                 {actionLabel}
 
@@ -2219,13 +2207,13 @@ function SummaryCard({
 }: {
     title: string;
     value:
-        | string
-        | number;
+    | string
+    | number;
     description: string;
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
     delay: number;
 }) {
     return (
@@ -2234,10 +2222,10 @@ function SummaryCard({
                 animationDelay:
                     `${delay}ms`,
             }}
-            className="resident-motion group animate-[residentFadeUp_.38s_ease-out_both] rounded-[24px] border border-green-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-md"
+            className="resident-motion group w-full min-w-0 max-w-full animate-[residentFadeUp_.38s_ease-out_both] overflow-hidden rounded-[24px] border border-green-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-md"
         >
-            <div className="flex items-start justify-between gap-3">
-                <div>
+            <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-zinc-500">
                         {title}
                     </p>
@@ -2280,10 +2268,10 @@ function DashboardSection({
             style={{
                 animationDelay,
             }}
-            className="resident-motion animate-[residentFadeUp_.4s_ease-out_both] rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-6"
+            className="resident-motion w-full min-w-0 max-w-full animate-[residentFadeUp_.4s_ease-out_both] overflow-hidden rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-6"
         >
-            <div className="flex items-start justify-between gap-4">
-                <div>
+            <div className="flex min-w-0 items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
                     <h2 className="text-xl font-black text-zinc-900">
                         {title}
                     </h2>
@@ -2310,7 +2298,7 @@ function DashboardSection({
                     )}
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 w-full min-w-0">
                 {children}
             </div>
 
@@ -2342,16 +2330,16 @@ function DashboardEmptyState({
     onAction,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
     title: string;
     description: string;
     actionLabel: string;
     onAction: () => void;
 }) {
     return (
-        <div className="flex flex-col items-center rounded-[24px] border border-dashed border-green-200 bg-green-50/60 px-6 py-9 text-center">
+        <div className="flex w-full min-w-0 flex-col items-center overflow-hidden rounded-[24px] border border-dashed border-green-200 bg-green-50/60 px-5 py-9 text-center sm:px-6">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-green-600 shadow-sm">
                 <Icon className="h-6 w-6" />
             </div>
@@ -2393,9 +2381,9 @@ function RecentScanCard({
             onClick={
                 onOpen
             }
-            className="group flex w-full items-center gap-4 rounded-[20px] border border-zinc-100 p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50/50"
+            className="group flex w-full min-w-0 max-w-full items-center gap-3 overflow-hidden rounded-[20px] border border-zinc-100 p-3 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50/50 min-[380px]:gap-4 min-[380px]:p-4"
         >
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-green-50 text-green-600">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-green-50 text-green-600 min-[380px]:h-16 min-[380px]:w-16">
                 {scan.image_url ? (
                     <img
                         src={
@@ -2457,7 +2445,7 @@ function JunkshopCard({
     junkshop: Junkshop;
 }) {
     return (
-        <article className="group overflow-hidden rounded-[24px] border border-green-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-md">
+        <article className="group w-full min-w-0 max-w-full overflow-hidden rounded-[24px] border border-green-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-md">
             <div className="relative h-36 overflow-hidden bg-green-100">
                 {junkshop.photo_url ? (
                     <img
@@ -2518,7 +2506,7 @@ function SchoolDriveCard({
     drive: NearbyDrive;
 }) {
     return (
-        <article className="group overflow-hidden rounded-[24px] border border-green-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-md">
+        <article className="group w-full min-w-0 max-w-full overflow-hidden rounded-[24px] border border-green-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-md">
             <div className="flex flex-col gap-4 p-4 sm:flex-row">
                 <div className="relative h-36 w-full shrink-0 overflow-hidden rounded-2xl bg-green-100 sm:w-40">
                     {drive.photo_url ? (
@@ -2576,31 +2564,31 @@ function SchoolDriveCard({
 
                     {drive.materials.length >
                         0 && (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                            {drive.materials
-                                .slice(
-                                    0,
-                                    3
-                                )
-                                .map(
-                                    (
-                                        material
-                                    ) => (
-                                        <Badge
-                                            key={
-                                                material.id
-                                            }
-                                            variant="secondary"
-                                            className="bg-zinc-100 text-zinc-600"
-                                        >
-                                            {
-                                                material.material_name
-                                            }
-                                        </Badge>
+                            <div className="mt-3 flex flex-wrap gap-1.5">
+                                {drive.materials
+                                    .slice(
+                                        0,
+                                        3
                                     )
-                                )}
-                        </div>
-                    )}
+                                    .map(
+                                        (
+                                            material
+                                        ) => (
+                                            <Badge
+                                                key={
+                                                    material.id
+                                                }
+                                                variant="secondary"
+                                                className="bg-zinc-100 text-zinc-600"
+                                            >
+                                                {
+                                                    material.material_name
+                                                }
+                                            </Badge>
+                                        )
+                                    )}
+                            </div>
+                        )}
                 </div>
             </div>
         </article>
@@ -2615,9 +2603,9 @@ function QuickAction({
     onClick,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
     title: string;
     description: string;
     onClick: () => void;
@@ -2628,7 +2616,7 @@ function QuickAction({
             onClick={
                 onClick
             }
-            className="group flex w-full items-center gap-4 rounded-2xl border border-zinc-100 p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50"
+            className="group flex w-full min-w-0 max-w-full items-center gap-3 overflow-hidden rounded-2xl border border-zinc-100 p-3 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50 min-[380px]:gap-4 min-[380px]:p-4"
         >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600 transition-transform duration-300 group-hover:scale-105">
                 <Icon className="h-5 w-5" />
@@ -2692,7 +2680,7 @@ function ResidentErrorState({
 function ResidentDashboardSkeleton() {
     return (
         <div className="space-y-7">
-            <div className="space-y-3">
+            <div className="w-full min-w-0 space-y-3">
                 <Skeleton className="h-4 w-48 bg-green-100" />
 
                 <Skeleton className="h-9 w-80 max-w-full bg-green-100" />
@@ -2706,7 +2694,7 @@ function ResidentDashboardSkeleton() {
             <Skeleton className="h-24 rounded-[24px] bg-green-100" />
 
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid w-full min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({
                     length: 4,
                 }).map(
