@@ -6,10 +6,17 @@ import type {
 } from "react";
 
 import {
+    useMemo,
+    useState,
+} from "react";
+
+import {
     BarChart3,
     Bell,
     ClipboardList,
     Home,
+    Loader2,
+    LogOut,
     Plus,
     Recycle,
     School,
@@ -18,7 +25,23 @@ import {
 } from "lucide-react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import {
+    usePathname,
+    useRouter,
+} from "next/navigation";
+
+import { toast } from "sonner";
+
+import { createClient } from "@/lib/supabase/client";
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 interface NavigationItem {
@@ -155,10 +178,80 @@ export default function SchoolPartnerLayout({
     const pathname =
         usePathname();
 
+    const router =
+        useRouter();
+
+    const supabase =
+        useMemo(
+            () =>
+                createClient(),
+            []
+        );
+
+    const [
+        loggingOut,
+        setLoggingOut,
+    ] =
+        useState(
+            false
+        );
+
     const pageTitle =
         getPageTitle(
             pathname
         );
+
+
+    const handleLogout =
+        async () => {
+            if (
+                loggingOut
+            ) {
+                return;
+            }
+
+            setLoggingOut(
+                true
+            );
+
+            try {
+                const {
+                    error,
+                } =
+                    await supabase.auth.signOut();
+
+                if (
+                    error
+                ) {
+                    throw error;
+                }
+
+                toast.success(
+                    "Signed out successfully."
+                );
+
+                router.replace(
+                    "/login"
+                );
+
+                router.refresh();
+            } catch (
+                error
+            ) {
+                const message =
+                    error instanceof Error
+                        ? error.message
+                        : "Unable to sign out. Please try again.";
+
+                toast.error(
+                    message
+                );
+            } finally {
+                setLoggingOut(
+                    false
+                );
+            }
+        };
 
     return (
         <>
@@ -293,6 +386,27 @@ export default function SchoolPartnerLayout({
                             Create collection drive
                         </Link>
 
+                        <button
+                            type="button"
+                            disabled={
+                                loggingOut
+                            }
+                            onClick={() =>
+                                void handleLogout()
+                            }
+                            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-red-100 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"
+                        >
+                            {loggingOut ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <LogOut className="h-4 w-4" />
+                            )}
+
+                            {loggingOut
+                                ? "Signing out..."
+                                : "Sign out"}
+                        </button>
+
                         <p className="mt-3 text-center text-[11px] leading-5 text-zinc-400">
                             Organize materials and school sustainability
                             activities.
@@ -332,19 +446,67 @@ export default function SchoolPartnerLayout({
                                 </button>
 
 
-                                <Link
-                                    href="/profiles/school-partner/profile"
-                                    aria-label="Open school profile"
-                                    className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 hover:-translate-y-0.5 ${
-                                        pathname.startsWith(
-                                            "/profiles/school-partner/profile"
-                                        )
-                                            ? "border-green-600 bg-green-600 text-white"
-                                            : "border-green-100 bg-green-50 text-green-700 hover:border-green-200"
-                                    }`}
-                                >
-                                    <UserRound className="h-5 w-5" />
-                                </Link>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger
+                                        aria-label="Open profile menu"
+                                        className={`flex h-10 w-10 items-center justify-center rounded-full border outline-none transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 ${
+                                            pathname.startsWith(
+                                                "/profiles/school-partner/profile"
+                                            )
+                                                ? "border-green-600 bg-green-600 text-white"
+                                                : "border-green-100 bg-green-50 text-green-700 hover:border-green-200"
+                                        }`}
+                                    >
+                                        {loggingOut ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : (
+                                            <UserRound className="h-5 w-5" />
+                                        )}
+                                    </DropdownMenuTrigger>
+
+
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="w-56 rounded-2xl border-green-100 p-2 shadow-xl"
+                                    >
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                router.push(
+                                                    "/profiles/school-partner/profile"
+                                                )
+                                            }
+                                            className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-zinc-700 focus:bg-green-50 focus:text-green-700"
+                                        >
+                                            <UserRound className="mr-2 h-4 w-4" />
+
+                                            School profile
+                                        </DropdownMenuItem>
+
+
+                                        <DropdownMenuSeparator className="bg-green-100" />
+
+
+                                        <DropdownMenuItem
+                                            disabled={
+                                                loggingOut
+                                            }
+                                            onClick={() =>
+                                                void handleLogout()
+                                            }
+                                            className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-red-600 focus:bg-red-50 focus:text-red-700"
+                                        >
+                                            {loggingOut ? (
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                            )}
+
+                                            {loggingOut
+                                                ? "Signing out..."
+                                                : "Sign out"}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     </header>
