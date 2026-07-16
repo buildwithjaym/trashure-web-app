@@ -2786,7 +2786,7 @@ export default function ResidentScanPage() {
       `}</style>
 
 
-      <div className="space-y-7">
+      <div className="min-w-0 space-y-7 overflow-x-hidden">
         {/* PAGE HEADER */}
 
         <section className="scan-motion animate-[scanFadeUp_.35s_ease-out_both]">
@@ -3534,14 +3534,14 @@ export default function ResidentScanPage() {
 
         {/* RECENT SCANS */}
 
-        <section className="scan-motion animate-[scanFadeUp_.4s_ease-out_.24s_both] rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
+        <section className="scan-motion min-w-0 overflow-hidden rounded-[28px] border border-green-100 bg-white p-4 shadow-sm animate-[scanFadeUp_.4s_ease-out_.24s_both] sm:p-7">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
               <h2 className="text-xl font-black text-zinc-900">
                 Recent scans
               </h2>
 
-              <p className="mt-1 text-sm leading-6 text-zinc-500">
+              <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">
                 Select a scan to review its material and current choices.
               </p>
             </div>
@@ -3549,13 +3549,13 @@ export default function ResidentScanPage() {
 
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() =>
                 router.push(
                   `${RESIDENT_BASE_PATH}/history`,
                 )
               }
-              className="w-fit rounded-full text-green-700 hover:bg-green-50"
+              className="w-full shrink-0 justify-center rounded-full border-green-200 text-green-700 hover:bg-green-50 sm:w-fit"
             >
               View history
 
@@ -3566,7 +3566,7 @@ export default function ResidentScanPage() {
 
           {recentScans.length ===
           0 ? (
-            <div className="mt-6 flex flex-col items-center rounded-[24px] border border-dashed border-green-200 bg-green-50 px-6 py-10 text-center">
+            <div className="mt-5 flex min-w-0 flex-col items-center rounded-[24px] border border-dashed border-green-200 bg-green-50 px-4 py-10 text-center sm:px-6">
               <ScanLine className="h-8 w-8 text-green-600" />
 
               <h3 className="mt-4 font-black text-zinc-900">
@@ -3578,7 +3578,7 @@ export default function ResidentScanPage() {
               </p>
             </div>
           ) : (
-            <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-3">
               {recentScans.map(
                 (
                   scan,
@@ -3918,26 +3918,53 @@ function RecentScanCard({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const [imageFailed, setImageFailed] =
+    useState(
+      false,
+    );
+
+
+  useEffect(
+    () => {
+      setImageFailed(
+        false,
+      );
+    },
+    [
+      scan.image_url,
+    ],
+  );
+
+
   return (
     <button
       type="button"
+      aria-pressed={
+        selected
+      }
       onClick={
         onSelect
       }
-      className={`flex w-full items-center gap-3 rounded-[20px] border p-3 text-left transition-all duration-300 hover:-translate-y-0.5 ${
+      className={`grid min-w-0 max-w-full grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-[20px] border p-2.5 text-left transition-all duration-300 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:p-3 ${
         selected
-          ? "border-green-400 bg-green-50"
-          : "border-zinc-100 bg-white hover:border-green-200 hover:bg-green-50"
+          ? "border-green-400 bg-green-50 ring-2 ring-green-100"
+          : "border-zinc-200 bg-white hover:border-green-300 hover:bg-green-50"
       }`}
     >
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-green-50 text-green-600">
-        {scan.image_url ? (
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-green-50 text-green-600 sm:h-14 sm:w-14 sm:rounded-2xl">
+        {scan.image_url &&
+        !imageFailed ? (
           <img
             src={
               scan.image_url
             }
             alt={
               scan.detected_object
+            }
+            onError={() =>
+              setImageFailed(
+                true,
+              )
             }
             className="h-full w-full object-cover"
           />
@@ -3946,14 +3973,15 @@ function RecentScanCard({
         )}
       </div>
 
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-black text-zinc-900">
+
+      <div className="min-w-0 overflow-hidden">
+        <p className="truncate text-sm font-black leading-5 text-zinc-900 sm:text-base">
           {
             scan.detected_object
           }
         </p>
 
-        <p className="mt-1 truncate text-xs text-zinc-500">
+        <p className="mt-0.5 truncate text-[11px] leading-5 text-zinc-500 sm:mt-1 sm:text-xs">
           {
             scan.material_type
           }{" "}
@@ -3964,11 +3992,20 @@ function RecentScanCard({
         </p>
       </div>
 
-      {scan.user_confirmed ? (
-        <BadgeCheck className="h-5 w-5 shrink-0 text-green-600" />
-      ) : (
-        <Clock3 className="h-5 w-5 shrink-0 text-amber-600" />
-      )}
+
+      <div
+        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+          scan.user_confirmed
+            ? "bg-green-50 text-green-600"
+            : "bg-amber-50 text-amber-600"
+        }`}
+      >
+        {scan.user_confirmed ? (
+          <BadgeCheck className="h-4 w-4 sm:h-5 sm:w-5" />
+        ) : (
+          <Clock3 className="h-4 w-4 sm:h-5 sm:w-5" />
+        )}
+      </div>
     </button>
   );
 }
