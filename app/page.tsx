@@ -23,7 +23,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-
+import { DownloadApkPrompt } from "@/components/download-apk-prompt";
 export default function Home() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -485,20 +485,20 @@ hover:-translate-y-1
 
 
               <Link href="/login">
-  <Button className="group w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-7 py-5 text-sm font-semibold text-white shadow-xl shadow-green-500/30 transition duration-300 hover:-translate-y-1 hover:shadow-green-500/50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
-    <ScanLine className="mr-2 h-4 w-4 transition group-hover:scale-110" />
-    Start Scanning Materials
-  </Button>
-</Link>
+                <Button className="group w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-7 py-5 text-sm font-semibold text-white shadow-xl shadow-green-500/30 transition duration-300 hover:-translate-y-1 hover:shadow-green-500/50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
+                  <ScanLine className="mr-2 h-4 w-4 transition group-hover:scale-110" />
+                  Start Scanning Materials
+                </Button>
+              </Link>
 
 
 
               <Link href="/how-it-works">
-  <Button className="group w-full rounded-full border border-green-200 bg-white px-7 py-5 text-sm font-semibold text-green-700 transition duration-300 hover:-translate-y-1 hover:border-green-300 hover:bg-green-50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
-    How It Works
-    <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
-  </Button>
-</Link>
+                <Button className="group w-full rounded-full border border-green-200 bg-white px-7 py-5 text-sm font-semibold text-green-700 transition duration-300 hover:-translate-y-1 hover:border-green-300 hover:bg-green-50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
+                  How It Works
+                  <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
+                </Button>
+              </Link>
 
             </div>
 
@@ -2565,7 +2565,7 @@ hover:-translate-y-1
 
       </footer>
 
-
+      <DownloadApkPrompt />
     </main>
 
   );
