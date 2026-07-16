@@ -1,293 +1,813 @@
 "use client";
 
+import type {
+    ComponentType,
+    ReactNode,
+} from "react";
+
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, History, ScanLine, Leaf, User, LogOut } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+
+import {
+    usePathname,
+    useRouter,
+} from "next/navigation";
+
+import {
+    Bell,
+    History,
+    Home,
+    Loader2,
+    Handshake,
+    LogOut,
+    MapPinned,
+    ScanLine,
+    UserRound,
+} from "lucide-react";
+
 import { toast } from "sonner";
 
+import { createClient } from "@/lib/supabase/client";
 
-const navigation = [
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+
+const RESIDENT_BASE_PATH =
+    "/profiles/resident";
+
+
+interface NavigationItem {
+    label: string;
+    href: string;
+
+    icon:
+        ComponentType<{
+            className?: string;
+        }>;
+}
+
+
+interface ResidentShellProfile {
+    full_name: string;
+    avatar_url: string | null;
+}
+
+
+const desktopNavigation: NavigationItem[] = [
     {
-        name: "Home",
-        href: "/profiles/resident",
-        icon: Home
+        label:
+            "Home",
+
+        href:
+            RESIDENT_BASE_PATH,
+
+        icon:
+            Home,
     },
     {
-        name: "History",
-        href: "/profiles/resident/history",
-        icon: History
+        label:
+            "Scan Item",
+
+        href:
+            `${RESIDENT_BASE_PATH}/scan`,
+
+        icon:
+            ScanLine,
     },
     {
-        name: "Impact",
-        href: "/profiles/resident/impact",
-        icon: Leaf
+        label:
+            "Offers",
+
+        href:
+            `${RESIDENT_BASE_PATH}/offers`,
+
+        icon:
+            Handshake,
     },
     {
-        name: "Profile",
-        href: "/profiles/resident/profile",
-        icon: User
-    }
+        label:
+            "Nearby Recovery",
+
+        href:
+            `${RESIDENT_BASE_PATH}/nearby`,
+
+        icon:
+            MapPinned,
+    },
+    {
+        label:
+            "Resident Profile",
+
+        href:
+            `${RESIDENT_BASE_PATH}/profile`,
+
+        icon:
+            UserRound,
+    },
 ];
 
 
+const mobileNavigation: NavigationItem[] = [
+    {
+        label:
+            "Home",
 
-export default function ResidentLayout({
-    children
-}: {
-    children: React.ReactNode
-}) {
+        href:
+            RESIDENT_BASE_PATH,
+
+        icon:
+            Home,
+    },
+    {
+        label:
+            "History",
+
+        href:
+            `${RESIDENT_BASE_PATH}/history`,
+
+        icon:
+            History,
+    },
+    {
+        label:
+            "Nearby",
+
+        href:
+            `${RESIDENT_BASE_PATH}/nearby`,
+
+        icon:
+            MapPinned,
+    },
+    {
+        label:
+            "Profile",
+
+        href:
+            `${RESIDENT_BASE_PATH}/profile`,
+
+        icon:
+            UserRound,
+    },
+];
 
 
-    const pathname = usePathname();
-
-    const router = useRouter();
-
-    const supabase = createClient();
-
-
-
-
-
-    const logout = async () => {
-
-
-        await supabase.auth.signOut();
-
-
-        toast.success("Logged out successfully.");
-
-
-        router.push("/login");
-
-
-    };
-
-
-
-
+function isRouteActive(
+    pathname: string,
+    href: string
+) {
+    if (
+        href ===
+        RESIDENT_BASE_PATH
+    ) {
+        return (
+            pathname ===
+            href
+        );
+    }
 
     return (
-
-        <div className="min-h-screen bg-green-50">
-
-
-
-            {/* DESKTOP TOPBAR */}
-
-
-            <header className="sticky top-0 z-30 hidden border-b border-green-100 bg-white/80 backdrop-blur-xl md:block">
+        pathname ===
+            href ||
+        pathname.startsWith(
+            `${href}/`
+        )
+    );
+}
 
 
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+function getPageTitle(
+    pathname: string
+) {
+    if (
+        pathname.startsWith(
+            `${RESIDENT_BASE_PATH}/scan`
+        )
+    ) {
+        return "Scan Item";
+    }
+
+    if (
+        pathname.startsWith(
+            `${RESIDENT_BASE_PATH}/history`
+        )
+    ) {
+        return "Scan History";
+    }
+
+    if (
+        pathname.startsWith(
+            `${RESIDENT_BASE_PATH}/nearby`
+        )
+    ) {
+        return "Nearby Recovery";
+    }
+
+    if (
+        pathname.startsWith(
+            `${RESIDENT_BASE_PATH}/profile`
+        )
+    ) {
+        return "Resident Profile";
+    }
+
+    return "Resident Dashboard";
+}
 
 
-                    <Link href="/profiles/resident" className="flex items-center gap-3">
+function firstName(
+    value: string
+) {
+    return (
+        value
+            .trim()
+            .split(/\s+/)[0] ||
+        "Resident"
+    );
+}
 
 
-                        <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white shadow">
+export default function ResidentLayout({
+    children,
+}: {
+    children: ReactNode;
+}) {
+    const pathname =
+        usePathname();
 
-                            <img src="/logo.png" alt="Trashure" className="h-full w-full object-contain" />
+    const router =
+        useRouter();
 
-                        </div>
-
-
-                        <div>
-
-                            <h1 className="font-black text-zinc-900">
-                                Trashure
-                            </h1>
-
-                            <p className="text-xs text-green-600">
-                                Material Intelligence
-                            </p>
-
-                        </div>
-
-
-                    </Link>
+    const supabase =
+        useMemo(
+            () =>
+                createClient(),
+            []
+        );
 
 
+    const [
+        shellProfile,
+        setShellProfile,
+    ] =
+        useState<ResidentShellProfile | null>(
+            null
+        );
+
+    const [
+        loggingOut,
+        setLoggingOut,
+    ] =
+        useState(
+            false
+        );
 
 
-
-                    <nav className="flex items-center gap-2">
-
-
-                        {navigation.map((item) => {
-
-
-                            const Icon = item.icon;
+    const pageTitle =
+        getPageTitle(
+            pathname
+        );
 
 
-                            const active = pathname === item.href;
+    useEffect(
+        () => {
+            let active =
+                true;
 
+            const loadProfile =
+                async () => {
+                    const {
+                        data: {
+                            user,
+                        },
+                    } =
+                        await supabase.auth.getUser();
 
+                    if (
+                        !user
+                    ) {
+                        router.replace(
+                            "/login"
+                        );
 
-                            return (
+                        return;
+                    }
 
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition ${active ? "bg-green-600 text-white" : "text-zinc-600 hover:bg-green-50 hover:text-green-700"}`}
-                                >
-
-
-                                    <Icon size={17} />
-
-                                    {item.name}
-
-
-                                </Link>
-
+                    const {
+                        data,
+                    } =
+                        await supabase
+                            .from(
+                                "profiles"
                             )
-
-                        })}
-
-
-
-                    </nav>
-
-
-
-
-
-                    <button
-                        onClick={logout}
-                        className="flex items-center gap-2 rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50"
-                    >
-
-                        <LogOut size={17} />
-
-                        Logout
-
-                    </button>
-
-
-                </div>
-
-
-            </header>
-
-
-
-
-
-
-
-            {/* PAGE CONTENT */}
-
-
-            <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 md:px-8 md:pb-10">
-
-
-                {children}
-
-
-            </main>
-
-
-
-
-
-
-
-            {/* MOBILE BOTTOM NAV */}
-
-
-            <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-green-100 bg-white/90 px-4 py-3 backdrop-blur-xl md:hidden">
-
-
-                <div className="flex items-center justify-between">
-
-
-                    <Link
-                        href="/profiles/resident"
-                        className={`flex flex-col items-center gap-1 text-xs ${pathname === "/profiles/resident" ? "text-green-600" : "text-zinc-500"}`}
-                    >
-
-                        <Home size={22} />
-
-                        Home
-
-                    </Link>
-
-
-
-
-
-                    <Link
-                        href="/profiles/resident/history"
-                        className="flex flex-col items-center gap-1 text-xs text-zinc-500"
-                    >
-
-                        <History size={22} />
-
-                        History
-
-                    </Link>
-
-
-
-
-
-                    {/* CENTER SCAN BUTTON */}
-
-
-                    <Link
-                        href="/profiles/resident/scan"
-                        className="relative -mt-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-700 text-white shadow-xl shadow-green-500/40 transition hover:-translate-y-1"
-                    >
-
-
-                        <ScanLine size={28} />
-
-
-                    </Link>
-
-
-
-
-
-                    <Link
-                        href="/profiles/resident/impact"
-                        className="flex flex-col items-center gap-1 text-xs text-zinc-500"
-                    >
-
-                        <Leaf size={22} />
-
-                        Impact
-
-                    </Link>
-
-
-
-
-
-                    <Link
-                        href="/profiles/resident/profile"
-                        className="flex flex-col items-center gap-1 text-xs text-zinc-500"
-                    >
-
-                        <User size={22} />
-
-                        Profile
-
-                    </Link>
-
-
-
-                </div>
-
-
-            </nav>
-
-
-
-        </div>
-
+                            .select(`
+                                full_name,
+                                avatar_url
+                            `)
+                            .eq(
+                                "auth_id",
+                                user.id
+                            )
+                            .maybeSingle();
+
+                    if (
+                        active &&
+                        data
+                    ) {
+                        setShellProfile(
+                            data as ResidentShellProfile
+                        );
+                    }
+                };
+
+            void loadProfile();
+
+            return () => {
+                active =
+                    false;
+            };
+        },
+        [
+            router,
+            supabase,
+        ]
     );
 
 
+    const handleLogout =
+        async () => {
+            if (
+                loggingOut
+            ) {
+                return;
+            }
+
+            setLoggingOut(
+                true
+            );
+
+            try {
+                const {
+                    error,
+                } =
+                    await supabase.auth.signOut();
+
+                if (
+                    error
+                ) {
+                    throw error;
+                }
+
+                toast.success(
+                    "Signed out successfully."
+                );
+
+                router.replace(
+                    "/login"
+                );
+
+                router.refresh();
+            } catch (
+                error
+            ) {
+                toast.error(
+                    error instanceof Error
+                        ? error.message
+                        : "Unable to sign out."
+                );
+            } finally {
+                setLoggingOut(
+                    false
+                );
+            }
+        };
+
+
+    return (
+        <>
+            <style jsx global>{`
+                @keyframes residentShellFade {
+                    from {
+                        opacity: 0;
+                        transform: translateY(6px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .resident-shell-motion {
+                        animation: none !important;
+                        transition-duration: 0.01ms !important;
+                    }
+                }
+            `}</style>
+
+
+            <div className="min-h-screen bg-green-50/60 text-zinc-900">
+                {/* DESKTOP SIDEBAR */}
+
+                <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-green-100 bg-white lg:flex lg:flex-col">
+                    <div className="flex h-20 items-center border-b border-green-100 px-6">
+                        <Link
+                            href={
+                                RESIDENT_BASE_PATH
+                            }
+                            className="group flex items-center gap-3"
+                        >
+                            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-green-100 transition-transform duration-300 group-hover:scale-105">
+                                <img
+                                    src="/logo.png"
+                                    alt="Trashure logo"
+                                    className="h-full w-full object-contain"
+                                />
+                            </div>
+
+                            <div>
+                                <p className="text-lg font-black tracking-tight text-zinc-900">
+                                    Trashure
+                                </p>
+
+                                <p className="text-xs font-semibold text-green-600">
+                                    Resident
+                                </p>
+                            </div>
+                        </Link>
+                    </div>
+
+
+                    <div className="flex-1 overflow-y-auto px-4 py-6">
+                        <div className="mb-5 rounded-[22px] border border-green-100 bg-green-50 p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white text-green-700 shadow-sm">
+                                    {shellProfile?.avatar_url ? (
+                                        <img
+                                            src={
+                                                shellProfile.avatar_url
+                                            }
+                                            alt={
+                                                shellProfile.full_name
+                                            }
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <UserRound className="h-5 w-5" />
+                                    )}
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="truncate font-black text-zinc-900">
+                                        {shellProfile
+                                            ? firstName(
+                                                  shellProfile.full_name
+                                              )
+                                            : "Resident workspace"}
+                                    </p>
+
+                                    <p className="mt-0.5 text-xs text-zinc-500">
+                                        Scan, recover, and reuse
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <p className="px-3 text-[11px] font-black uppercase tracking-[0.16em] text-zinc-400">
+                            Workspace
+                        </p>
+
+                        <nav className="mt-3 space-y-1.5">
+                            {desktopNavigation.map(
+                                (
+                                    item
+                                ) => {
+                                    const Icon =
+                                        item.icon;
+
+                                    const active =
+                                        isRouteActive(
+                                            pathname,
+                                            item.href
+                                        );
+
+                                    return (
+                                        <Link
+                                            key={
+                                                item.href
+                                            }
+                                            href={
+                                                item.href
+                                            }
+                                            className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-all duration-200 ${
+                                                active
+                                                    ? "bg-green-600 text-white shadow-sm shadow-green-600/20"
+                                                    : "text-zinc-500 hover:translate-x-0.5 hover:bg-green-50 hover:text-green-700"
+                                            }`}
+                                        >
+                                            <Icon
+                                                className={`h-5 w-5 ${
+                                                    active
+                                                        ? "text-white"
+                                                        : "text-zinc-400 transition-colors group-hover:text-green-600"
+                                                }`}
+                                            />
+
+                                            <span className="flex-1">
+                                                {
+                                                    item.label
+                                                }
+                                            </span>
+                                        </Link>
+                                    );
+                                }
+                            )}
+                        </nav>
+                    </div>
+
+
+                    <div className="border-t border-green-100 p-4">
+                        <Link
+                            href={`${RESIDENT_BASE_PATH}/scan`}
+                            className="group flex w-full items-center justify-center gap-2 rounded-full bg-green-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-700 hover:shadow-md"
+                        >
+                            <ScanLine className="h-4 w-4" />
+
+                            Scan an item
+                        </Link>
+
+
+                        <button
+                            type="button"
+                            disabled={
+                                loggingOut
+                            }
+                            onClick={() =>
+                                void handleLogout()
+                            }
+                            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-red-100 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"
+                        >
+                            {loggingOut ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <LogOut className="h-4 w-4" />
+                            )}
+
+                            {loggingOut
+                                ? "Signing out..."
+                                : "Sign out"}
+                        </button>
+                    </div>
+                </aside>
+
+
+                {/* MAIN AREA */}
+
+                <div className="min-h-screen lg:pl-72">
+                    <header className="sticky top-0 z-30 border-b border-green-100 bg-white/95 backdrop-blur-md">
+                        <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:h-20 lg:px-8">
+                            <div className="resident-shell-motion animate-[residentShellFade_.3s_ease-out_both]">
+                                <p className="text-xs font-bold text-green-600 lg:hidden">
+                                    Trashure Resident
+                                </p>
+
+                                <h1 className="text-lg font-black text-zinc-900 sm:text-xl">
+                                    {pageTitle}
+                                </h1>
+                            </div>
+
+
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    aria-label="Notifications"
+                                    title="Notifications will be connected later"
+                                    className="relative flex h-10 w-10 items-center justify-center rounded-full border border-green-100 bg-white text-zinc-500 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50 hover:text-green-700"
+                                >
+                                    <Bell className="h-5 w-5" />
+                                </button>
+
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger
+                                        aria-label="Open resident menu"
+                                        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border bg-white outline-none transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 ${
+                                            pathname.startsWith(
+                                                `${RESIDENT_BASE_PATH}/profile`
+                                            )
+                                                ? "border-green-600 bg-green-600 text-white"
+                                                : "border-green-100 bg-white text-green-700 hover:border-green-200 hover:bg-green-50"
+                                        }`}
+                                    >
+                                        {loggingOut ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : shellProfile?.avatar_url ? (
+                                            <img
+                                                src={
+                                                    shellProfile.avatar_url
+                                                }
+                                                alt={
+                                                    shellProfile.full_name
+                                                }
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <UserRound className="h-5 w-5" />
+                                        )}
+                                    </DropdownMenuTrigger>
+
+
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="w-60 rounded-2xl border border-green-100 !bg-white p-2 text-zinc-900 shadow-xl"
+                                    >
+                                        {shellProfile && (
+                                            <div className="px-3 py-2">
+                                                <p className="truncate text-sm font-black text-zinc-900">
+                                                    {
+                                                        shellProfile.full_name
+                                                    }
+                                                </p>
+
+                                                <p className="mt-0.5 text-xs text-zinc-400">
+                                                    Resident account
+                                                </p>
+                                            </div>
+                                        )}
+
+
+                                        <DropdownMenuSeparator className="bg-green-100" />
+
+
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                router.push(
+                                                    `${RESIDENT_BASE_PATH}/profile`
+                                                )
+                                            }
+                                            className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-zinc-700 focus:bg-green-50 focus:text-green-700"
+                                        >
+                                            <UserRound className="mr-2 h-4 w-4" />
+
+                                            Resident profile
+                                        </DropdownMenuItem>
+
+
+                                        <DropdownMenuSeparator className="bg-green-100" />
+
+
+                                        <DropdownMenuItem
+                                            disabled={
+                                                loggingOut
+                                            }
+                                            onClick={() =>
+                                                void handleLogout()
+                                            }
+                                            className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-red-600 focus:bg-red-50 focus:text-red-700"
+                                        >
+                                            {loggingOut ? (
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                            )}
+
+                                            {loggingOut
+                                                ? "Signing out..."
+                                                : "Sign out"}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
+                    </header>
+
+
+                    <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-10 lg:pt-8">
+                        <div className="mx-auto w-full max-w-[1500px]">
+                            {children}
+                        </div>
+                    </main>
+                </div>
+
+
+                {/* MOBILE BOTTOM NAVIGATION */}
+
+                <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-green-100 bg-white/95 px-3 py-3 backdrop-blur-xl md:hidden">
+                    <div className="mx-auto flex max-w-md items-center justify-between">
+                        {mobileNavigation
+                            .slice(
+                                0,
+                                2
+                            )
+                            .map(
+                                (
+                                    item
+                                ) => (
+                                    <MobileNavigationItem
+                                        key={
+                                            item.href
+                                        }
+                                        item={
+                                            item
+                                        }
+                                        active={isRouteActive(
+                                            pathname,
+                                            item.href
+                                        )}
+                                    />
+                                )
+                            )}
+
+
+                        <div className="relative flex justify-center">
+                            <Link
+                                href={`${RESIDENT_BASE_PATH}/scan`}
+                                aria-label="Scan an item"
+                                className="relative -mt-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-700 text-white shadow-xl shadow-green-500/40 transition active:scale-95"
+                            >
+                                
+
+                                <ScanLine className="h-7 w-7" />
+                            </Link>
+                        </div>
+
+
+                        {mobileNavigation
+                            .slice(
+                                2
+                            )
+                            .map(
+                                (
+                                    item
+                                ) => (
+                                    <MobileNavigationItem
+                                        key={
+                                            item.href
+                                        }
+                                        item={
+                                            item
+                                        }
+                                        active={isRouteActive(
+                                            pathname,
+                                            item.href
+                                        )}
+                                    />
+                                )
+                            )}
+                    </div>
+                </nav>
+            </div>
+        </>
+    );
+}
+
+
+function MobileNavigationItem({
+    item,
+    active,
+}: {
+    item: NavigationItem;
+    active: boolean;
+}) {
+    const Icon =
+        item.icon;
+
+    return (
+        <Link
+            href={
+                item.href
+            }
+            className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[10px] font-bold transition-colors ${
+                active
+                    ? "text-green-700"
+                    : "text-zinc-400 hover:text-green-600"
+            }`}
+        >
+            <div
+                className={`flex h-8 w-10 items-center justify-center rounded-full transition-colors ${
+                    active
+                        ? "bg-green-100"
+                        : "bg-transparent"
+                }`}
+            >
+                <Icon className="h-5 w-5" />
+            </div>
+
+            <span className="truncate">
+                {item.label}
+            </span>
+        </Link>
+    );
 }
