@@ -2394,3 +2394,1181 @@ with check (
 );
 
 commit;
+
+begin;
+
+
+-- ============================================================
+-- 1. SECURITY-DEFINER HELPERS
+--
+-- These functions keep policy checks compact and prevent policy
+-- chains from becoming recursive.
+-- ============================================================
+
+create or replace function public.is_authenticated_resident()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles as profile
+        where profile.auth_id = auth.uid()
+          and profile.role = 'resident'
+    );
+$$;
+
+
+create or replace function public.resident_can_view_junkshop(
+    target_junkshop_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.junkshops as junkshop
+        where junkshop.id = target_junkshop_id
+          and junkshop.is_active = true
+          and junkshop.verification_status = 'approved'
+    );
+$$;
+
+
+create or replace function public.resident_can_view_school_partner(
+    target_school_partner_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.school_partners as partner
+        where partner.id = target_school_partner_id
+          and partner.is_active = true
+          and partner.verification_status = 'approved'
+    );
+$$;
+
+
+create or replace function public.resident_can_view_school_drive(
+    target_drive_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.school_drives as drive
+        join public.school_partners as partner
+          on partner.id = drive.school_partner_id
+        where drive.id = target_drive_id
+          and drive.status = 'active'
+          and partner.is_active = true
+          and partner.verification_status = 'approved'
+    );
+$$;
+
+
+revoke all
+on function public.is_authenticated_resident()
+from public;
+
+revoke all
+on function public.resident_can_view_junkshop(uuid)
+from public;
+
+revoke all
+on function public.resident_can_view_school_partner(uuid)
+from public;
+
+revoke all
+on function public.resident_can_view_school_drive(uuid)
+from public;
+
+
+grant execute
+on function public.is_authenticated_resident()
+to authenticated;
+
+grant execute
+on function public.resident_can_view_junkshop(uuid)
+to authenticated;
+
+grant execute
+on function public.resident_can_view_school_partner(uuid)
+to authenticated;
+
+grant execute
+on function public.resident_can_view_school_drive(uuid)
+to authenticated;
+
+
+-- ============================================================
+-- 2. ENABLE ROW-LEVEL SECURITY
+-- ============================================================
+
+alter table public.profiles
+enable row level security;
+
+alter table public.materials
+enable row level security;
+
+alter table public.junkshops
+enable row level security;
+
+alter table public.junkshop_materials
+enable row level security;
+
+alter table public.school_partners
+enable row level security;
+
+alter table public.school_drives
+enable row level security;
+
+alter table public.school_drive_materials
+enable row level security;
+
+
+-- ============================================================
+-- 3. RESIDENT OWN-PROFILE ACCESS
+-- ============================================================
+
+drop policy if exists
+"Residents can view their own profile"
+on public.profiles;
+
+create policy
+"Residents can view their own profile"
+on public.profiles
+for select
+to authenticated
+using (
+    auth_id = auth.uid()
+    and role = 'resident'
+);
+
+
+drop policy if exists
+"Residents can update their own profile"
+on public.profiles;
+
+create policy
+"Residents can update their own profile"
+on public.profiles
+for update
+to authenticated
+using (
+    auth_id = auth.uid()
+    and role = 'resident'
+)
+with check (
+    auth_id = auth.uid()
+    and role = 'resident'
+);
+
+
+-- ============================================================
+-- 4. MATERIAL CATALOG
+--
+-- Residents may read the material catalog so the nearby page
+-- can display and filter accepted materials.
+-- ============================================================
+
+drop policy if exists
+"Residents can view materials"
+on public.materials;
+
+create policy
+"Residents can view materials"
+on public.materials
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+);
+
+
+-- ============================================================
+-- 5. APPROVED JUNKSHOPS
+-- ============================================================
+
+drop policy if exists
+"Residents can view approved active junkshops"
+on public.junkshops;
+
+create policy
+"Residents can view approved active junkshops"
+on public.junkshops
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+    and is_active = true
+    and verification_status = 'approved'
+);
+
+
+drop policy if exists
+"Residents can view accepted junkshop materials"
+on public.junkshop_materials;
+
+create policy
+"Residents can view accepted junkshop materials"
+on public.junkshop_materials
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+    and is_accepting = true
+    and public.resident_can_view_junkshop(
+        junkshop_id
+    )
+);
+
+
+-- ============================================================
+-- 6. APPROVED SCHOOL PARTNERS
+-- ============================================================
+
+drop policy if exists
+"Residents can view approved active school partners"
+on public.school_partners;
+
+create policy
+"Residents can view approved active school partners"
+on public.school_partners
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+    and is_active = true
+    and verification_status = 'approved'
+);
+
+
+-- ============================================================
+-- 7. ACTIVE SCHOOL COLLECTION DRIVES
+-- ============================================================
+
+drop policy if exists
+"Residents can view active school drives"
+on public.school_drives;
+
+create policy
+"Residents can view active school drives"
+on public.school_drives
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+    and status = 'active'
+    and public.resident_can_view_school_partner(
+        school_partner_id
+    )
+);
+
+
+drop policy if exists
+"Residents can view active school drive materials"
+on public.school_drive_materials;
+
+create policy
+"Residents can view active school drive materials"
+on public.school_drive_materials
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+    and public.resident_can_view_school_drive(
+        drive_id
+    )
+);
+
+
+-- ============================================================
+-- 8. TABLE PRIVILEGES
+--
+-- RLS still controls which rows are visible.
+-- ============================================================
+
+grant select
+on table public.profiles
+to authenticated;
+
+grant update (
+    full_name,
+    avatar_url,
+    age,
+    sex,
+    barangay,
+    city,
+    province,
+    onboarding_completed,
+    updated_at
+)
+on table public.profiles
+to authenticated;
+
+
+grant select
+on table public.materials
+to authenticated;
+
+grant select
+on table public.junkshops
+to authenticated;
+
+grant select
+on table public.junkshop_materials
+to authenticated;
+
+grant select
+on table public.school_partners
+to authenticated;
+
+grant select
+on table public.school_drives
+to authenticated;
+
+grant select
+on table public.school_drive_materials
+to authenticated;
+
+
+commit;
+
+
+----------------------===============-----------------------------
+
+begin;
+
+create extension if not exists pgcrypto;
+
+
+-- ============================================================
+-- 1. RESIDENT OWNERSHIP HELPERS
+--
+-- SECURITY DEFINER prevents recursive profile-policy checks.
+-- ============================================================
+
+create or replace function public.is_authenticated_resident()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles as profile
+        where profile.auth_id = auth.uid()
+          and profile.role = 'resident'
+    );
+$$;
+
+
+create or replace function public.resident_owns_profile(
+    target_profile_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles as profile
+        where profile.id = target_profile_id
+          and profile.auth_id = auth.uid()
+          and profile.role = 'resident'
+    );
+$$;
+
+
+revoke all
+on function public.is_authenticated_resident()
+from public;
+
+revoke all
+on function public.resident_owns_profile(uuid)
+from public;
+
+
+grant execute
+on function public.is_authenticated_resident()
+to authenticated;
+
+grant execute
+on function public.resident_owns_profile(uuid)
+to authenticated;
+
+
+-- ============================================================
+-- 2. CREATE OR EXTEND THE SCANS TABLE
+-- ============================================================
+
+create table if not exists public.scans (
+    id uuid primary key default gen_random_uuid(),
+
+    user_id uuid not null
+        references public.profiles(id)
+        on delete cascade,
+
+    image_url text null,
+
+    detected_object text not null,
+
+    material_type text not null,
+
+    confidence_score numeric(5, 4) null,
+
+    recommended_action jsonb null,
+
+    barangay text null,
+
+    created_at timestamptz not null default now()
+);
+
+
+alter table public.scans
+add column if not exists image_storage_path text null;
+
+alter table public.scans
+add column if not exists object_description text null;
+
+alter table public.scans
+add column if not exists material_id uuid null
+references public.materials(id)
+on delete set null;
+
+alter table public.scans
+add column if not exists material_category text null;
+
+alter table public.scans
+add column if not exists condition text null;
+
+alter table public.scans
+add column if not exists primary_action text null;
+
+alter table public.scans
+add column if not exists preparation_steps jsonb not null
+default '[]'::jsonb;
+
+alter table public.scans
+add column if not exists hazardous boolean not null
+default false;
+
+alter table public.scans
+add column if not exists hazard_notes text null;
+
+alter table public.scans
+add column if not exists needs_user_confirmation boolean not null
+default true;
+
+alter table public.scans
+add column if not exists user_confirmed boolean not null
+default false;
+
+alter table public.scans
+add column if not exists correction_material_id uuid null
+references public.materials(id)
+on delete set null;
+
+alter table public.scans
+add column if not exists ai_raw_result jsonb null;
+
+alter table public.scans
+add column if not exists model_name text null;
+
+alter table public.scans
+add column if not exists analysis_status text not null
+default 'processing';
+
+alter table public.scans
+add column if not exists updated_at timestamptz not null
+default now();
+
+
+-- ============================================================
+-- 3. CONVERT AN OLDER TEXT recommended_action COLUMN TO JSONB
+-- ============================================================
+
+create or replace function public.safe_text_to_jsonb(
+    input_text text
+)
+returns jsonb
+language plpgsql
+immutable
+as $$
+begin
+    if input_text is null or btrim(input_text) = '' then
+        return null;
+    end if;
+
+    begin
+        return input_text::jsonb;
+    exception
+        when others then
+            return jsonb_build_object(
+                'title',
+                input_text,
+                'description',
+                input_text
+            );
+    end;
+end;
+$$;
+
+
+do $$
+declare
+    current_type text;
+begin
+    select data_type
+      into current_type
+      from information_schema.columns
+     where table_schema = 'public'
+       and table_name = 'scans'
+       and column_name = 'recommended_action';
+
+    if current_type in (
+        'text',
+        'character varying'
+    ) then
+        alter table public.scans
+        alter column recommended_action
+        type jsonb
+        using public.safe_text_to_jsonb(
+            recommended_action
+        );
+    end if;
+end
+$$;
+
+
+drop function if exists public.safe_text_to_jsonb(text);
+
+
+-- ============================================================
+-- 4. VALIDATION CONSTRAINTS
+--
+-- NOT VALID protects the migration from older inconsistent rows.
+-- New and updated rows must still satisfy the constraints.
+-- ============================================================
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'scans_analysis_status_check'
+          and conrelid = 'public.scans'::regclass
+    ) then
+        alter table public.scans
+        add constraint scans_analysis_status_check
+        check (
+            analysis_status in (
+                'processing',
+                'completed',
+                'needs_confirmation',
+                'failed'
+            )
+        )
+        not valid;
+    end if;
+end
+$$;
+
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'scans_condition_check'
+          and conrelid = 'public.scans'::regclass
+    ) then
+        alter table public.scans
+        add constraint scans_condition_check
+        check (
+            condition is null
+            or condition in (
+                'clean',
+                'dirty',
+                'damaged',
+                'mixed',
+                'unknown'
+            )
+        )
+        not valid;
+    end if;
+end
+$$;
+
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'scans_primary_action_check'
+          and conrelid = 'public.scans'::regclass
+    ) then
+        alter table public.scans
+        add constraint scans_primary_action_check
+        check (
+            primary_action is null
+            or primary_action in (
+                'reuse',
+                'donate',
+                'sell',
+                'recycle',
+                'special_handling',
+                'dispose'
+            )
+        )
+        not valid;
+    end if;
+end
+$$;
+
+
+do $$
+begin
+    if not exists (
+        select 1
+        from pg_constraint
+        where conname = 'scans_confidence_score_check'
+          and conrelid = 'public.scans'::regclass
+    ) then
+        alter table public.scans
+        add constraint scans_confidence_score_check
+        check (
+            confidence_score is null
+            or (
+                confidence_score >= 0
+                and confidence_score <= 1
+            )
+        )
+        not valid;
+    end if;
+end
+$$;
+
+
+-- ============================================================
+-- 5. INDEXES
+-- ============================================================
+
+create index if not exists scans_user_created_index
+on public.scans (
+    user_id,
+    created_at desc
+);
+
+create index if not exists scans_material_index
+on public.scans (
+    material_id
+);
+
+create index if not exists scans_status_index
+on public.scans (
+    analysis_status
+);
+
+create unique index if not exists scans_image_storage_path_unique
+on public.scans (
+    image_storage_path
+)
+where image_storage_path is not null;
+
+
+-- ============================================================
+-- 6. UPDATED_AT TRIGGER
+-- ============================================================
+
+create or replace function public.set_scans_updated_at()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+    new.updated_at = now();
+    return new;
+end;
+$$;
+
+
+drop trigger if exists set_scans_updated_at
+on public.scans;
+
+create trigger set_scans_updated_at
+before update
+on public.scans
+for each row
+execute function public.set_scans_updated_at();
+
+
+-- ============================================================
+-- 7. SCAN ROW LEVEL SECURITY
+-- ============================================================
+
+alter table public.scans
+enable row level security;
+
+
+drop policy if exists
+"Residents can view their own scans"
+on public.scans;
+
+create policy
+"Residents can view their own scans"
+on public.scans
+for select
+to authenticated
+using (
+    public.resident_owns_profile(
+        user_id
+    )
+);
+
+
+drop policy if exists
+"Residents can create their own scans"
+on public.scans;
+
+create policy
+"Residents can create their own scans"
+on public.scans
+for insert
+to authenticated
+with check (
+    public.resident_owns_profile(
+        user_id
+    )
+);
+
+
+drop policy if exists
+"Residents can update their own scans"
+on public.scans;
+
+create policy
+"Residents can update their own scans"
+on public.scans
+for update
+to authenticated
+using (
+    public.resident_owns_profile(
+        user_id
+    )
+)
+with check (
+    public.resident_owns_profile(
+        user_id
+    )
+);
+
+
+drop policy if exists
+"Residents can delete their own scans"
+on public.scans;
+
+create policy
+"Residents can delete their own scans"
+on public.scans
+for delete
+to authenticated
+using (
+    public.resident_owns_profile(
+        user_id
+    )
+);
+
+
+grant select, insert, update, delete
+on table public.scans
+to authenticated;
+
+
+-- ============================================================
+-- 8. MATERIAL CATALOG ACCESS
+--
+-- Residents need this to confirm or correct AI results.
+-- ============================================================
+
+alter table public.materials
+enable row level security;
+
+
+drop policy if exists
+"Residents can view materials"
+on public.materials;
+
+create policy
+"Residents can view materials"
+on public.materials
+for select
+to authenticated
+using (
+    public.is_authenticated_resident()
+);
+
+
+grant select
+on table public.materials
+to authenticated;
+
+
+commit;
+
+
+
+
+
+begin;
+
+
+-- ============================================================
+-- 1. ENSURE THE RESIDENT HELPER EXISTS
+-- ============================================================
+
+create or replace function public.is_authenticated_resident()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+    select exists (
+        select 1
+        from public.profiles as profile
+        where profile.auth_id = auth.uid()
+          and profile.role = 'resident'
+    );
+$$;
+
+
+revoke all
+on function public.is_authenticated_resident()
+from public;
+
+
+grant execute
+on function public.is_authenticated_resident()
+to authenticated;
+
+
+-- ============================================================
+-- 2. CREATE A PRIVATE STORAGE BUCKET
+--
+-- 5 MB server-side limit.
+-- The client page should compress images below this limit.
+-- ============================================================
+
+insert into storage.buckets (
+    id,
+    name,
+    public,
+    file_size_limit,
+    allowed_mime_types
+)
+values (
+    'resident-scans',
+    'resident-scans',
+    false,
+    5242880,
+    array[
+        'image/jpeg',
+        'image/png',
+        'image/webp'
+    ]
+)
+on conflict (id)
+do update set
+    public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+
+-- ============================================================
+-- 3. RESIDENT STORAGE POLICIES
+--
+-- Residents can only access the folder matching auth.uid().
+-- ============================================================
+
+drop policy if exists
+"Residents can upload their scan images"
+on storage.objects;
+
+create policy
+"Residents can upload their scan images"
+on storage.objects
+for insert
+to authenticated
+with check (
+    bucket_id = 'resident-scans'
+    and public.is_authenticated_resident()
+    and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+
+drop policy if exists
+"Residents can view their scan images"
+on storage.objects;
+
+create policy
+"Residents can view their scan images"
+on storage.objects
+for select
+to authenticated
+using (
+    bucket_id = 'resident-scans'
+    and public.is_authenticated_resident()
+    and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+
+drop policy if exists
+"Residents can delete their scan images"
+on storage.objects;
+
+create policy
+"Residents can delete their scan images"
+on storage.objects
+for delete
+to authenticated
+using (
+    bucket_id = 'resident-scans'
+    and public.is_authenticated_resident()
+    and (storage.foldername(name))[1] = auth.uid()::text
+);
+
+
+-- No UPDATE policy is included.
+-- Scanner uploads should use upsert: false and create a new UUID file.
+
+
+commit;
+
+create unique index if not exists
+material_opportunities_active_scan_unique
+on public.material_opportunities(scan_id)
+where scan_id is not null
+and status in ('open', 'accepted');
+
+
+begin;
+
+drop function if exists public.accept_opportunity_response(uuid, uuid);
+
+create function public.accept_opportunity_response(
+  p_opportunity_id uuid,
+  p_response_id uuid
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $function$
+declare
+  v_resident_profile_id uuid;
+  v_opportunity public.material_opportunities%rowtype;
+  v_response public.opportunity_responses%rowtype;
+  v_junkshop_name text;
+begin
+  /*
+   * Resolve the authenticated resident.
+   * auth.uid() is supplied by Supabase when the RPC is called
+   * using the signed-in user's access token.
+   */
+  select profile.id
+  into v_resident_profile_id
+  from public.profiles as profile
+  where profile.auth_id = auth.uid()
+    and profile.role = 'resident'
+  limit 1;
+
+  if v_resident_profile_id is null then
+    raise exception 'Resident account was not found.'
+      using errcode = '42501';
+  end if;
+
+  /*
+   * Lock the opportunity so two responses cannot be accepted
+   * at the same time.
+   */
+  select opportunity.*
+  into v_opportunity
+  from public.material_opportunities as opportunity
+  where opportunity.id = p_opportunity_id
+  for update;
+
+  if not found then
+    raise exception 'Opportunity was not found.'
+      using errcode = 'P0002';
+  end if;
+
+  if v_opportunity.resident_profile_id <> v_resident_profile_id then
+    raise exception 'You do not own this opportunity.'
+      using errcode = '42501';
+  end if;
+
+  /*
+   * Lock and validate the selected recycler response.
+   */
+  select response.*
+  into v_response
+  from public.opportunity_responses as response
+  where response.id = p_response_id
+    and response.opportunity_id = p_opportunity_id
+  for update;
+
+  if not found then
+    raise exception 'Recycler response was not found for this opportunity.'
+      using errcode = 'P0002';
+  end if;
+
+  /*
+   * Make repeat requests safe. A second click on the already
+   * accepted response returns the current accepted result.
+   */
+  if v_opportunity.status = 'accepted'
+     and v_opportunity.selected_junkshop_id = v_response.junkshop_id
+     and v_response.status = 'accepted' then
+
+    select junkshop.junkshop_name
+    into v_junkshop_name
+    from public.junkshops as junkshop
+    where junkshop.id = v_response.junkshop_id;
+
+    return jsonb_build_object(
+      'opportunity_id', v_opportunity.id,
+      'response_id', v_response.id,
+      'selected_junkshop_id', v_response.junkshop_id,
+      'junkshop_name', v_junkshop_name,
+      'offered_price_per_kg', v_response.offered_price_per_kg,
+      'pickup_available', v_response.pickup_available,
+      'status', 'accepted',
+      'already_accepted', true
+    );
+  end if;
+
+  if v_opportunity.status <> 'open' then
+    raise exception
+      'Only an open opportunity can accept a recycler response.';
+  end if;
+
+  if v_response.status <> 'interested' then
+    raise exception
+      'Only an interested recycler response can be accepted.';
+  end if;
+
+  /*
+   * Do not assign an inactive or unapproved junkshop.
+   */
+  select junkshop.junkshop_name
+  into v_junkshop_name
+  from public.junkshops as junkshop
+  where junkshop.id = v_response.junkshop_id
+    and junkshop.verification_status = 'approved'
+    and junkshop.is_active = true;
+
+  if not found then
+    raise exception
+      'The selected junkshop is not currently approved and active.';
+  end if;
+
+  /*
+   * Accept the opportunity and assign the selected junkshop.
+   */
+  update public.material_opportunities
+  set
+    status = 'accepted',
+    selected_junkshop_id = v_response.junkshop_id,
+    updated_at = now()
+  where id = p_opportunity_id;
+
+  /*
+   * Accept the chosen response.
+   */
+  update public.opportunity_responses
+  set
+    status = 'accepted',
+    updated_at = now()
+  where id = p_response_id;
+
+  /*
+   * Decline the remaining active responses while preserving
+   * responses that were already withdrawn or declined.
+   */
+  update public.opportunity_responses
+  set
+    status = 'declined',
+    updated_at = now()
+  where opportunity_id = p_opportunity_id
+    and id <> p_response_id
+    and status = 'interested';
+
+  return jsonb_build_object(
+    'opportunity_id', p_opportunity_id,
+    'response_id', p_response_id,
+    'selected_junkshop_id', v_response.junkshop_id,
+    'junkshop_name', v_junkshop_name,
+    'offered_price_per_kg', v_response.offered_price_per_kg,
+    'pickup_available', v_response.pickup_available,
+    'status', 'accepted',
+    'already_accepted', false
+  );
+end;
+$function$;
+
+revoke all
+on function public.accept_opportunity_response(uuid, uuid)
+from public;
+
+grant execute
+on function public.accept_opportunity_response(uuid, uuid)
+to authenticated;
+
+comment on function public.accept_opportunity_response(uuid, uuid)
+is 'Allows the authenticated resident owner to atomically accept one recycler response and decline competing interested responses.';
+
+commit;
+
+/*
+ * Ask PostgREST to discover the newly created RPC and its
+ * exact named arguments.
+ */
+notify pgrst, 'reload schema';
+
+/*
+ * Verification query. Expected signature:
+ * public.accept_opportunity_response(uuid,uuid)
+ *
+ * Expected arguments:
+ * p_opportunity_id uuid, p_response_id uuid
+ */
+select
+  procedure.oid::regprocedure as function_signature,
+  pg_get_function_arguments(
+    procedure.oid
+  ) as function_arguments
+from pg_proc as procedure
+join pg_namespace as namespace
+  on namespace.oid = procedure.pronamespace
+where namespace.nspname = 'public'
+  and procedure.proname = 'accept_opportunity_response';
