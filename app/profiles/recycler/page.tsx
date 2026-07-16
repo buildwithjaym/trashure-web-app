@@ -84,10 +84,10 @@ interface Junkshop {
     operating_hours: OperatingHours | null;
 
     verification_status:
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "suspended";
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "suspended";
 
     is_active: boolean;
 }
@@ -97,8 +97,8 @@ interface JunkshopMaterialRow {
     material_id: string;
 
     price_per_kg:
-        | number
-        | string;
+    | number
+    | string;
 
     is_accepting: boolean;
 }
@@ -138,13 +138,13 @@ interface OpportunityDatabaseRow {
     image_url: string | null;
 
     estimated_weight_kg:
-        | number
-        | string;
+    | number
+    | string;
 
     material_condition: string | null;
 
     fulfillment_method:
-        FulfillmentMethod;
+    FulfillmentMethod;
 
     barangay: string;
     city: string;
@@ -153,16 +153,16 @@ interface OpportunityDatabaseRow {
     status: OpportunityStatus;
 
     selected_junkshop_id:
-        | string
-        | null;
+    | string
+    | null;
 
     created_at: string;
     updated_at: string;
 
     materials:
-        | MaterialRelation
-        | MaterialRelation[]
-        | null;
+    | MaterialRelation
+    | MaterialRelation[]
+    | null;
 }
 
 
@@ -192,8 +192,8 @@ interface OpportunityResponse {
     junkshop_id: string;
 
     offered_price_per_kg:
-        | number
-        | string;
+    | number
+    | string;
 
     pickup_available: boolean;
     message: string | null;
@@ -210,9 +210,9 @@ interface PriorityAlert {
     actionRoute: string;
 
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
 
     containerClass: string;
     iconClass: string;
@@ -403,11 +403,10 @@ function formatRelativeDate(
         hours <
         24
     ) {
-        return `${hours} hr${
-            hours === 1
-                ? ""
-                : "s"
-        } ago`;
+        return `${hours} hr${hours === 1
+            ? ""
+            : "s"
+            } ago`;
     }
 
     const days =
@@ -419,11 +418,10 @@ function formatRelativeDate(
         days <
         7
     ) {
-        return `${days} day${
-            days === 1
-                ? ""
-                : "s"
-        } ago`;
+        return `${days} day${days === 1
+            ? ""
+            : "s"
+            } ago`;
     }
 
     return new Date(
@@ -460,7 +458,7 @@ function getFulfillmentLabel(
     method: FulfillmentMethod
 ) {
     switch (
-        method
+    method
     ) {
         case "pickup":
             return "Pickup requested";
@@ -676,9 +674,7 @@ function getPriorityAlert(
 }
 
 
-/* =========================================================
-   PAGE
-========================================================= */
+
 
 export default function RecyclerHomePage() {
     const router =
@@ -844,7 +840,7 @@ export default function RecyclerHomePage() {
                             user,
                         },
                         error:
-                            authError,
+                        authError,
                     } =
                         await supabase.auth.getUser();
 
@@ -862,9 +858,9 @@ export default function RecyclerHomePage() {
 
                     const {
                         data:
-                            profileData,
+                        profileData,
                         error:
-                            profileError,
+                        profileError,
                     } =
                         await supabase
                             .from(
@@ -914,9 +910,9 @@ export default function RecyclerHomePage() {
 
                     const {
                         data:
-                            junkshopData,
+                        junkshopData,
                         error:
-                            junkshopError,
+                        junkshopError,
                     } =
                         await supabase
                             .from(
@@ -954,8 +950,8 @@ export default function RecyclerHomePage() {
                     const currentJunkshop =
                         (
                             junkshopData as
-                                | Junkshop
-                                | null
+                            | Junkshop
+                            | null
                         ) ?? null;
 
                     setJunkshop(
@@ -992,9 +988,9 @@ export default function RecyclerHomePage() {
 
                     const {
                         data:
-                            materialRows,
+                        materialRows,
                         error:
-                            materialError,
+                        materialError,
                     } =
                         await supabase
                             .from(
@@ -1080,9 +1076,9 @@ export default function RecyclerHomePage() {
                     ) {
                         const {
                             data:
-                                openOpportunityRows,
+                            openOpportunityRows,
                             error:
-                                openOpportunityError,
+                            openOpportunityError,
                         } =
                             await supabase
                                 .from(
@@ -1149,9 +1145,9 @@ export default function RecyclerHomePage() {
 
                     const {
                         data:
-                            acceptedOpportunityRows,
+                        acceptedOpportunityRows,
                         error:
-                            acceptedOpportunityError,
+                        acceptedOpportunityError,
                     } =
                         await supabase
                             .from(
@@ -1214,9 +1210,9 @@ export default function RecyclerHomePage() {
 
                     const {
                         data:
-                            responseRows,
+                        responseRows,
                         error:
-                            responseError,
+                        responseError,
                     } =
                         await supabase
                             .from(
@@ -1251,7 +1247,7 @@ export default function RecyclerHomePage() {
                         ) as OpportunityResponse[]
                     );
                 } catch (
-                    error
+                error
                 ) {
                     const message =
                         error instanceof Error
@@ -1304,9 +1300,9 @@ export default function RecyclerHomePage() {
                         (
                             response
                         ) => [
-                            response.opportunity_id,
-                            response,
-                        ]
+                                response.opportunity_id,
+                                response,
+                            ]
                     )
                 ),
             [
@@ -1330,9 +1326,9 @@ export default function RecyclerHomePage() {
                         return (
                             !response ||
                             response.status ===
-                                "withdrawn" ||
+                            "withdrawn" ||
                             response.status ===
-                                "declined"
+                            "declined"
                         );
                     }
                 ),
@@ -1410,10 +1406,10 @@ export default function RecyclerHomePage() {
             () =>
                 junkshop
                     ? getPriorityAlert(
-                          junkshop,
-                          activeMaterialCount,
-                          profileCompleteness
-                      )
+                        junkshop,
+                        activeMaterialCount,
+                        profileCompleteness
+                    )
                     : null,
             [
                 activeMaterialCount,
@@ -1452,20 +1448,20 @@ export default function RecyclerHomePage() {
 
     const verificationBadge =
         junkshop?.verification_status ===
-        "approved"
+            "approved"
             ? {
-                  label:
-                      "Verified",
+                label:
+                    "Verified",
 
-                  className:
-                      "border-green-200 bg-green-50 text-green-700",
+                className:
+                    "border-green-200 bg-green-50 text-green-700",
 
-                  icon:
-                      BadgeCheck,
-              }
+                icon:
+                    BadgeCheck,
+            }
             : junkshop?.verification_status ===
-              "rejected"
-              ? {
+                "rejected"
+                ? {
                     label:
                         "Needs correction",
 
@@ -1475,28 +1471,28 @@ export default function RecyclerHomePage() {
                     icon:
                         AlertCircle,
                 }
-              : junkshop?.verification_status ===
-                "suspended"
-                ? {
-                      label:
-                          "Suspended",
+                : junkshop?.verification_status ===
+                    "suspended"
+                    ? {
+                        label:
+                            "Suspended",
 
-                      className:
-                          "border-orange-200 bg-orange-50 text-orange-700",
+                        className:
+                            "border-orange-200 bg-orange-50 text-orange-700",
 
-                      icon:
-                          AlertCircle,
-                  }
-                : {
-                      label:
-                          "Pending verification",
+                        icon:
+                            AlertCircle,
+                    }
+                    : {
+                        label:
+                            "Pending verification",
 
-                      className:
-                          "border-amber-200 bg-amber-50 text-amber-700",
+                        className:
+                            "border-amber-200 bg-amber-50 text-amber-700",
 
-                      icon:
-                          Clock3,
-                  };
+                        icon:
+                            Clock3,
+                    };
 
     const VerificationIcon =
         verificationBadge.icon;
@@ -1563,7 +1559,7 @@ export default function RecyclerHomePage() {
                         </div>
 
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="grid w-full grid-cols-[auto_minmax(0,1fr)] gap-2 sm:w-auto sm:flex sm:flex-wrap">
                             <Button
                                 type="button"
                                 variant="outline"
@@ -1578,11 +1574,10 @@ export default function RecyclerHomePage() {
                                 className="rounded-full border-green-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50 hover:text-green-700"
                             >
                                 <RefreshCcw
-                                    className={`mr-2 h-4 w-4 ${
-                                        refreshing
-                                            ? "animate-spin"
-                                            : ""
-                                    }`}
+                                    className={`mr-2 h-4 w-4 ${refreshing
+                                        ? "animate-spin"
+                                        : ""
+                                        }`}
                                 />
 
                                 Refresh
@@ -1591,15 +1586,16 @@ export default function RecyclerHomePage() {
                             <Button
                                 type="button"
                                 onClick={() =>
-                                    router.push(
-                                        "/profiles/recycler/opportunities"
-                                    )
+                                    router.push("/profiles/recycler/opportunities")
                                 }
-                                className="rounded-full bg-green-600 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-700"
+                                className="min-w-0 rounded-full bg-green-600 px-3 text-xs transition-all duration-200 hover:bg-green-700 sm:px-4 sm:text-sm"
                             >
-                                <Inbox className="mr-2 h-4 w-4" />
+                                <Inbox className="mr-2 h-4 w-4 shrink-0" />
 
-                                View opportunities
+                                <span className="sm:hidden">View offers</span>
+                                <span className="hidden sm:inline">
+                                    View opportunities
+                                </span>
                             </Button>
                         </div>
                     </div>
@@ -1621,8 +1617,8 @@ export default function RecyclerHomePage() {
                     <>
                         {/* SHOP HERO */}
 
-                        <section className="trashure-motion animate-[trashureSoftScale_.4s_ease-out_.04s_both] overflow-hidden rounded-[32px] border border-green-100 bg-white shadow-sm">
-                            <div className="relative min-h-56 overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-emerald-800 p-6 text-white sm:p-8">
+                        <section className="trashure-motion w-full min-w-0 animate-[trashureSoftScale_.4s_ease-out_.04s_both] overflow-hidden rounded-[24px] border border-green-100 bg-white shadow-sm sm:rounded-[32px]">
+                            <div className="relative w-full min-w-0 overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-emerald-800 p-5 text-white sm:min-h-56 sm:p-8">
                                 {junkshop.photo_url && (
                                     <>
                                         <img
@@ -1642,7 +1638,7 @@ export default function RecyclerHomePage() {
                                 <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-white/10" />
 
                                 <div className="relative flex min-h-40 flex-col justify-between gap-7 sm:flex-row sm:items-end">
-                                    <div className="flex items-start gap-4">
+                                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                                         <Avatar className="h-16 w-16 shrink-0 border-2 border-white/70 bg-white shadow-lg">
                                             <AvatarImage
                                                 src={
@@ -1663,7 +1659,7 @@ export default function RecyclerHomePage() {
                                         </Avatar>
 
 
-                                        <div>
+                                        <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap gap-2">
                                                 <Badge className="border-white/20 bg-white/15 text-white hover:bg-white/15">
                                                     <Store className="mr-1.5 h-3.5 w-3.5" />
@@ -1680,36 +1676,31 @@ export default function RecyclerHomePage() {
                                                 </Badge>
                                             </div>
 
-                                            <h2 className="mt-3 text-2xl font-black sm:text-3xl">
-                                                {
-                                                    junkshop.junkshop_name
-                                                }
+                                            <h2 className="mt-3 break-words text-2xl font-black sm:text-3xl">
+                                                {junkshop.junkshop_name}
                                             </h2>
 
-                                            <p className="mt-2 flex items-center gap-2 text-sm text-green-50/85">
-                                                <MapPin className="h-4 w-4" />
+                                            <p className="mt-2 flex min-w-0 items-start gap-2 text-sm text-green-50/85">
+                                                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
 
-                                                {[
-                                                    junkshop.barangay,
-                                                    junkshop.city,
-                                                    junkshop.province,
-                                                ]
-                                                    .filter(
-                                                        Boolean
-                                                    )
-                                                    .join(
-                                                        ", "
-                                                    ) ||
-                                                    "Location not provided"}
+                                                <span className="min-w-0 break-words">
+                                                    {[
+                                                        junkshop.barangay,
+                                                        junkshop.city,
+                                                        junkshop.province,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join(", ") || "Location not provided"}
+                                                </span>
                                             </p>
                                         </div>
                                     </div>
 
 
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap">
                                         <Badge
                                             variant="outline"
-                                            className={`border-white/30 bg-white text-sm ${verificationBadge.className}`}
+                                            className={`min-w-0 justify-center border-white/30 bg-white px-2 text-xs sm:text-sm ${verificationBadge.className}`}
                                         >
                                             <VerificationIcon className="mr-1.5 h-3.5 w-3.5" />
 
@@ -1721,13 +1712,11 @@ export default function RecyclerHomePage() {
                                         <Button
                                             type="button"
                                             onClick={() =>
-                                                router.push(
-                                                    "/profiles/recycler/profile"
-                                                )
+                                                router.push("/profiles/recycler/profile")
                                             }
-                                            className="rounded-full bg-white text-green-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50"
+                                            className="min-w-0 rounded-full bg-white px-3 text-xs text-green-700 transition-all duration-200 hover:bg-green-50 sm:px-4 sm:text-sm"
                                         >
-                                            <Settings2 className="mr-2 h-4 w-4" />
+                                            <Settings2 className="mr-1.5 h-4 w-4 shrink-0" />
 
                                             Manage profile
                                         </Button>
@@ -1849,7 +1838,7 @@ export default function RecyclerHomePage() {
                                 animationDelay="200ms"
                             >
                                 {acceptedOpportunities.length ===
-                                0 ? (
+                                    0 ? (
                                     <SectionEmptyState
                                         icon={
                                             Handshake
@@ -1858,7 +1847,7 @@ export default function RecyclerHomePage() {
                                         description="Opportunities selected by residents will appear here."
                                     />
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="w-full min-w-0 space-y-3">
                                         {acceptedOpportunities
                                             .slice(
                                                 0,
@@ -1967,7 +1956,7 @@ export default function RecyclerHomePage() {
                                 animationDelay="300ms"
                             >
                                 {availableOpportunities.length ===
-                                0 ? (
+                                    0 ? (
                                     <SectionEmptyState
                                         icon={
                                             Inbox
@@ -1976,7 +1965,7 @@ export default function RecyclerHomePage() {
                                         description="Resident offers matching your active materials will appear here."
                                     />
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="w-full min-w-0 space-y-3">
                                         {availableOpportunities
                                             .slice(
                                                 0,
@@ -1995,8 +1984,8 @@ export default function RecyclerHomePage() {
                                                         }
                                                         pricePerKg={
                                                             materialPrices[
-                                                                opportunity
-                                                                    .material_id
+                                                            opportunity
+                                                                .material_id
                                                             ] ??
                                                             0
                                                         }
@@ -2025,7 +2014,7 @@ export default function RecyclerHomePage() {
                                 animationDelay="350ms"
                             >
                                 {waitingOpportunities.length ===
-                                0 ? (
+                                    0 ? (
                                     <SectionEmptyState
                                         icon={
                                             Clock3
@@ -2034,7 +2023,7 @@ export default function RecyclerHomePage() {
                                         description="Offers you send to residents will appear here."
                                     />
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="w-full min-w-0 space-y-3">
                                         {waitingOpportunities
                                             .slice(
                                                 0,
@@ -2157,9 +2146,9 @@ function DashboardSummaryCard({
     description: string;
 
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
 
     delay: number;
     onClick: () => void;
@@ -2292,8 +2281,8 @@ function AcceptedRecoveryCard({
     opportunity: Opportunity;
 
     response:
-        | OpportunityResponse
-        | null;
+    | OpportunityResponse
+    | null;
 
     onView: () => void;
 }) {
@@ -2389,81 +2378,60 @@ function AvailableOpportunityCard({
     onView: () => void;
 }) {
     const estimatedValue =
-        opportunity.estimated_weight_kg *
-        pricePerKg;
+        opportunity.estimated_weight_kg * pricePerKg;
 
     return (
-        <div className="group flex gap-4 rounded-2xl border border-zinc-100 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-50/40">
-            <MaterialThumbnail
-                opportunity={
-                    opportunity
-                }
-            />
+        <div className="group relative grid w-full min-w-0 grid-cols-[3.75rem_minmax(0,1fr)] gap-3 overflow-hidden rounded-2xl border border-zinc-100 p-4 pr-12 transition-all duration-300 hover:-translate-y-0.5 hover:border-green-300 hover:bg-green-50/40 sm:grid-cols-[4rem_minmax(0,1fr)] sm:gap-4 sm:pr-14">
+            <MaterialThumbnail opportunity={opportunity} />
 
-            <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-black text-zinc-900">
-                        {
-                            opportunity.material_name
-                        }
+            <div className="min-w-0">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <h3 className="min-w-0 break-words font-black leading-tight text-zinc-900">
+                        {opportunity.material_name}
                     </h3>
 
                     <Badge
                         variant="secondary"
-                        className="bg-zinc-100 text-zinc-600"
+                        className="shrink-0 bg-zinc-100 text-zinc-600"
                     >
-                        {
-                            opportunity.category
-                        }
+                        {opportunity.category}
                     </Badge>
                 </div>
 
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-500">
-                    <span className="flex items-center gap-1.5">
+                <div className="mt-2 flex min-w-0 flex-wrap gap-x-3 gap-y-1.5 text-xs text-zinc-500">
+                    <span className="flex shrink-0 items-center gap-1.5">
                         <Scale className="h-3.5 w-3.5 text-green-600" />
 
-                        {
-                            opportunity.estimated_weight_kg
-                        }{" "}
-                        kg
+                        {opportunity.estimated_weight_kg} kg
                     </span>
 
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex shrink-0 items-center gap-1.5">
                         <WalletCards className="h-3.5 w-3.5 text-green-600" />
 
-                        {formatPeso(
-                            estimatedValue
-                        )}
+                        {formatPeso(estimatedValue)}
                     </span>
                 </div>
 
-                <p className="mt-2 truncate text-xs text-zinc-500">
-                    {getLocationText(
-                        opportunity
-                    )}
+                <p className="mt-2 line-clamp-2 min-w-0 break-words text-xs leading-5 text-zinc-500">
+                    {getLocationText(opportunity)}
                 </p>
 
                 <p className="mt-1 text-xs text-zinc-400">
-                    {formatRelativeDate(
-                        opportunity.created_at
-                    )}
+                    {formatRelativeDate(opportunity.created_at)}
                 </p>
             </div>
 
             <button
                 type="button"
                 aria-label={`View ${opportunity.material_name}`}
-                onClick={
-                    onView
-                }
-                className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-green-50 text-green-700 transition-all duration-200 hover:bg-green-100 group-hover:translate-x-0.5"
+                onClick={onView}
+                className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-green-50 text-green-700 shadow-sm transition-all duration-200 hover:bg-green-100 group-hover:translate-x-0.5"
             >
                 <ArrowRight className="h-4 w-4" />
             </button>
         </div>
     );
 }
-
 
 function WaitingResponseCard({
     opportunity,
@@ -2475,42 +2443,34 @@ function WaitingResponseCard({
     onView: () => void;
 }) {
     return (
-        <div className="group flex gap-4 rounded-2xl border border-amber-100 bg-amber-50/40 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200">
-            <MaterialThumbnail
-                opportunity={
-                    opportunity
-                }
-            />
+        <div className="group relative grid w-full min-w-0 grid-cols-[3.75rem_minmax(0,1fr)] gap-3 overflow-hidden rounded-2xl border border-amber-100 bg-amber-50/40 p-4 pr-12 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 sm:grid-cols-[4rem_minmax(0,1fr)] sm:gap-4 sm:pr-14">
+            <MaterialThumbnail opportunity={opportunity} />
 
-            <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-black text-zinc-900">
-                        {
-                            opportunity.material_name
-                        }
+            <div className="min-w-0">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <h3 className="min-w-0 break-words font-black leading-tight text-zinc-900">
+                        {opportunity.material_name}
                     </h3>
 
                     <Badge
                         variant="outline"
-                        className="border-amber-200 bg-white text-amber-700"
+                        className="shrink-0 border-amber-200 bg-white text-amber-700"
                     >
                         Waiting
                     </Badge>
                 </div>
 
-                <p className="mt-2 text-sm text-zinc-600">
+                <p className="mt-2 min-w-0 break-words text-sm text-zinc-600">
                     Your offer:{" "}
                     <span className="font-black text-green-700">
                         {formatPeso(
-                            Number(
-                                response.offered_price_per_kg
-                            )
+                            Number(response.offered_price_per_kg)
                         )}
                         /kg
                     </span>
                 </p>
 
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+                <div className="mt-2 flex min-w-0 flex-col gap-1 text-xs text-zinc-500 min-[380px]:flex-row min-[380px]:flex-wrap min-[380px]:gap-x-3">
                     <span>
                         {response.pickup_available
                             ? "Pickup available"
@@ -2518,10 +2478,7 @@ function WaitingResponseCard({
                     </span>
 
                     <span>
-                        Sent{" "}
-                        {formatRelativeDate(
-                            response.created_at
-                        )}
+                        Sent {formatRelativeDate(response.created_at)}
                     </span>
                 </div>
             </div>
@@ -2529,10 +2486,8 @@ function WaitingResponseCard({
             <button
                 type="button"
                 aria-label={`View response for ${opportunity.material_name}`}
-                onClick={
-                    onView
-                }
-                className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-white text-green-700 shadow-sm transition-transform duration-200 group-hover:translate-x-0.5"
+                onClick={onView}
+                className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-green-700 shadow-sm transition-all duration-200 hover:bg-green-50 group-hover:translate-x-0.5"
             >
                 <ArrowRight className="h-4 w-4" />
             </button>
@@ -2576,9 +2531,9 @@ function QuickAction({
     disabled = false,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
 
     title: string;
     description: string;
@@ -2624,9 +2579,9 @@ function SectionEmptyState({
     description,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
 
     title: string;
     description: string;
@@ -2657,7 +2612,7 @@ function MissingJunkshopHome({
     onSetup: () => void;
 }) {
     return (
-        <section className="trashure-motion animate-[trashureSoftScale_.4s_ease-out_both] overflow-hidden rounded-[32px] border border-green-100 bg-white shadow-sm">
+        <section className="trashure-motion w-full min-w-0 overflow-hidden animate-[trashureFadeUp_.4s_ease-out_both] rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-6">
             <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="relative overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-emerald-800 p-7 text-white sm:p-10">
                     <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-white/10" />
@@ -2755,9 +2710,9 @@ function HomeFeature({
     description,
 }: {
     icon:
-        ComponentType<{
-            className?: string;
-        }>;
+    ComponentType<{
+        className?: string;
+    }>;
 
     title: string;
     description: string;
@@ -2825,7 +2780,7 @@ function RecyclerHomeSkeleton() {
     return (
         <div className="space-y-7">
             <div className="flex justify-between gap-4">
-                <div className="space-y-3">
+                <div className="w-full min-w-0 space-y-3">
                     <Skeleton className="h-4 w-40 bg-green-100" />
 
                     <Skeleton className="h-9 w-80 max-w-full bg-green-100" />
