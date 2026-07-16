@@ -1,0 +1,838 @@
+You are continuing development of a Next.js application named:
+
+Trashure: Turn Trash Into Treasure
+
+Do not restart the project or replace working features. Continue from the current implementation and preserve the existing design system, database relationships, Supabase authentication, and folder structure.
+
+==================================================
+PROJECT PURPOSE
+==================================================
+
+Trashure is an AI-powered circular economy platform.
+
+It does not only answer:
+
+“Where should I throw this?”
+
+It answers:
+
+“What can this material become?”
+
+Residents can scan discarded items and receive circular recovery recommendations:
+
+- Reuse
+- Sell
+- Donate
+- Recycle
+
+The platform should also connect residents with:
+
+- Nearby junkshops that accept the detected material
+- Junkshops’ local price per kilogram
+- Schools or community partners requesting the material
+- Material requirements and preparation instructions
+- Collection or recovery opportunities
+
+The partner network is more important than the AI scanner.
+
+The AI creates interest, but the platform becomes useful when it can answer:
+
+- Which nearby junkshop accepts this material?
+- How much does the junkshop pay per kilogram?
+- What condition should the material be in?
+- Which school currently needs the material?
+- Where should the resident bring it?
+
+==================================================
+TECHNOLOGY STACK
+==================================================
+
+Frontend:
+
+- Next.js 15
+- App Router
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Lucide React icons
+- Sonner notifications
+
+Backend:
+
+- Next.js App Router
+- API routes or server actions
+- Supabase PostgreSQL
+- Supabase Auth
+- Supabase Storage
+
+AI:
+
+- Gemini Vision API
+- Material identification
+- Circular recovery recommendations
+
+Deployment:
+
+- Vercel
+
+==================================================
+USER ROLES
+==================================================
+
+The application already uses one profiles table that supports four roles:
+
+1. resident
+2. school_partner
+3. recycler_partner
+4. lgu_admin
+
+Do not create separate authentication systems for these roles.
+
+The profiles table represents the authenticated user account.
+
+Role-specific organization information belongs in separate tables.
+
+==================================================
+CURRENT PROFILE TABLE
+==================================================
+
+The profiles table already contains fields similar to:
+
+- id
+- auth_id
+- full_name
+- email
+- avatar_url
+- age
+- sex
+- role
+- barangay
+- city
+- province
+- onboarding_completed
+- created_at
+- updated_at
+
+The authenticated Supabase user is connected using:
+
+profiles.auth_id = auth.users.id
+
+==================================================
+CURRENT SCANS TABLE
+==================================================
+
+The scans table already exists and includes fields such as:
+
+- id
+- user_id
+- image_url
+- detected_object
+- material_type
+- category
+- confidence_score
+- recommended_action
+- action_taken
+- estimated_weight
+- estimated_value
+- barangay
+- created_at
+
+The scans table connects to:
+
+scans.user_id = profiles.id
+
+==================================================
+PARTNER DATABASE DESIGN
+==================================================
+
+The following partner tables were planned or created:
+
+1. materials
+
+This is the central material catalog.
+
+Important fields:
+
+- id
+- material_name
+- category
+- recyclable
+- reuse_options
+- donation_options
+- selling_information
+- recycling_process
+- created_at
+- updated_at
+
+2. junkshops
+
+This stores the junkshop organization managed by a recycler partner.
+
+Important fields:
+
+- id
+- profile_id
+- junkshop_name
+- description
+- photo_url
+- address_line
+- barangay
+- city
+- province
+- postal_code
+- latitude
+- longitude
+- contact_number
+- contact_email
+- operating_hours
+- verification_status
+- is_active
+- created_at
+- updated_at
+
+Relationship:
+
+junkshops.profile_id = profiles.id
+
+For the MVP, one recycler profile manages one junkshop.
+
+3. junkshop_materials
+
+This stores the materials accepted by each junkshop.
+
+Important fields:
+
+- id
+- junkshop_id
+- material_id
+- price_per_kg
+- minimum_weight_kg
+- accepted_condition
+- preparation_instructions
+- is_accepting
+- created_at
+- updated_at
+
+Relationships:
+
+junkshop_materials.junkshop_id = junkshops.id
+
+junkshop_materials.material_id = materials.id
+
+The price belongs in junkshop_materials, not materials, because each junkshop may offer a different price.
+
+The combination of junkshop_id and material_id should be unique.
+
+4. school_partners
+
+This will store the school or community organization.
+
+Important fields:
+
+- id
+- profile_id
+- organization_name
+- organization_type
+- description
+- project_description
+- photo_url
+- address_line
+- barangay
+- city
+- province
+- postal_code
+- latitude
+- longitude
+- contact_person
+- contact_number
+- contact_email
+- verification_status
+- is_active
+- created_at
+- updated_at
+
+5. school_material_requests
+
+This will store school material needs.
+
+Important fields:
+
+- id
+- school_partner_id
+- material_id
+- request_title
+- description
+- quantity_needed
+- quantity_received
+- unit
+- required_condition
+- intended_use
+- needed_by
+- status
+- created_at
+- updated_at
+
+Recommended school request statuses:
+
+- draft
+- open
+- partially_fulfilled
+- fulfilled
+- cancelled
+
+Do not use vague values such as “done” or “needed.”
+
+==================================================
+LGU SCOPE
+==================================================
+
+Do not build a complicated LGU management system yet.
+
+For now, the LGU administrator only needs monitoring.
+
+The LGU dashboard will eventually use anonymous aggregated data from scans, such as:
+
+- Total scans
+- Material categories
+- Estimated recovered weight
+- Estimated material value
+- Action taken
+- Barangay participation
+- Reuse, sell, donate, and recycle counts
+- Partner participation
+- Monthly or weekly activity
+
+Do not expose residents’ private information to LGU analytics.
+
+==================================================
+CURRENT RECYCLER FOLDER STRUCTURE
+==================================================
+
+The current structure is:
+
+app/
+└── profiles/
+    └── recycler/
+        ├── layout.tsx
+        ├── page.tsx
+        └── materials/
+            └── page.tsx
+
+The recycler layout applies to both:
+
+- /profiles/recycler
+- /profiles/recycler/materials
+
+==================================================
+RECYCLER LAYOUT COMPLETED FEATURES
+==================================================
+
+The recycler layout was designed to match the resident interface.
+
+Design colors:
+
+- Main page background: bg-green-50
+- Primary button: bg-green-600
+- Primary hover: hover:bg-green-700
+- Gradient: from-green-500 to-emerald-700
+- White cards
+- Green borders such as border-green-100
+- Zinc text colors
+- Rounded cards and controls
+- Clean mobile-first layout
+
+Desktop layout:
+
+- Sticky white translucent top bar
+- Trashure logo
+- “Junkshop Partner” subtitle
+- Navigation links
+- Profile dropdown
+
+Mobile layout:
+
+- Sticky top bar
+- Trashure logo on the left
+- User avatar on the right
+- Fixed bottom navigation
+- Raised center Add Material button
+
+Mobile profile dropdown requirements:
+
+- Show profile image
+- Show recycler’s name
+- Show barangay
+- Show Junkshop Partner
+- Show only:
+  - Junkshop profile
+  - Logout
+
+Do not show both Account Profile and Junkshop Profile.
+
+The dropdown must:
+
+- Have a solid white background
+- Be narrower than the phone screen
+- Open below the avatar
+- Use a high z-index
+- Not appear translucent
+- Not cover the entire dashboard unnecessarily
+
+==================================================
+IMPORTANT BASE UI RULE
+==================================================
+
+The project’s Shadcn components use Base UI, not Radix UI.
+
+Do not use:
+
+asChild
+
+Using asChild caused:
+
+- React warning that asChild was passed to a DOM element
+- Nested button elements
+- Hydration mismatch
+- Invalid HTML
+- Dropdown trigger errors
+
+Incorrect:
+
+<Button asChild>
+    <Link href="/somewhere">Open</Link>
+</Button>
+
+Incorrect:
+
+<DropdownMenuTrigger asChild>
+    <button>Profile</button>
+</DropdownMenuTrigger>
+
+Correct navigation approach:
+
+const router = useRouter();
+
+<Button
+    type="button"
+    onClick={() => router.push("/somewhere")}
+>
+    Open
+</Button>
+
+Correct dropdown trigger approach:
+
+<DropdownMenuTrigger
+    type="button"
+    className="..."
+>
+    Profile content
+</DropdownMenuTrigger>
+
+DropdownMenuTrigger already renders the button.
+
+Do not nest a button inside DropdownMenuTrigger.
+
+==================================================
+DROPDOWN MENU ISSUE THAT WAS FIXED
+==================================================
+
+A previous dropdown caused this error:
+
+- button cannot be a descendant of button
+- hydration failed
+- React does not recognize asChild
+- MenuGroupContext is missing
+
+The causes were:
+
+1. Using Radix-style asChild with Base UI
+2. Nesting a button inside DropdownMenuTrigger
+3. Using DropdownMenuLabel without the required menu group
+4. Importing DropdownMenuSeparator more than once
+
+The safe simplified dropdown should use:
+
+- DropdownMenu
+- DropdownMenuTrigger
+- DropdownMenuContent
+- DropdownMenuItem
+- DropdownMenuSeparator
+
+Avoid DropdownMenuLabel unless it is correctly wrapped by DropdownMenuGroup.
+
+Keep imports unique. Do not import the same component twice.
+
+==================================================
+REACT HOOK RULE
+==================================================
+
+Hooks must remain inside the React component.
+
+Incorrect:
+
+const router = useRouter();
+
+export default function RecyclerPage() {
+}
+
+Correct:
+
+export default function RecyclerPage() {
+    const router = useRouter();
+}
+
+Do not place useRouter, useState, useEffect, useMemo, or other hooks at module level.
+
+==================================================
+RECYCLER DASHBOARD COMPLETED FEATURES
+==================================================
+
+The recycler dashboard is located at:
+
+app/profiles/recycler/page.tsx
+
+Its purpose is to manage the junkshop organization, not the authenticated account.
+
+Features implemented or planned:
+
+- Authentication check
+- Recycler profile loading
+- Role validation
+- Junkshop lookup using profile_id
+- Loading skeleton
+- Refresh state
+- Error state with retry
+- Empty state when no junkshop exists
+- Junkshop setup wizard
+- Junkshop edit wizard
+- Live resident-facing preview
+- Junkshop image upload
+- Supabase Storage integration
+- Address fields
+- Barangay
+- City or municipality
+- Province
+- Postal code
+- Contact number
+- Contact email
+- Operating days
+- Opening time
+- Closing time
+- Verification status
+- Profile completeness
+- Accepted material count
+- Active material count
+- Average listed price
+- Shop status
+- Accepted materials preview
+- Link to the materials management page
+- Sonner success and error notifications
+
+The junkshop setup modal should not be a basic generic form.
+
+It should be a polished multi-step wizard:
+
+Step 1:
+- Junkshop name
+- Description
+
+Step 2:
+- Street address or landmark
+- Barangay
+- City or municipality
+- Province
+- Postal code
+- Operating days
+- Opening time
+- Closing time
+
+Step 3:
+- Junkshop photo
+- Contact number
+- Contact email
+- Verification notice
+
+The right side of the modal should show a live resident preview when space allows.
+
+On mobile, the modal should remain readable and scroll correctly.
+
+==================================================
+SUPABASE STORAGE
+==================================================
+
+The partner image bucket is:
+
+partner-images
+
+Suggested junkshop path:
+
+partner-images/
+└── junkshops/
+    └── auth-user-id/
+        └── generated-file-name.jpg
+
+Validate images before uploading:
+
+- Must be an image
+- Accept JPG, PNG, or WebP
+- Maximum size: 5 MB
+
+Use Sonner for:
+
+- Uploading state
+- Success
+- Error
+
+==================================================
+RECYCLER MATERIALS PAGE
+==================================================
+
+The materials page is:
+
+app/profiles/recycler/materials/page.tsx
+
+Its purpose is to manage what the junkshop is willing to buy.
+
+The page should support:
+
+- Authentication
+- Recycler role validation
+- Junkshop lookup
+- Material catalog loading
+- Junkshop material listings
+- Loading skeleton
+- Error state
+- Empty state
+- Filtered empty state
+- Refresh state
+- Search
+- Category filter
+- Status filter
+- Add material
+- Edit material
+- Pause or resume material
+- Delete confirmation
+- Sonner notifications
+- Mobile responsive layout
+- Consistent green/emerald colors
+- No asChild usage
+
+The page should open the Add Material interface automatically when the URL contains:
+
+/profiles/recycler/materials?action=add
+
+The raised center button in the recycler mobile navigation already points to this URL.
+
+==================================================
+MATERIAL LISTING FIELDS
+==================================================
+
+When a junkshop adds a material, collect:
+
+- Exact material from the materials catalog
+- Price per kilogram
+- Minimum accepted weight
+- Required material condition
+- Preparation instructions
+- Currently accepting status
+
+Example:
+
+Material:
+PET Plastic Bottle
+
+Category:
+Plastic
+
+Price:
+₱20 per kilogram
+
+Minimum:
+1 kilogram
+
+Condition:
+Clean and dry, without remaining liquid
+
+Preparation:
+Remove bottle cap and keep bottles in a separate sack
+
+Status:
+Accepting
+
+==================================================
+MATERIAL MODAL REQUIREMENTS
+==================================================
+
+The Add Material modal should be a two-step interface.
+
+Step 1: Choose material
+
+- Search the material catalog
+- Filter by category
+- Show material cards
+- Prevent duplicate materials already listed by the same junkshop
+- Highlight selected material
+- If editing, keep the current material fixed
+
+Step 2: Price and conditions
+
+- Price per kilogram
+- Minimum weight
+- Required condition
+- Preparation instructions
+- Accepting toggle
+- Resident-facing live preview
+
+The modal should show:
+
+- Step indicator
+- Green gradient header
+- Back button
+- Continue button
+- Save button
+- Loading state
+- Clear validation messages
+
+==================================================
+MATERIAL PAGE SUMMARY CARDS
+==================================================
+
+Display:
+
+- Total listings
+- Actively buying
+- Paused
+- Average price per kilogram
+
+==================================================
+MATERIAL LIST CARD
+==================================================
+
+Each material listing card should show:
+
+- Material name
+- Category
+- Accepting or paused badge
+- Price per kilogram
+- Minimum weight
+- Required condition
+- Preparation instructions
+- Toggle
+- Edit button
+- Delete button
+
+Use a custom switch button if the installed Switch component is uncertain.
+
+==================================================
+DATABASE SECURITY
+==================================================
+
+Row Level Security must ensure:
+
+- Recycler partners can only create a junkshop connected to their own profile
+- Recycler partners can only update their own junkshop
+- Recycler partners can only manage materials belonging to their own junkshop
+- Public users can only see approved and active junkshops
+- Public users can only see accepted materials from approved and active junkshops
+- Profiles must not be publicly exposed
+
+A dangerous policy existed earlier:
+
+“Public can view profiles”
+
+This should not remain because it can expose:
+
+- Full name
+- Email
+- Age
+- Sex
+- Barangay
+- City
+- Province
+
+Public partner pages should read from junkshops and school_partners, not directly from profiles.
+
+==================================================
+GENERAL DEVELOPMENT RULES
+==================================================
+
+When writing or modifying code:
+
+- Use TypeScript
+- Preserve Next.js App Router conventions
+- Keep client hooks inside client components
+- Use "use client" when browser hooks or Supabase browser client are needed
+- Use reusable helper functions
+- Use Sonner notifications
+- Include loading states
+- Include empty states
+- Include retry states
+- Include disabled states during mutations
+- Handle Supabase errors
+- Do not hardcode fake materials
+- Read materials from the materials table
+- Avoid any asChild prop
+- Avoid nested buttons
+- Do not duplicate imports
+- Do not replace working files unnecessarily
+- Do not remove existing functionality
+- Keep the same green and emerald visual system
+- Design mobile-first
+- Think from the recycler’s perspective
+- Make forms clear and practical
+- Avoid generic or unfinished-looking modals
+
+==================================================
+CURRENT IMMEDIATE NEXT STEP
+==================================================
+
+The immediate next step is to finish and verify:
+
+app/profiles/recycler/materials/page.tsx
+
+Do the following:
+
+1. Confirm the file compiles without TypeScript errors.
+2. Confirm there are no asChild usages.
+3. Confirm all React hooks are inside the component.
+4. Confirm the recycler can load their junkshop.
+5. Confirm the materials catalog loads from Supabase.
+6. Confirm Add Material works.
+7. Confirm duplicate materials are prevented.
+8. Confirm Edit Material works.
+9. Confirm pause and resume work.
+10. Confirm deletion uses a confirmation modal.
+11. Confirm ?action=add opens the add modal.
+12. Confirm mobile layout works with the recycler bottom navigation.
+13. Confirm all RLS policies allow only the owning recycler to mutate the data.
+14. Confirm Sonner shows success and error feedback.
+15. Run:
+
+npx tsc --noEmit
+
+Then resolve every TypeScript error before proceeding.
+
+After the recycler materials page is working, the next module will be:
+
+app/profiles/school-partner
+
+That module will include:
+
+- School or community profile setup
+- Organization photo
+- Complete address
+- Contact person and contact details
+- Sustainability project description
+- Create material request
+- Target quantity
+- Quantity received
+- Required condition
+- Intended use
+- Deadline
+- Request status
+- Open, partially fulfilled, fulfilled, cancelled states
+- Loading and empty states
+- Mobile responsive profile menu
+- Same Trashure green and emerald design system
+
+Do not begin the LGU module until the recycler and school partner flows are complete.

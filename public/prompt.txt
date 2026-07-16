@@ -54,7 +54,7 @@ AI
 
 Use:
 
-OpenAI Vision API
+Gemini Vision API
 
 Purpose:
 
@@ -114,6 +114,7 @@ Upload waste image
 Receive AI analysis
 View recommendations
 Track environmental contribution
+
 2. School/Community Partner
 
 Can:
@@ -121,6 +122,7 @@ Can:
 Receive donated materials
 Create material requests
 Support sustainability projects
+
 3. Recycler/Junkshop Partner
 
 Can:
@@ -128,6 +130,7 @@ Can:
 Register accepted materials
 Provide estimated material value
 Receive recycling opportunities
+
 4. LGU Administrator
 
 Can:
@@ -241,7 +244,7 @@ trashure-images/
       plastic001.jpg
 Step 3
 
-Send image to OpenAI Vision API.
+Send image to  Vision API.
 
 Create:
 
