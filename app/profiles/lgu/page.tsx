@@ -65,31 +65,31 @@ interface MonitoringPeriod {
 
 interface MonitoringSummary {
   total_recovered_kg:
-    | number
-    | string;
+  | number
+  | string;
   total_recovered_tons:
-    | number
-    | string;
+  | number
+  | string;
   resident_recovered_kg:
-    | number
-    | string;
+  | number
+  | string;
   resident_recovered_tons:
-    | number
-    | string;
+  | number
+  | string;
   school_recovered_kg:
-    | number
-    | string;
+  | number
+  | string;
   school_recovered_tons:
-    | number
-    | string;
+  | number
+  | string;
   completed_resident_recoveries: number;
   school_collection_entries: number;
   pipeline_kg:
-    | number
-    | string;
+  | number
+  | string;
   pipeline_tons:
-    | number
-    | string;
+  | number
+  | string;
   pipeline_count: number;
   registered_residents: number;
   active_junkshops: number;
@@ -110,17 +110,17 @@ interface MonthlyTrend {
   month_start: string;
   month_label: string;
   resident_kg:
-    | number
-    | string;
+  | number
+  | string;
   school_kg:
-    | number
-    | string;
+  | number
+  | string;
   total_kg:
-    | number
-    | string;
+  | number
+  | string;
   total_tons:
-    | number
-    | string;
+  | number
+  | string;
 }
 
 
@@ -129,26 +129,26 @@ interface MaterialBreakdown {
   material_name: string;
   category: string;
   total_kg:
-    | number
-    | string;
+  | number
+  | string;
   total_tons:
-    | number
-    | string;
+  | number
+  | string;
   activity_count: number;
   share_percent:
-    | number
-    | string;
+  | number
+  | string;
 }
 
 
 interface BarangayPerformance {
   barangay: string;
   total_kg:
-    | number
-    | string;
+  | number
+  | string;
   total_tons:
-    | number
-    | string;
+  | number
+  | string;
   activity_count: number;
   resident_recoveries: number;
   school_entries: number;
@@ -161,11 +161,11 @@ interface RecyclerPerformance {
   barangay: string | null;
   completed_count: number;
   recovered_kg:
-    | number
-    | string;
+  | number
+  | string;
   recovered_tons:
-    | number
-    | string;
+  | number
+  | string;
 }
 
 
@@ -175,27 +175,27 @@ interface SchoolPerformance {
   barangay: string | null;
   entry_count: number;
   recovered_kg:
-    | number
-    | string;
+  | number
+  | string;
   recovered_tons:
-    | number
-    | string;
+  | number
+  | string;
 }
 
 
 interface RecentActivity {
   id: string;
   source_type:
-    | "resident_recovery"
-    | "school_collection";
+  | "resident_recovery"
+  | "school_collection";
   material_name: string;
   category: string;
   weight_kg:
-    | number
-    | string;
+  | number
+  | string;
   weight_tons:
-    | number
-    | string;
+  | number
+  | string;
   barangay: string;
   title: string;
   occurred_at: string;
@@ -267,18 +267,6 @@ function formatKilograms(
 }
 
 
-function formatTons(
-  value:
-    | number
-    | string,
-) {
-  return `${formatNumber(
-    numberValue(
-      value,
-    ),
-    3,
-  )} t`;
-}
 
 
 function formatDate(
@@ -340,17 +328,17 @@ function getErrorMessage(
 
   if (
     typeof error ===
-      "object" &&
+    "object" &&
     error !==
-      null &&
+    null &&
     "message" in
-      error &&
+    error &&
     typeof (
       error as {
         message?: unknown;
       }
     ).message ===
-      "string"
+    "string"
   ) {
     return (
       error as {
@@ -370,7 +358,7 @@ function dateString(
     date.getFullYear(),
     String(
       date.getMonth() +
-        1,
+      1,
     ).padStart(
       2,
       "0",
@@ -420,10 +408,10 @@ function periodDates(
 
   start.setDate(
     start.getDate() -
-      (
-        days -
-        1
-      ),
+    (
+      days -
+      1
+    ),
   );
 
   return {
@@ -446,7 +434,7 @@ function readDashboard(
   if (
     !value ||
     typeof value !==
-      "object"
+    "object"
   ) {
     throw new Error(
       "The LGU monitoring function returned invalid data.",
@@ -574,7 +562,7 @@ function LguMonitoringContent() {
             ),
           );
         } catch (
-          error
+        error
         ) {
           setPageError(
             getErrorMessage(
@@ -695,12 +683,12 @@ function LguMonitoringContent() {
 
   const actualResidentShare =
     weightRecords >
-    0
+      0
       ? (
-          actualWeightRecords /
-          weightRecords
-        ) *
-        100
+        actualWeightRecords /
+        weightRecords
+      ) *
+      100
       : 0;
 
 
@@ -814,11 +802,10 @@ function LguMonitoringContent() {
               className="h-11 rounded-full border-green-200 bg-white text-green-700 hover:bg-green-50"
             >
               <RefreshCcw
-                className={`mr-2 h-4 w-4 ${
-                  refreshing
-                    ? "animate-spin"
-                    : ""
-                }`}
+                className={`mr-2 h-4 w-4 ${refreshing
+                  ? "animate-spin"
+                  : ""
+                  }`}
               />
 
               Refresh data
@@ -832,65 +819,35 @@ function LguMonitoringContent() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          icon={
-            Weight
-          }
-          label="Recovered tonnage"
-          value={formatTons(
-            summary.total_recovered_tons,
-          )}
-          description={`${formatKilograms(
-            summary.total_recovered_kg,
-          )} completed in the selected period`}
+          icon={Weight}
+          label="Recovered weight"
+          value={formatKilograms(summary.total_recovered_kg)}
+          description="Completed recovery in the selected period"
           featured
         />
 
         <MetricCard
-          icon={
-            Recycle
-          }
+          icon={Recycle}
           label="Resident recoveries"
-          value={formatTons(
-            summary.resident_recovered_tons,
-          )}
-          description={`${summary.completed_resident_recoveries} completed resident transaction${
-            summary.completed_resident_recoveries ===
-            1
-              ? ""
-              : "s"
-          }`}
+          value={formatKilograms(summary.resident_recovered_kg)}
+          description={`${summary.completed_resident_recoveries} completed resident transaction${summary.completed_resident_recoveries === 1 ? "" : "s"
+            }`}
         />
 
         <MetricCard
-          icon={
-            GraduationCap
-          }
+          icon={GraduationCap}
           label="School collections"
-          value={formatTons(
-            summary.school_recovered_tons,
-          )}
-          description={`${summary.school_collection_entries} recorded collection entr${
-            summary.school_collection_entries ===
-            1
-              ? "y"
-              : "ies"
-          }`}
+          value={formatKilograms(summary.school_recovered_kg)}
+          description={`${summary.school_collection_entries} recorded collection entr${summary.school_collection_entries === 1 ? "y" : "ies"
+            }`}
         />
 
         <MetricCard
-          icon={
-            Clock3
-          }
+          icon={Clock3}
           label="Recovery pipeline"
-          value={formatTons(
-            summary.pipeline_tons,
-          )}
-          description={`${summary.pipeline_count} open or accepted resident offer${
-            summary.pipeline_count ===
-            1
-              ? ""
-              : "s"
-          }`}
+          value={formatKilograms(summary.pipeline_kg)}
+          description={`${summary.pipeline_count} open or accepted resident offer${summary.pipeline_count === 1 ? "" : "s"
+            }`}
         />
       </section>
 
@@ -992,7 +949,7 @@ function LguMonitoringContent() {
           description="Completed kilograms by month, separated by resident and school activity."
         >
           {dashboard.monthly_trend.length ===
-          0 ? (
+            0 ? (
             <EmptyPanel
               message="No monthly recovery data is available for this period."
             />
@@ -1025,27 +982,27 @@ function LguMonitoringContent() {
                           totalKg /
                           trendMaximum
                         ) *
-                          210,
+                        210,
                       );
 
                     const residentHeight =
                       totalKg >
-                      0
+                        0
                         ? (
-                            residentKg /
-                            totalKg
-                          ) *
-                          totalHeight
+                          residentKg /
+                          totalKg
+                        ) *
+                        totalHeight
                         : 0;
 
                     const schoolHeight =
                       totalKg >
-                      0
+                        0
                         ? (
-                            schoolKg /
-                            totalKg
-                          ) *
-                          totalHeight
+                          schoolKg /
+                          totalKg
+                        ) *
+                        totalHeight
                         : 0;
 
                     return (
@@ -1075,25 +1032,25 @@ function LguMonitoringContent() {
                         >
                           {schoolHeight >
                             0 && (
-                            <div
-                              className="w-full bg-emerald-300"
-                              style={{
-                                height:
-                                  `${schoolHeight}px`,
-                              }}
-                            />
-                          )}
+                              <div
+                                className="w-full bg-emerald-300"
+                                style={{
+                                  height:
+                                    `${schoolHeight}px`,
+                                }}
+                              />
+                            )}
 
                           {residentHeight >
                             0 && (
-                            <div
-                              className="w-full bg-green-600"
-                              style={{
-                                height:
-                                  `${residentHeight}px`,
-                              }}
-                            />
-                          )}
+                              <div
+                                className="w-full bg-green-600"
+                                style={{
+                                  height:
+                                    `${residentHeight}px`,
+                                }}
+                              />
+                            )}
                         </div>
 
                         <p className="mt-3 text-center text-[11px] font-semibold text-zinc-500">
@@ -1134,7 +1091,7 @@ function LguMonitoringContent() {
           description="Materials contributing the most weight to city recovery."
         >
           {dashboard.materials.length ===
-          0 ? (
+            0 ? (
             <EmptyPanel
               message="No recovered material data is available."
             />
@@ -1156,7 +1113,7 @@ function LguMonitoringContent() {
                         kilograms /
                         materialMaximum
                       ) *
-                        100,
+                      100,
                     );
 
                   return (
@@ -1183,7 +1140,7 @@ function LguMonitoringContent() {
                             }{" "}
                             activit
                             {material.activity_count ===
-                            1
+                              1
                               ? "y"
                               : "ies"}
                           </p>
@@ -1191,9 +1148,7 @@ function LguMonitoringContent() {
 
                         <div className="text-right">
                           <p className="font-black text-green-700">
-                            {formatTons(
-                              material.total_tons,
-                            )}
+                            {formatKilograms(material.total_kg)}
                           </p>
 
                           <p className="text-xs text-zinc-400">
@@ -1241,7 +1196,7 @@ function LguMonitoringContent() {
           description="Recovery volume by barangay within the LGU monitoring scope."
         >
           {dashboard.barangays.length ===
-          0 ? (
+            0 ? (
             <EmptyPanel
               message="No barangay recovery activity is available for this period."
             />
@@ -1287,7 +1242,7 @@ function LguMonitoringContent() {
                         kilograms /
                         barangayMaximum
                       ) *
-                        100,
+                      100,
                     );
 
                   return (
@@ -1348,9 +1303,7 @@ function LguMonitoringContent() {
                         </span>
 
                         <p className="font-black text-green-700">
-                          {formatTons(
-                            barangay.total_tons,
-                          )}
+                          {formatKilograms(barangay.total_kg)}
                         </p>
                       </div>
 
@@ -1419,17 +1372,15 @@ function LguMonitoringContent() {
                     recycler.recovered_kg,
                   ),
 
-                weightLabel:
-                  formatTons(
-                    recycler.recovered_tons,
-                  ),
+                weightLabel: formatKilograms(
+                  recycler.recovered_kg,
+                ),
 
                 activityLabel:
-                  `${recycler.completed_count} completed recover${
-                    recycler.completed_count ===
+                  `${recycler.completed_count} completed recover${recycler.completed_count ===
                     1
-                      ? "y"
-                      : "ies"
+                    ? "y"
+                    : "ies"
                   }`,
               }),
             )}
@@ -1467,17 +1418,15 @@ function LguMonitoringContent() {
                     school.recovered_kg,
                   ),
 
-                weightLabel:
-                  formatTons(
-                    school.recovered_tons,
-                  ),
+                weightLabel: formatKilograms(
+                  school.recovered_kg,
+                ),
 
                 activityLabel:
-                  `${school.entry_count} collection entr${
-                    school.entry_count ===
+                  `${school.entry_count} collection entr${school.entry_count ===
                     1
-                      ? "y"
-                      : "ies"
+                    ? "y"
+                    : "ies"
                   }`,
               }),
             )}
@@ -1501,7 +1450,7 @@ function LguMonitoringContent() {
           description="Latest recovery events included in the city total."
         >
           {dashboard.recent_activity.length ===
-          0 ? (
+            0 ? (
             <EmptyPanel
               message="No completed recovery activity is available for this period."
             />
@@ -1539,14 +1488,13 @@ function LguMonitoringContent() {
                     className="grid gap-3 border-b border-zinc-100 px-5 py-4 last:border-b-0 lg:grid-cols-[minmax(220px,1.4fr)_minmax(160px,1fr)_130px_160px_170px] lg:items-center"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
-                        activity.source_type ===
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${activity.source_type ===
                         "school_collection"
-                          ? "bg-blue-50 text-blue-600"
-                          : "bg-green-50 text-green-600"
-                      }`}>
+                        ? "bg-blue-50 text-blue-600"
+                        : "bg-green-50 text-green-600"
+                        }`}>
                         {activity.source_type ===
-                        "school_collection" ? (
+                          "school_collection" ? (
                           <School className="h-5 w-5" />
                         ) : (
                           <Recycle className="h-5 w-5" />
@@ -1562,7 +1510,7 @@ function LguMonitoringContent() {
 
                         <p className="mt-1 text-xs text-zinc-500">
                           {activity.source_type ===
-                          "school_collection"
+                            "school_collection"
                             ? "School collection"
                             : "Resident recovery"}
                         </p>
@@ -1635,7 +1583,7 @@ function LguMonitoringContent() {
               {dashboard.scope.province
                 ? `, ${dashboard.scope.province}`
                 : ""}
-              . Scans alone are not counted as recovered tonnage. Only
+              . Scans alone are not counted as recovered weight. Only
               completed resident recoveries and recorded school collection
               entries contribute to the total.
             </p>
@@ -1653,12 +1601,12 @@ function MetricCard({
   value,
   description,
   featured =
-    false,
+  false,
 }: {
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
   label: string;
   value: string;
   description: string;
@@ -1666,20 +1614,18 @@ function MetricCard({
 }) {
   return (
     <article
-      className={`rounded-[26px] border p-5 shadow-sm ${
-        featured
-          ? "border-green-600 bg-green-600 text-white"
-          : "border-green-100 bg-white text-zinc-900"
-      }`}
+      className={`rounded-[26px] border p-5 shadow-sm ${featured
+        ? "border-green-600 bg-green-600 text-white"
+        : "border-green-100 bg-white text-zinc-900"
+        }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p
-            className={`text-sm font-semibold ${
-              featured
-                ? "text-green-100"
-                : "text-zinc-500"
-            }`}
+            className={`text-sm font-semibold ${featured
+              ? "text-green-100"
+              : "text-zinc-500"
+              }`}
           >
             {label}
           </p>
@@ -1690,22 +1636,20 @@ function MetricCard({
         </div>
 
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-            featured
-              ? "bg-white/15 text-white"
-              : "bg-green-50 text-green-600"
-          }`}
+          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${featured
+            ? "bg-white/15 text-white"
+            : "bg-green-50 text-green-600"
+            }`}
         >
           <Icon className="h-6 w-6" />
         </div>
       </div>
 
       <p
-        className={`mt-4 text-xs leading-5 ${
-          featured
-            ? "text-green-50"
-            : "text-zinc-500"
-        }`}
+        className={`mt-4 text-xs leading-5 ${featured
+          ? "text-green-50"
+          : "text-zinc-500"
+          }`}
       >
         {description}
       </p>
@@ -1720,9 +1664,9 @@ function CompactMetric({
   value,
 }: {
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
   label: string;
   value: number;
 }) {
@@ -1755,13 +1699,13 @@ function Panel({
   children,
 }: {
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
   title: string;
   description: string;
   children:
-    ReactNode;
+  ReactNode;
 }) {
   return (
     <section className="rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-6">
@@ -1802,9 +1746,9 @@ function PartnerList({
   }>;
   emptyMessage: string;
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
 }) {
   const maximum =
     Math.max(
@@ -1892,7 +1836,7 @@ function PartnerList({
                         item.weight /
                         maximum
                       ) *
-                        100,
+                      100,
                     )}%`,
                 }}
               />
