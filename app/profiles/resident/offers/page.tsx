@@ -130,8 +130,8 @@ interface OpportunityDatabaseRow {
   scan_id: string | null;
   image_url: string | null;
   estimated_weight_kg:
-    | number
-    | string;
+  | number
+  | string;
   material_condition: string | null;
   fulfillment_method: FulfillmentMethod;
   barangay: string;
@@ -142,9 +142,9 @@ interface OpportunityDatabaseRow {
   created_at: string;
   updated_at: string;
   materials:
-    | MaterialRelation
-    | MaterialRelation[]
-    | null;
+  | MaterialRelation
+  | MaterialRelation[]
+  | null;
 }
 
 
@@ -184,17 +184,17 @@ interface ResponseDatabaseRow {
   opportunity_id: string;
   junkshop_id: string;
   offered_price_per_kg:
-    | number
-    | string;
+  | number
+  | string;
   pickup_available: boolean;
   message: string | null;
   status: ResponseStatus;
   created_at: string;
   updated_at: string;
   junkshops:
-    | JunkshopRelation
-    | JunkshopRelation[]
-    | null;
+  | JunkshopRelation
+  | JunkshopRelation[]
+  | null;
 }
 
 
@@ -284,17 +284,17 @@ function getErrorMessage(
 
   if (
     typeof error ===
-      "object" &&
+    "object" &&
     error !==
-      null &&
+    null &&
     "message" in
-      error &&
+    error &&
     typeof (
       error as {
         message?: unknown;
       }
     ).message ===
-      "string"
+    "string"
   ) {
     return (
       error as {
@@ -314,15 +314,15 @@ function formatRelativeDate(
     Math.max(
       0,
       Date.now() -
-        new Date(
-          value,
-        ).getTime(),
+      new Date(
+        value,
+      ).getTime(),
     );
 
   const minutes =
     Math.floor(
       difference /
-        60_000,
+      60_000,
     );
 
   if (
@@ -342,37 +342,35 @@ function formatRelativeDate(
   const hours =
     Math.floor(
       minutes /
-        60,
+      60,
     );
 
   if (
     hours <
     24
   ) {
-    return `${hours} hr${
-      hours ===
-      1
+    return `${hours} hr${hours ===
+        1
         ? ""
         : "s"
-    } ago`;
+      } ago`;
   }
 
   const days =
     Math.floor(
       hours /
-        24,
+      24,
     );
 
   if (
     days <
     7
   ) {
-    return `${days} day${
-      days ===
-      1
+    return `${days} day${days ===
+        1
         ? ""
         : "s"
-    } ago`;
+      } ago`;
   }
 
   return new Date(
@@ -626,7 +624,7 @@ export default function ResidentOffersPage() {
               user,
             },
             error:
-              authError,
+            authError,
           } =
             await supabase.auth.getUser();
 
@@ -643,9 +641,9 @@ export default function ResidentOffersPage() {
 
           const {
             data:
-              profileData,
+            profileData,
             error:
-              profileError,
+            profileError,
           } =
             await supabase
               .from(
@@ -896,9 +894,9 @@ export default function ResidentOffersPage() {
 
           const {
             data:
-              responseData,
+            responseData,
             error:
-              responseError,
+            responseError,
           } =
             await supabase
               .from(
@@ -1013,7 +1011,7 @@ export default function ResidentOffersPage() {
             normalizedResponses,
           );
         } catch (
-          error
+        error
         ) {
           const message =
             getErrorMessage(
@@ -1101,19 +1099,19 @@ export default function ResidentOffersPage() {
                 second,
               ) =>
                 second.offered_price_per_kg -
-                  first.offered_price_per_kg ||
+                first.offered_price_per_kg ||
                 Number(
                   second.pickup_available,
                 ) -
-                  Number(
-                    first.pickup_available,
-                  ) ||
+                Number(
+                  first.pickup_available,
+                ) ||
                 new Date(
                   second.created_at,
                 ).getTime() -
-                  new Date(
-                    first.created_at,
-                  ).getTime(),
+                new Date(
+                  first.created_at,
+                ).getTime(),
             ),
           );
         }
@@ -1136,11 +1134,11 @@ export default function ResidentOffersPage() {
                 opportunity,
               ) =>
                 opportunity.status ===
-                  "open" ||
+                "open" ||
                 opportunity.status ===
-                  "accepted" ||
+                "accepted" ||
                 opportunity.status ===
-                  "completed",
+                "completed",
             )
             .map(
               (
@@ -1191,7 +1189,7 @@ export default function ResidentOffersPage() {
             opportunity,
           ) =>
             opportunity.status ===
-              "open" &&
+            "open" &&
             (
               responseMap.get(
                 opportunity.id,
@@ -1204,7 +1202,7 @@ export default function ResidentOffersPage() {
                 response.status ===
                 "interested",
             ).length ===
-              0,
+            0,
         );
       },
       [
@@ -1222,7 +1220,7 @@ export default function ResidentOffersPage() {
             opportunity,
           ) =>
             opportunity.status ===
-              "open" &&
+            "open" &&
             (
               responseMap.get(
                 opportunity.id,
@@ -1269,9 +1267,9 @@ export default function ResidentOffersPage() {
             opportunity,
           ) =>
             opportunity.status ===
-              "completed" ||
+            "completed" ||
             opportunity.status ===
-              "cancelled",
+            "cancelled",
         );
       },
       [
@@ -1674,7 +1672,7 @@ export default function ResidentOffersPage() {
           true,
         );
       } catch (
-        error
+      error
       ) {
         toast.error(
           getErrorMessage(
@@ -1735,7 +1733,7 @@ export default function ResidentOffersPage() {
           true,
         );
       } catch (
-        error
+      error
       ) {
         toast.error(
           getErrorMessage(
@@ -1796,7 +1794,7 @@ export default function ResidentOffersPage() {
           true,
         );
       } catch (
-        error
+      error
       ) {
         toast.error(
           getErrorMessage(
@@ -1812,69 +1810,8 @@ export default function ResidentOffersPage() {
     };
 
 
-  const completeOffer =
-    async (
-      opportunity: Opportunity,
-    ) => {
-      const confirmed =
-        window.confirm(
-          "Mark this recovery as completed?",
-        );
 
-      if (
-        !confirmed
-      ) {
-        return;
-      }
 
-      setActionOpportunityId(
-        opportunity.id,
-      );
-
-      try {
-        const {
-          error,
-        } =
-          await supabase.rpc(
-            "resident_complete_material_opportunity",
-            {
-              p_opportunity_id:
-                opportunity.id,
-            },
-          );
-
-        if (
-          error
-        ) {
-          throw error;
-        }
-
-        toast.success(
-          "Recovery marked as completed.",
-        );
-
-        await loadPageData(
-          true,
-        );
-
-        setActiveTab(
-          "history",
-        );
-      } catch (
-        error
-      ) {
-        toast.error(
-          getErrorMessage(
-            error,
-            "Unable to complete the recovery.",
-          ),
-        );
-      } finally {
-        setActionOpportunityId(
-          null,
-        );
-      }
-    };
 
 
   const openResponses =
@@ -1977,7 +1914,7 @@ export default function ResidentOffersPage() {
           "accepted",
         );
       } catch (
-        error
+      error
       ) {
         toast.error(
           getErrorMessage(
@@ -2023,19 +1960,19 @@ export default function ResidentOffersPage() {
   const selectedResponses =
     selectedOpportunity
       ? (
-          responseMap.get(
-            selectedOpportunity.id,
-          ) ??
-          []
-        ).filter(
-          (
-            response,
-          ) =>
-            response.status ===
-              "interested" ||
-            response.status ===
-              "accepted",
-        )
+        responseMap.get(
+          selectedOpportunity.id,
+        ) ??
+        []
+      ).filter(
+        (
+          response,
+        ) =>
+          response.status ===
+          "interested" ||
+          response.status ===
+          "accepted",
+      )
       : [];
 
 
@@ -2090,11 +2027,10 @@ export default function ResidentOffersPage() {
                 className="rounded-full border-green-200 text-green-700 hover:bg-green-50"
               >
                 <RefreshCcw
-                  className={`mr-2 h-4 w-4 ${
-                    refreshing
+                  className={`mr-2 h-4 w-4 ${refreshing
                       ? "animate-spin"
                       : ""
-                  }`}
+                    }`}
                 />
 
                 Refresh
@@ -2250,10 +2186,10 @@ export default function ResidentOffersPage() {
                 "responses"
                 ? "Recycler responses"
                 : activeTab ===
-                    "accepted"
+                  "accepted"
                   ? "Accepted recoveries"
                   : activeTab ===
-                      "history"
+                    "history"
                     ? "Offer history"
                     : "Open offers"}
             </h2>
@@ -2270,7 +2206,7 @@ export default function ResidentOffersPage() {
 
 
           {displayedOffers.length ===
-          0 ? (
+            0 ? (
             <EmptyOffersState
               tab={
                 activeTab
@@ -2305,9 +2241,9 @@ export default function ResidentOffersPage() {
                         response,
                       ) =>
                         response.status ===
-                          "interested" ||
+                        "interested" ||
                         response.status ===
-                          "accepted",
+                        "accepted",
                     );
 
                   const highestResponse =
@@ -2371,11 +2307,7 @@ export default function ResidentOffersPage() {
                           opportunity,
                         )
                       }
-                      onComplete={() =>
-                        void completeOffer(
-                          opportunity,
-                        )
-                      }
+
                     />
                   );
                 },
@@ -2751,7 +2683,7 @@ export default function ResidentOffersPage() {
                     response
                     {
                       selectedResponses.length ===
-                      1
+                        1
                         ? ""
                         : "s"
                     }
@@ -2761,7 +2693,7 @@ export default function ResidentOffersPage() {
 
 
               {selectedResponses.length ===
-              0 ? (
+                0 ? (
                 <div className="rounded-2xl border border-dashed border-green-200 bg-green-50 p-8 text-center">
                   <Inbox className="mx-auto h-8 w-8 text-green-600" />
 
@@ -2810,10 +2742,10 @@ export default function ResidentOffersPage() {
 
                                 {index ===
                                   0 && (
-                                  <Badge className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50">
-                                    Highest price
-                                  </Badge>
-                                )}
+                                    <Badge className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50">
+                                      Highest price
+                                    </Badge>
+                                  )}
 
                                 {response.pickup_available && (
                                   <Badge className="border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50">
@@ -2877,30 +2809,30 @@ export default function ResidentOffersPage() {
 
                             {selectedOpportunity.status ===
                               "open" && (
-                              <Button
-                                type="button"
-                                disabled={
-                                  Boolean(
-                                    acceptingResponseId,
-                                  )
-                                }
-                                onClick={() =>
-                                  void acceptResponse(
-                                    response,
-                                  )
-                                }
-                                className="rounded-full bg-green-600 hover:bg-green-700"
-                              >
-                                {acceptingResponseId ===
-                                response.id ? (
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                  <BadgeCheck className="mr-2 h-4 w-4" />
-                                )}
+                                <Button
+                                  type="button"
+                                  disabled={
+                                    Boolean(
+                                      acceptingResponseId,
+                                    )
+                                  }
+                                  onClick={() =>
+                                    void acceptResponse(
+                                      response,
+                                    )
+                                  }
+                                  className="rounded-full bg-green-600 hover:bg-green-700"
+                                >
+                                  {acceptingResponseId ===
+                                    response.id ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <BadgeCheck className="mr-2 h-4 w-4" />
+                                  )}
 
-                                Accept offer
-                              </Button>
-                            )}
+                                  Accept offer
+                                </Button>
+                              )}
                           </div>
                         </article>
                       );
@@ -2924,9 +2856,9 @@ function SummaryCard({
   description,
 }: {
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
   label: string;
   value: number;
   description: string;
@@ -2974,20 +2906,18 @@ function TabButton({
       onClick={
         onClick
       }
-      className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition ${
-        active
+      className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition ${active
           ? "bg-green-600 text-white"
           : "text-zinc-500 hover:bg-green-50 hover:text-green-700"
-      }`}
+        }`}
     >
       {label}
 
       <span
-        className={`rounded-full px-2 py-0.5 text-xs ${
-          active
+        className={`rounded-full px-2 py-0.5 text-xs ${active
             ? "bg-white/20 text-white"
             : "bg-zinc-100 text-zinc-500"
-        }`}
+          }`}
       >
         {count}
       </span>
@@ -3006,20 +2936,18 @@ function OfferCard({
   onResponses,
   onCancel,
   onDelete,
-  onComplete,
 }: {
   opportunity: Opportunity;
   responseCount: number;
   highestResponse:
-    OpportunityResponse | null;
+  OpportunityResponse | null;
   acceptedResponse:
-    OpportunityResponse | null;
+  OpportunityResponse | null;
   busy: boolean;
   onEdit: () => void;
   onResponses: () => void;
   onCancel: () => void;
   onDelete: () => void;
-  onComplete: () => void;
 }) {
   const displayedResponse =
     acceptedResponse ??
@@ -3028,8 +2956,8 @@ function OfferCard({
   const estimatedTotal =
     displayedResponse
       ? displayedResponse
-          .offered_price_per_kg *
-        opportunity.estimated_weight_kg
+        .offered_price_per_kg *
+      opportunity.estimated_weight_kg
       : 0;
 
   return (
@@ -3082,7 +3010,7 @@ function OfferCard({
           <Metric
             icon={
               responseCount >
-              0
+                0
                 ? WalletCards
                 : Clock3
             }
@@ -3094,8 +3022,8 @@ function OfferCard({
             value={
               displayedResponse
                 ? formatPeso(
-                    estimatedTotal,
-                  )
+                  estimatedTotal,
+                )
                 : "Waiting"
             }
           />
@@ -3181,7 +3109,7 @@ function OfferCard({
           {opportunity.status ===
             "open" &&
             responseCount ===
-              0 && (
+            0 && (
               <>
                 <Button
                   type="button"
@@ -3223,7 +3151,7 @@ function OfferCard({
           {opportunity.status ===
             "open" &&
             responseCount >
-              0 && (
+            0 && (
               <>
                 <Button
                   type="button"
@@ -3259,58 +3187,49 @@ function OfferCard({
             )}
 
 
-          {opportunity.status ===
-            "accepted" && (
+          {opportunity.status === "accepted" && (
             <>
               <Button
                 type="button"
                 variant="outline"
-                onClick={
-                  onResponses
-                }
+                onClick={onResponses}
                 className="flex-1 rounded-full border-green-200 text-green-700 hover:bg-green-50"
               >
                 View details
               </Button>
 
-              <Button
-                type="button"
-                disabled={
-                  busy
-                }
-                onClick={
-                  onComplete
-                }
-                className="flex-1 rounded-full bg-green-600 hover:bg-green-700"
+              <div
+                className="
+        flex flex-1 items-center justify-center gap-2
+        rounded-full border border-blue-200
+        bg-blue-50 px-4 py-2.5
+        text-sm font-bold text-blue-700
+      "
               >
-                {busy ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                )}
+                <Clock3 className="h-4 w-4" />
 
-                Mark completed
-              </Button>
+                Awaiting recycler confirmation
+              </div>
             </>
           )}
 
 
           {opportunity.status ===
             "cancelled" && (
-            <div className="flex flex-1 items-center justify-center rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-bold text-zinc-600">
-              Offer cancelled
-            </div>
-          )}
+              <div className="flex flex-1 items-center justify-center rounded-full bg-zinc-100 px-4 py-2.5 text-sm font-bold text-zinc-600">
+                Offer cancelled
+              </div>
+            )}
 
 
           {opportunity.status ===
             "completed" && (
-            <div className="flex flex-1 items-center justify-center rounded-full bg-green-50 px-4 py-2.5 text-sm font-bold text-green-700">
-              <CheckCircle2 className="mr-2 h-4 w-4" />
+              <div className="flex flex-1 items-center justify-center rounded-full bg-green-50 px-4 py-2.5 text-sm font-bold text-green-700">
+                <CheckCircle2 className="mr-2 h-4 w-4" />
 
-              Recovery completed
-            </div>
-          )}
+                Recovery completed
+              </div>
+            )}
         </div>
       </div>
     </article>
@@ -3324,9 +3243,9 @@ function Metric({
   value,
 }: {
   icon:
-    ComponentType<{
-      className?: string;
-    }>;
+  ComponentType<{
+    className?: string;
+  }>;
   label: string;
   value: string;
 }) {
@@ -3361,39 +3280,39 @@ function EmptyOffersState({
 }) {
   const copy =
     tab ===
-    "responses"
+      "responses"
       ? {
+        title:
+          "No recycler responses yet",
+
+        description:
+          "When recyclers respond to your open listings, they will appear here.",
+      }
+      : tab ===
+        "accepted"
+        ? {
           title:
-            "No recycler responses yet",
+            "No accepted recovery",
 
           description:
-            "When recyclers respond to your open listings, they will appear here.",
+            "Choose a recycler response first, then the accepted recovery will appear here.",
         }
-      : tab ===
-          "accepted"
-        ? {
+        : tab ===
+          "history"
+          ? {
             title:
-              "No accepted recovery",
+              "No offer history",
 
             description:
-              "Choose a recycler response first, then the accepted recovery will appear here.",
+              "Completed and cancelled offers will appear here.",
           }
-        : tab ===
-            "history"
-          ? {
-              title:
-                "No offer history",
-
-              description:
-                "Completed and cancelled offers will appear here.",
-            }
           : {
-              title:
-                "No open offer",
+            title:
+              "No open offer",
 
-              description:
-                "Post one of your confirmed scans so matching recyclers can respond.",
-            };
+            description:
+              "Post one of your confirmed scans so matching recyclers can respond.",
+          };
 
   return (
     <div className="mt-6 flex flex-col items-center rounded-[24px] border border-dashed border-green-200 bg-green-50 px-6 py-12 text-center">
@@ -3413,30 +3332,30 @@ function EmptyOffersState({
 
       {tab ===
         "open" && (
-        <Button
-          type="button"
-          onClick={
-            canCreate
-              ? onCreate
-              : onScan
-          }
-          className="mt-5 rounded-full bg-green-600 hover:bg-green-700"
-        >
-          {canCreate ? (
-            <>
-              <Plus className="mr-2 h-4 w-4" />
+          <Button
+            type="button"
+            onClick={
+              canCreate
+                ? onCreate
+                : onScan
+            }
+            className="mt-5 rounded-full bg-green-600 hover:bg-green-700"
+          >
+            {canCreate ? (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
 
-              Post an offer
-            </>
-          ) : (
-            <>
-              <Package className="mr-2 h-4 w-4" />
+                Post an offer
+              </>
+            ) : (
+              <>
+                <Package className="mr-2 h-4 w-4" />
 
-              Scan an item
-            </>
-          )}
-        </Button>
-      )}
+                Scan an item
+              </>
+            )}
+          </Button>
+        )}
     </div>
   );
 }
