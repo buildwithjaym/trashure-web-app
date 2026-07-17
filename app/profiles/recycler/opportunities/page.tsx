@@ -149,6 +149,8 @@ interface Opportunity {
   category: string;
   image_url: string | null;
   estimated_weight_kg: number | string;
+  actual_weight_kg: number | string | null;
+  completed_at: string | null;
   material_condition: string | null;
   fulfillment_method: FulfillmentMethod;
   barangay: string;
@@ -175,6 +177,13 @@ interface Opportunity {
   estimated_listed_value: number | string;
   bucket: OpportunityBucket;
   response: OpportunityResponse | null;
+}
+
+
+interface OpportunityCompletionDetail {
+  opportunity_id: string;
+  actual_weight_kg: number | string | null;
+  completed_at: string | null;
 }
 
 
@@ -426,17 +435,61 @@ function getOpportunityPrice(
 }
 
 
+function getDisplayWeight(
+  opportunity: Opportunity,
+) {
+  if (
+    opportunity.status ===
+      "completed" &&
+    opportunity.actual_weight_kg !==
+      null
+  ) {
+    return numberValue(
+      opportunity.actual_weight_kg,
+    );
+  }
+
+  return numberValue(
+    opportunity.estimated_weight_kg,
+  );
+}
+
+
 function getEstimatedValue(
   opportunity: Opportunity,
 ) {
   return (
-    numberValue(
-      opportunity.estimated_weight_kg,
+    getDisplayWeight(
+      opportunity,
     ) *
     getOpportunityPrice(
       opportunity,
     )
   );
+}
+
+
+function readCompletionDetails(
+  value: unknown,
+): OpportunityCompletionDetail[] {
+  if (
+    value ===
+    null
+  ) {
+    return [];
+  }
+
+  if (
+    !Array.isArray(
+      value,
+    )
+  ) {
+    throw new Error(
+      "The recovery completion details returned an invalid response.",
+    );
+  }
+
+  return value as OpportunityCompletionDetail[];
 }
 
 
@@ -604,6 +657,22 @@ function RecyclerOpportunitiesContent() {
       null,
     );
 
+  const [
+    actualWeightKg,
+    setActualWeightKg,
+  ] =
+    useState(
+      "",
+    );
+
+  const [
+    completingOpportunity,
+    setCompletingOpportunity,
+  ] =
+    useState(
+      false,
+    );
+
 
   const loadPageData =
     useCallback(
@@ -648,25 +717,79 @@ function RecyclerOpportunitiesContent() {
             return;
           }
 
-          const {
-            data,
-            error,
-          } =
-            await supabase.rpc(
-              "get_recycler_opportunity_dashboard",
-            );
+          const [
+            dashboardResult,
+            completionResult,
+          ] =
+            await Promise.all([
+              supabase.rpc(
+                "get_recycler_opportunity_dashboard",
+              ),
+
+              supabase.rpc(
+                "get_recycler_opportunity_completion_details",
+              ),
+            ]);
 
           if (
-            error
+            dashboardResult.error
           ) {
-            throw error;
+            throw dashboardResult.error;
           }
 
-          setDashboard(
+          if (
+            completionResult.error
+          ) {
+            throw completionResult.error;
+          }
+
+          const payload =
             readDashboardPayload(
-              data,
-            ),
-          );
+              dashboardResult.data,
+            );
+
+          const completionDetails =
+            readCompletionDetails(
+              completionResult.data,
+            );
+
+          const completionByOpportunity =
+            new Map(
+              completionDetails.map(
+                (detail) => [
+                  detail.opportunity_id,
+                  detail,
+                ],
+              ),
+            );
+
+          setDashboard({
+            ...payload,
+
+            opportunities:
+              payload.opportunities.map(
+                (opportunity) => {
+                  const completion =
+                    completionByOpportunity.get(
+                      opportunity.id,
+                    );
+
+                  return {
+                    ...opportunity,
+
+                    actual_weight_kg:
+                      completion
+                        ?.actual_weight_kg ??
+                      null,
+
+                    completed_at:
+                      completion
+                        ?.completed_at ??
+                      null,
+                  };
+                },
+              ),
+          });
         } catch (
           error
         ) {
@@ -963,6 +1086,17 @@ function RecyclerOpportunitiesContent() {
         opportunity,
       );
 
+      setActualWeightKg(
+        opportunity.actual_weight_kg !==
+          null
+          ? String(
+              numberValue(
+                opportunity.actual_weight_kg,
+              ),
+            )
+          : "",
+      );
+
       setResponseForm({
         offered_price_per_kg:
           opportunity.response
@@ -1005,7 +1139,8 @@ function RecyclerOpportunitiesContent() {
       open: boolean,
     ) => {
       if (
-        savingResponse
+        savingResponse ||
+        completingOpportunity
       ) {
         return;
       }
@@ -1023,6 +1158,10 @@ function RecyclerOpportunitiesContent() {
 
         setResponseForm(
           emptyResponseForm,
+        );
+
+        setActualWeightKg(
+          "",
         );
       }
     };
@@ -1210,6 +1349,110 @@ function RecyclerOpportunitiesContent() {
       } finally {
         setWithdrawingOpportunityId(
           null,
+        );
+      }
+    };
+
+
+  const completeOpportunity =
+    async () => {
+      if (
+        !selectedOpportunity ||
+        completingOpportunity
+      ) {
+        return;
+      }
+
+      if (
+        selectedOpportunity.status !==
+        "accepted"
+      ) {
+        toast.error(
+          "Only an accepted recovery can be completed.",
+        );
+
+        return;
+      }
+
+      const actualWeight =
+        Number(
+          actualWeightKg,
+        );
+
+      if (
+        !Number.isFinite(
+          actualWeight,
+        ) ||
+        actualWeight <=
+          0
+      ) {
+        toast.error(
+          "Enter an actual weight greater than zero.",
+        );
+
+        return;
+      }
+
+      setCompletingOpportunity(
+        true,
+      );
+
+      try {
+        const {
+          error,
+        } =
+          await supabase.rpc(
+            "complete_recycler_material_opportunity",
+            {
+              p_opportunity_id:
+                selectedOpportunity.id,
+
+              p_actual_weight_kg:
+                actualWeight,
+            },
+          );
+
+        if (
+          error
+        ) {
+          throw error;
+        }
+
+        toast.success(
+          "Actual weight confirmed and recovery completed.",
+        );
+
+        setOpportunityDialogOpen(
+          false,
+        );
+
+        setSelectedOpportunity(
+          null,
+        );
+
+        setActualWeightKg(
+          "",
+        );
+
+        setActiveTab(
+          "completed",
+        );
+
+        await loadPageData(
+          true,
+        );
+      } catch (
+        error
+      ) {
+        toast.error(
+          error instanceof
+          Error
+            ? error.message
+            : "Unable to complete the recovery.",
+        );
+      } finally {
+        setCompletingOpportunity(
+          false,
         );
       }
     };
@@ -2169,11 +2412,73 @@ function RecyclerOpportunitiesContent() {
                         </div>
                       </div>
                     ) : (
-                      <AcceptedDetails
-                        opportunity={
-                          selectedOpportunity
-                        }
-                      />
+                      <>
+                        <AcceptedDetails
+                          opportunity={
+                            selectedOpportunity
+                          }
+                        />
+
+                        {selectedOpportunity.status ===
+                          "accepted" && (
+                          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                            <div className="flex items-start gap-3">
+                              <Scale className="mt-0.5 h-5 w-5 shrink-0 text-blue-700" />
+
+                              <div className="min-w-0 flex-1">
+                                <Label
+                                  htmlFor="actual_weight_kg"
+                                  className="font-black text-zinc-900"
+                                >
+                                  Confirm actual weight
+                                </Label>
+
+                                <p className="mt-1 text-xs leading-5 text-zinc-600">
+                                  Weigh the received material before completing this recovery. The LGU report will use this value.
+                                </p>
+
+                                <div className="relative mt-3">
+                                  <Input
+                                    id="actual_weight_kg"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.01"
+                                    inputMode="decimal"
+                                    value={
+                                      actualWeightKg
+                                    }
+                                    onChange={(
+                                      event,
+                                    ) =>
+                                      setActualWeightKg(
+                                        event.target.value,
+                                      )
+                                    }
+                                    placeholder="Example: 12.50"
+                                    disabled={
+                                      completingOpportunity
+                                    }
+                                    className="h-12 rounded-xl border-blue-200 bg-white pr-12 focus-visible:ring-blue-500"
+                                  />
+
+                                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-zinc-500">
+                                    kg
+                                  </span>
+                                </div>
+
+                                <p className="mt-2 text-xs text-zinc-500">
+                                  Resident estimate:{" "}
+                                  {numberValue(
+                                    selectedOpportunity
+                                      .estimated_weight_kg,
+                                  )}{" "}
+                                  kg
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -2185,7 +2490,8 @@ function RecyclerOpportunitiesContent() {
                   type="button"
                   variant="ghost"
                   disabled={
-                    savingResponse
+                    savingResponse ||
+                    completingOpportunity
                   }
                   onClick={() =>
                     setOpportunityDialogOpen(
@@ -2243,6 +2549,36 @@ function RecyclerOpportunitiesContent() {
                     <Package className="mr-2 h-4 w-4" />
 
                     Add material
+                  </Button>
+                )}
+
+
+                {selectedOpportunity.status ===
+                  "accepted" && (
+                  <Button
+                    type="button"
+                    disabled={
+                      completingOpportunity ||
+                      !actualWeightKg ||
+                      numberValue(
+                        actualWeightKg,
+                      ) <=
+                        0
+                    }
+                    onClick={() =>
+                      void completeOpportunity()
+                    }
+                    className="min-w-48 rounded-full bg-blue-600 px-6 text-white hover:bg-blue-700 disabled:bg-zinc-200 disabled:text-zinc-400"
+                  >
+                    {completingOpportunity ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <PackageCheck className="mr-2 h-4 w-4" />
+                    )}
+
+                    {completingOpportunity
+                      ? "Completing..."
+                      : "Confirm weight & complete"}
                   </Button>
                 )}
               </div>
@@ -2454,9 +2790,14 @@ function OpportunityCard({
             icon={
               Scale
             }
-            label="Estimated weight"
-            value={`${numberValue(
-              opportunity.estimated_weight_kg,
+            label={
+              opportunity.status ===
+              "completed"
+                ? "Actual weight"
+                : "Estimated weight"
+            }
+            value={`${getDisplayWeight(
+              opportunity,
             )} kg`}
           />
 
@@ -2465,9 +2806,12 @@ function OpportunityCard({
               WalletCards
             }
             label={
-              opportunity.response
-                ? "Your estimate"
-                : "Listed estimate"
+              opportunity.status ===
+              "completed"
+                ? "Recovered value"
+                : opportunity.response
+                  ? "Your estimate"
+                  : "Listed estimate"
             }
             value={formatPeso(
               estimatedTotal,
@@ -2851,9 +3195,14 @@ function OpportunityDetailGrid({
         icon={
           Scale
         }
-        label="Estimated weight"
-        value={`${numberValue(
-          opportunity.estimated_weight_kg,
+        label={
+          opportunity.status ===
+          "completed"
+            ? "Actual weight"
+            : "Estimated weight"
+        }
+        value={`${getDisplayWeight(
+          opportunity,
         )} kg`}
       />
 
@@ -2982,6 +3331,47 @@ function AcceptedDetails({
               ? " with pickup available."
               : "."}
           </p>
+
+          {opportunity.status ===
+            "completed" && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl bg-white p-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+                  Actual weight
+                </p>
+
+                <p className="mt-1 font-black text-zinc-900">
+                  {numberValue(
+                    opportunity.actual_weight_kg,
+                  )}{" "}
+                  kg
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-white p-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-zinc-400">
+                  Completed
+                </p>
+
+                <p className="mt-1 font-black text-zinc-900">
+                  {opportunity.completed_at
+                    ? new Date(
+                        opportunity.completed_at,
+                      ).toLocaleString(
+                        "en-PH",
+                        {
+                          dateStyle:
+                            "medium",
+
+                          timeStyle:
+                            "short",
+                        },
+                      )
+                    : "Not recorded"}
+                </p>
+              </div>
+            </div>
+          )}
 
           {opportunity.response
             ?.message && (
