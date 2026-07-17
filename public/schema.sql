@@ -4551,3 +4551,191 @@ to authenticated;
 commit;
 
 notify pgrst, 'reload schema';
+
+begin;
+
+-- 1. Require a confirmed actual weight before an opportunity can be completed.
+create or replace function public.sync_material_opportunity_completion()
+returns trigger
+language plpgsql
+set search_path = public
+as $function$
+begin
+  new.updated_at := now();
+
+  if new.status = 'completed' then
+    if new.actual_weight_kg is null or new.actual_weight_kg <= 0 then
+      raise exception 'An actual weight greater than zero is required before completion.'
+        using errcode = '22023';
+    end if;
+
+    new.completed_at := coalesce(new.completed_at, now());
+  elsif new.status <> 'completed' then
+    new.completed_at := null;
+  end if;
+
+  return new;
+end;
+$function$;
+
+-- Recreate the trigger so changes to either status or actual weight are checked.
+drop trigger if exists material_opportunities_completion_trigger
+on public.material_opportunities;
+
+create trigger material_opportunities_completion_trigger
+before insert or update of status, actual_weight_kg
+on public.material_opportunities
+for each row
+execute function public.sync_material_opportunity_completion();
+
+-- Enforce the rule for all new and updated rows without failing on older legacy data.
+alter table public.material_opportunities
+  drop constraint if exists material_opportunities_completed_weight_check;
+
+alter table public.material_opportunities
+  add constraint material_opportunities_completed_weight_check
+  check (
+    status <> 'completed'
+    or (
+      actual_weight_kg is not null
+      and actual_weight_kg > 0
+      and completed_at is not null
+    )
+  )
+  not valid;
+
+-- 2. Complete one accepted recovery as the authenticated recycler.
+create or replace function public.complete_recycler_material_opportunity(
+  p_opportunity_id uuid,
+  p_actual_weight_kg numeric
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $function$
+declare
+  v_opportunity public.material_opportunities%rowtype;
+  v_is_owner boolean := false;
+begin
+  if auth.uid() is null then
+    raise exception 'You must be signed in.'
+      using errcode = '42501';
+  end if;
+
+  if p_actual_weight_kg is null or p_actual_weight_kg <= 0 then
+    raise exception 'Enter an actual weight greater than zero.'
+      using errcode = '22023';
+  end if;
+
+  select opportunity.*
+  into v_opportunity
+  from public.material_opportunities as opportunity
+  where opportunity.id = p_opportunity_id
+  for update;
+
+  if not found then
+    raise exception 'The recovery opportunity was not found.'
+      using errcode = 'P0002';
+  end if;
+
+  select exists (
+    select 1
+    from public.junkshops as junkshop
+    join public.profiles as profile
+      on profile.id = junkshop.profile_id
+    where junkshop.id = v_opportunity.selected_junkshop_id
+      and profile.auth_id = auth.uid()
+      and junkshop.verification_status = 'approved'
+      and junkshop.is_active = true
+  )
+  into v_is_owner;
+
+  if not v_is_owner then
+    raise exception 'This recovery is not assigned to your active junkshop.'
+      using errcode = '42501';
+  end if;
+
+  if v_opportunity.status = 'completed' then
+    return jsonb_build_object(
+      'opportunity_id', v_opportunity.id,
+      'status', v_opportunity.status,
+      'actual_weight_kg', v_opportunity.actual_weight_kg,
+      'completed_at', v_opportunity.completed_at,
+      'already_completed', true
+    );
+  end if;
+
+  if v_opportunity.status <> 'accepted' then
+    raise exception 'Only an accepted recovery can be completed.'
+      using errcode = '22023';
+  end if;
+
+  update public.material_opportunities
+  set
+    actual_weight_kg = round(p_actual_weight_kg, 2),
+    status = 'completed',
+    completed_at = now()
+  where id = p_opportunity_id
+  returning *
+  into v_opportunity;
+
+  return jsonb_build_object(
+    'opportunity_id', v_opportunity.id,
+    'status', v_opportunity.status,
+    'actual_weight_kg', v_opportunity.actual_weight_kg,
+    'completed_at', v_opportunity.completed_at,
+    'already_completed', false
+  );
+end;
+$function$;
+
+-- 3. Return actual weights and completion dates for this recycler's assigned rows.
+create or replace function public.get_recycler_opportunity_completion_details()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $function$
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'opportunity_id', opportunity.id,
+        'actual_weight_kg', opportunity.actual_weight_kg,
+        'completed_at', opportunity.completed_at
+      )
+      order by opportunity.updated_at desc
+    ),
+    '[]'::jsonb
+  )
+  from public.material_opportunities as opportunity
+  join public.junkshops as junkshop
+    on junkshop.id = opportunity.selected_junkshop_id
+  join public.profiles as profile
+    on profile.id = junkshop.profile_id
+  where profile.auth_id = auth.uid()
+    and junkshop.verification_status = 'approved'
+    and junkshop.is_active = true
+    and opportunity.status in ('accepted', 'completed');
+$function$;
+
+revoke all
+on function public.complete_recycler_material_opportunity(uuid, numeric)
+from public;
+
+grant execute
+on function public.complete_recycler_material_opportunity(uuid, numeric)
+to authenticated;
+
+revoke all
+on function public.get_recycler_opportunity_completion_details()
+from public;
+
+grant execute
+on function public.get_recycler_opportunity_completion_details()
+to authenticated;
+
+commit;
+
+notify pgrst, 'reload schema';
