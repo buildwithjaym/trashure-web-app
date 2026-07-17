@@ -1456,7 +1456,18 @@ function LguMonitoringContent() {
             />
           ) : (
             <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200">
-              <div className="hidden grid-cols-[minmax(220px,1.4fr)_minmax(160px,1fr)_130px_160px_170px] border-b border-zinc-200 bg-zinc-50 px-5 py-3 text-xs font-black uppercase tracking-[0.08em] text-zinc-500 lg:grid">
+              <div
+                className="
+    hidden border-b border-zinc-200 bg-zinc-50
+    px-5 py-3
+    text-xs font-black uppercase
+    tracking-[0.08em] text-zinc-500
+    lg:grid
+    lg:grid-cols-[minmax(220px,1.4fr)_minmax(160px,1fr)_120px_170px_180px]
+    lg:items-center
+    lg:gap-x-8
+  "
+              >
                 <span>
                   Activity
                 </span>
@@ -1465,7 +1476,7 @@ function LguMonitoringContent() {
                   Material
                 </span>
 
-                <span className="text-right">
+                <span className="pr-2 text-right">
                   Weight
                 </span>
 
@@ -1485,7 +1496,15 @@ function LguMonitoringContent() {
                 ) => (
                   <div
                     key={`${activity.source_type}-${activity.id}`}
-                    className="grid gap-3 border-b border-zinc-100 px-5 py-4 last:border-b-0 lg:grid-cols-[minmax(220px,1.4fr)_minmax(160px,1fr)_130px_160px_170px] lg:items-center"
+                    className="
+  grid gap-y-3
+  border-b border-zinc-100
+  px-5 py-4
+  last:border-b-0
+  lg:grid-cols-[minmax(220px,1.4fr)_minmax(160px,1fr)_120px_170px_180px]
+  lg:items-center
+  lg:gap-x-8
+"
                   >
                     <div className="flex items-start gap-3">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${activity.source_type ===
