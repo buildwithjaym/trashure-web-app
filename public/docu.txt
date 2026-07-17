@@ -1,0 +1,53 @@
+Problem Statement
+*
+Many households already have recyclable materials such as plastic bottles, cans, scrap metal, glass, cardboard, and old electronic items. However, most people do not know what type of material they have, whether it can still be reused or recycled, where they can sell it, which junkshop accepts it, or how much it is worth.
+
+Because this information is difficult to find, recyclable materials are often stored at home, mixed with regular garbage, or thrown away. Residents also waste time visiting junkshops that may not accept their materials. At the same time, junkshops have difficulty finding nearby residents who have the materials they need.
+
+Schools and community groups may also be collecting specific materials, but residents are often unaware of these collection projects. Local government units have limited access to organized and updated data showing how much recyclable waste has been collected, sold, donated, or recovered.
+
+Trashure addresses this problem by helping residents identify their materials, understand what they can do with them, find matching junkshops or school collection drives, compare available prices, and connect directly with recovery partners.
+Brief Description of the Innovation
+*
+Trashure is an AI-powered waste recovery platform that helps people discover what they can do with recyclable materials they already have at home. By simply taking a photo, the system identifies the item and its material, checks its condition, and recommends the best action: sell, recycle, donate, or reuse.
+
+Instead of giving advice alone, Trashure connects users to real opportunities. It shows registered junkshops that accept the material, available prices per kilogram, active school or community collection drives, and simple preparation instructions. Junkshops can also find materials posted by nearby residents and send offers, while local government units can monitor the total kilograms or tons of waste recovered in their city.
+
+Trashure transforms an unwanted item into a useful resource, a possible source of income, and a measurable contribution to a cleaner community.
+Objectives of the Innovation
+*
+Trashure aims to:
+
+1. Help people identify recyclable materials using AI image scanning.
+2. Guide users on whether an item should be sold, recycled, donated, or reused.
+3. Connect residents with registered junkshops that accept their materials.
+4. Show available buying prices so users can make better selling decisions.
+5. Link recyclable materials to active school and community collection drives.
+6. Reduce recyclable waste that is mixed with regular garbage or sent to landfills.
+7. Help junkshops find available materials from nearby residents.
+8. Provide local government units with clear data on how many kilograms or tons of waste have been recovered.
+9. Encourage people to see waste as a useful resource, a possible source of income, and a contribution to a cleaner community.
+Target Beneficiaries
+*
+The primary beneficiaries of Trashure are households and residents who have recyclable materials but do not know where to sell them, how much they are worth, or what to do with them.
+
+Other beneficiaries include:
+
+Junkshop owners and recyclers, who can find nearby materials and connect with potential sellers.
+Schools and community organizations, which can receive recyclable materials for collection drives and environmental projects.
+Local government units, which can monitor recovered waste, barangay participation, and the total kilograms or tons diverted from landfills.
+Students and young people, who can develop better recycling habits and environmental awareness.
+The wider community, which benefits from cleaner surroundings, reduced waste, and stronger local recycling systems.
+Expected Environmental Impact
+*
+Trashure is expected to reduce recyclable waste that ends up in streets, canals, dumpsites, and landfills. In the first six months, if at least 500 residents in Isabela City recover an average of 2 kg of recyclable materials each month, the platform could help recover around 6,000 kg of waste.
+
+This can improve waste segregation, reduce improper disposal and burning, and keep communities cleaner. As more residents, schools, and junkshops participate, the amount of recovered waste can continue to increase. Trashure will also help the LGU monitor the exact kilograms collected and identify which barangays need more support.
+Why is your innovation unique?
+Trashure is unique because it does more than identify waste. It turns an unwanted item into a real opportunity.
+
+With one photo, the AI helps the user understand what the material is and what can be done with it. The platform then connects that item to actual junkshops, buying prices, school collection drives, and reuse options. This means people are not left with information alone. They are given a clear next step.
+
+What makes Trashure stand out is the way it connects residents, recyclers, schools, and the LGU in one centralized platform. Residents can earn from materials they usually throw away, junkshops can find nearby supplies, schools can support collection projects, and the LGU can monitor the exact kilograms of waste recovered.
+
+Trashure transforms waste from a community problem into income, resources, and measurable environmental action.
