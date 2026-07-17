@@ -119,48 +119,27 @@ const desktopNavigation: NavigationItem[] = [
 
 
 const mobileNavigation: NavigationItem[] = [
-    {
-        label:
-            "Home",
-
-        href:
-            RESIDENT_BASE_PATH,
-
-        icon:
-            Home,
-    },
-    {
-        label:
-            "History",
-
-        href:
-            `${RESIDENT_BASE_PATH}/history`,
-
-        icon:
-            History,
-    },
-    {
-        label:
-            "Nearby",
-
-        href:
-            `${RESIDENT_BASE_PATH}/nearby`,
-
-        icon:
-            MapPinned,
-    },
-    {
-        label:
-            "Profile",
-
-        href:
-            `${RESIDENT_BASE_PATH}/profile`,
-
-        icon:
-            UserRound,
-    },
+  {
+    label: "Home",
+    href: RESIDENT_BASE_PATH,
+    icon: Home,
+  },
+  {
+    label: "Offers",
+    href: `${RESIDENT_BASE_PATH}/offers`,
+    icon: Handshake,
+  },
+  {
+    label: "Nearby",
+    href: `${RESIDENT_BASE_PATH}/nearby`,
+    icon: MapPinned,
+  },
+  {
+    label: "Profile",
+    href: `${RESIDENT_BASE_PATH}/profile`,
+    icon: UserRound,
+  },
 ];
-
 
 function isRouteActive(
     pathname: string,
@@ -187,41 +166,49 @@ function isRouteActive(
 
 
 function getPageTitle(
-    pathname: string
+  pathname: string,
 ) {
-    if (
-        pathname.startsWith(
-            `${RESIDENT_BASE_PATH}/scan`
-        )
-    ) {
-        return "Scan Item";
-    }
+  if (
+    pathname.startsWith(
+      `${RESIDENT_BASE_PATH}/scan`,
+    )
+  ) {
+    return "Scan Item";
+  }
 
-    if (
-        pathname.startsWith(
-            `${RESIDENT_BASE_PATH}/history`
-        )
-    ) {
-        return "Scan History";
-    }
+  if (
+    pathname.startsWith(
+      `${RESIDENT_BASE_PATH}/history`,
+    )
+  ) {
+    return "Scan History";
+  }
 
-    if (
-        pathname.startsWith(
-            `${RESIDENT_BASE_PATH}/nearby`
-        )
-    ) {
-        return "Nearby Recovery";
-    }
+  if (
+    pathname.startsWith(
+      `${RESIDENT_BASE_PATH}/offers`,
+    )
+  ) {
+    return "Recovery Offers";
+  }
 
-    if (
-        pathname.startsWith(
-            `${RESIDENT_BASE_PATH}/profile`
-        )
-    ) {
-        return "Resident Profile";
-    }
+  if (
+    pathname.startsWith(
+      `${RESIDENT_BASE_PATH}/nearby`,
+    )
+  ) {
+    return "Nearby Recovery";
+  }
 
-    return "Resident Dashboard";
+  if (
+    pathname.startsWith(
+      `${RESIDENT_BASE_PATH}/profile`,
+    )
+  ) {
+    return "Resident Profile";
+  }
+
+  return "Resident Dashboard";
 }
 
 
