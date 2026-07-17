@@ -1,4 +1,4 @@
-{ /*Lapp/profiles/resident/layout.tsx*/}
+
 
 "use client";
 
