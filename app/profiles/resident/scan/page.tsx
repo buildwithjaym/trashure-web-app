@@ -3066,7 +3066,7 @@ export default function ResidentScanPage() {
 
               {analyzing
                 ? "Analyzing item..."
-                : "Analyze with Gemini"}
+                : "Analyze with Trashure Ai"}
             </Button>
 
 
