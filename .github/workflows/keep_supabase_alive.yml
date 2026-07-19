@@ -1,0 +1,25 @@
+name: Supabase Ping
+
+on:
+  schedule:
+    - cron: "0 16 * * *" # Every day at 12:00 AM Philippine Time (UTC+8)
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send ping to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "${SUPABASE_URL}/rest/v1/pings" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '[{"value":1}]'
+
+          echo "Supabase ping successful"
