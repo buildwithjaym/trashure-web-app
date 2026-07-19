@@ -1,0 +1,74 @@
+Core Formula
+Recovered Waste=Active Residents×Average Kg per Resident per Month×Number of Months
+Six-Month Projection
+500×2 kg×6=6,000 kg
+6,000 kg = 6 metric tons of recyclable waste
+
+This equals:
+
+1,000 kg recovered per month
+12 kg recovered per resident over six months
+6 metric tons potentially diverted from streets, canals, dumpsites, and landfills
+
+
+
+======================
+
+
+Real Data
+
+es. The latest verified household count I found for Isabela City, Basilan is:
+
+26,649 households
+Average household size: 4.9 persons
+Source: Philippine Statistics Authority, 2020 Census of Population and Housing.
+
+The PSA’s newer 2024 Census of Population reports that Isabela City has 151,297 residents.
+
+Using the 2020 average household size:
+
+151,297 ÷ 4.9 = approximately 30,877 households
+
+However, 30,877 is only a planning estimate, not an official 2024 household count. For formal presentations, use 26,649 verified households as the baseline and place the estimated figure in a note.
+
+Recommended Final Slide Content
+Projected Environmental Impact
+Less Than 2% Household Participation Can Recover 6 Metric Tons in Six Months
+
+Isabela City has 26,649 officially recorded households. By activating only 500 households, equivalent to approximately 1.9% of the city’s household base, Trashure can begin producing measurable environmental results.
+
+Core Formula
+
+Expected Recovered Waste = Active Households × Average Kilograms Recovered per Household per Month × Number of Months
+
+Six-Month Projection
+
+500 households × 2 kg × 6 months = 6,000 kg
+
+Expected Results
+1,000 kg
+
+of recyclable materials recovered every month
+
+12 kg
+
+recovered by each participating household in six months
+
+6 metric tons
+
+potentially diverted from streets, canals, dumpsites, and landfills
+
+Expected Community Impact
+Cleaner streets, canals, and residential areas
+Improved household waste segregation
+Reduced improper disposal and open burning
+More recyclable materials connected to junkshops and recovery partners
+Verified recovery data by barangay
+Better evidence for LGU planning and environmental programs
+Bottom Statement
+
+Trashure does not need citywide adoption to create impact. Activating less than 2% of Isabela City’s households can already recover 6 metric tons of recyclable waste in six months.
+
+Suggested Source Note
+
+Household baseline: 2020 Census of Population and Housing, Philippine Statistics Authority. The 2024 POPCEN recorded a total city population of 151,297. Updated household totals may be validated through the PSA or Isabela City’s 2024 CBMS data.
