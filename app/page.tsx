@@ -221,6 +221,13 @@ md:flex
               About
             </a>
 
+            <Link
+  href="/about-the-developer"
+  className="hover:text-green-600 transition"
+>
+  About Developer
+</Link>
+
           </div>
 
 
@@ -302,6 +309,14 @@ sm:flex
                 >
                   About
                 </Link>
+
+                <Link
+  href="/about-the-developer"
+  onClick={() => setMobileOpen(false)}
+  className="text-base font-medium transition hover:text-green-600"
+>
+  About Developer
+</Link>
                 <Link href="/login">
 
                   <Button
