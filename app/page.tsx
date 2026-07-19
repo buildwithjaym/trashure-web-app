@@ -178,58 +178,42 @@ export default function Home() {
             </div>
           </div>
 
-
-          <div
-            className="
-hidden
-items-center
-gap-8
-text-sm
-text-zinc-600
-md:flex
-"
-          >
-
+          <div className="hidden items-center gap-7 text-sm font-medium text-zinc-600 md:flex">
             <a
               href="#features"
-              className="hover:text-green-600 transition"
+              className="transition hover:text-green-600"
             >
               Features
             </a>
 
-
             <a
               href="#how-it-works"
-              className="hover:text-green-600 transition"
+              className="transition hover:text-green-600"
             >
               How It Works
             </a>
 
+            <a
+              href="#benefits"
+              className="transition hover:text-green-600"
+            >
+              Why Trashure
+            </a>
 
             <a
               href="#dashboard"
-              className="hover:text-green-600 transition"
+              className="transition hover:text-green-600"
             >
               Dashboard
             </a>
 
-
-            <a
-              href="#about"
-              className="hover:text-green-600 transition"
-            >
-              About
-            </a>
-
             <Link
-  href="/about-the-developer"
-  className="hover:text-green-600 transition"
->
-  About Developer
-</Link>
-
+              href="/about-the-developer"
+              className="transition hover:text-green-600"
+            >
+              About Developer
+            </Link>
           </div>
-
 
           <div className="flex items-center gap-3">
 
@@ -274,70 +258,56 @@ sm:flex
 
           {mobileOpen && (
             <div className="absolute left-0 top-full w-full border-t border-green-100 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:hidden">
-              <div className="flex flex-col gap-6 text-zinc-700">
+              <div className="flex flex-col gap-2 text-zinc-700">
                 <Link
                   href="#features"
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium transition hover:text-green-600"
+                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
                 >
                   Features
                 </Link>
 
-
                 <Link
-                  href="/how-it-works"
+                  href="#how-it-works"
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium transition hover:text-green-600"
+                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
                 >
                   How It Works
                 </Link>
 
+                <Link
+                  href="#benefits"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
+                >
+                  Why Trashure
+                </Link>
 
                 <Link
                   href="#dashboard"
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium transition hover:text-green-600"
+                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
                 >
                   Dashboard
                 </Link>
 
-
                 <Link
-                  href="#about"
+                  href="/about-the-developer"
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-medium transition hover:text-green-600"
+                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
                 >
-                  About
+                  About Developer
                 </Link>
 
                 <Link
-  href="/about-the-developer"
-  onClick={() => setMobileOpen(false)}
-  className="text-base font-medium transition hover:text-green-600"
->
-  About Developer
-</Link>
-                <Link href="/login">
-
-                  <Button
-                    className="
-w-full
-rounded-full
-bg-gradient-to-r
-from-green-500
-to-emerald-700
-py-6
-text-white
-shadow-lg
-shadow-green-500/30
-transition
-hover:-translate-y-1
-"
-                  >
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-3"
+                >
+                  <Button className="w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 py-6 text-white shadow-lg shadow-green-500/30 transition hover:-translate-y-1">
                     Start Your Journey
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-
                 </Link>
               </div>
             </div>
