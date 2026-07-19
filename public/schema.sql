@@ -4739,3 +4739,33 @@ to authenticated;
 commit;
 
 notify pgrst, 'reload schema';
+
+
+
+-- Create the table
+create table if not exists public.pings (
+    id bigint generated always as identity primary key,
+    value integer not null check (value = 1),
+    created_at timestamptz default now()
+);
+
+-- Enable Row Level Security
+alter table public.pings enable row level security;
+
+-----------------------------------------------------
+-- POLICY: Allow anyone to insert (optional)
+-----------------------------------------------------
+create policy "allow insert"
+on public.pings
+for insert
+to anon
+with check (true);
+
+-----------------------------------------------------
+-- POLICY: Allow anyone to read (optional)
+-----------------------------------------------------
+create policy "allow read"
+on public.pings
+for select
+to anon
+using (true);
