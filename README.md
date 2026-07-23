@@ -1604,8 +1604,6 @@ Open a pull request with:
 
 No public license has been selected in this README.
 
-Before public distribution, add a `LICENSE` file that matches the project's academic, government, nonprofit, or commercial use requirements.
-
 ---
 
 # Project Identity
