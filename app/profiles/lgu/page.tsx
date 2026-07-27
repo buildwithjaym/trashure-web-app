@@ -936,251 +936,287 @@ function LguMonitoringContent() {
 
 
       {/* TREND + MATERIAL */}
+<section
+  id="trend"
+  className="scroll-mt-28 grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]"
+>
+  {/* RECOVERY TREND */}
+  <div className="min-w-0">
+    <Panel
+      icon={BarChart3}
+      title="Recovery trend"
+      description="Completed kilograms by month, separated by resident and school activity."
+    >
+      {dashboard.monthly_trend.length === 0 ? (
+        <EmptyPanel message="No monthly recovery data is available for this period." />
+      ) : (
+        <div className="mt-6 min-w-0">
+          <div
+            className="
+              -mx-2 overflow-x-auto px-2 pb-3
+              overscroll-x-contain scroll-smooth
+              [scrollbar-width:thin]
+            "
+          >
+            <div
+              className="
+                grid min-w-max grid-flow-col
+                auto-cols-[72px] items-end gap-3
+                px-1 sm:auto-cols-[84px]
+                xl:min-w-0 xl:grid-flow-row
+                xl:grid-cols-[repeat(auto-fit,minmax(72px,1fr))]
+              "
+            >
+              {dashboard.monthly_trend.map((month) => {
+                const residentKg = numberValue(month.resident_kg)
+                const schoolKg = numberValue(month.school_kg)
+                const totalKg = numberValue(month.total_kg)
 
-      <section
-        id="trend"
-        className="scroll-mt-28 grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]"
-      >
-        <Panel
-          icon={
-            BarChart3
-          }
-          title="Recovery trend"
-          description="Completed kilograms by month, separated by resident and school activity."
-        >
-          {dashboard.monthly_trend.length ===
-            0 ? (
-            <EmptyPanel
-              message="No monthly recovery data is available for this period."
-            />
-          ) : (
-            <div className="mt-6 overflow-x-auto">
-              <div className="flex min-w-[620px] items-end gap-3">
-                {dashboard.monthly_trend.map(
-                  (
-                    month,
-                  ) => {
-                    const residentKg =
-                      numberValue(
-                        month.resident_kg,
-                      );
-
-                    const schoolKg =
-                      numberValue(
-                        month.school_kg,
-                      );
-
-                    const totalKg =
-                      numberValue(
-                        month.total_kg,
-                      );
-
-                    const totalHeight =
-                      Math.max(
-                        8,
-                        (
-                          totalKg /
-                          trendMaximum
-                        ) *
+                const totalHeight =
+                  trendMaximum > 0
+                    ? Math.min(
                         210,
-                      );
+                        Math.max(
+                          8,
+                          (totalKg / trendMaximum) * 210,
+                        ),
+                      )
+                    : 8
 
-                    const residentHeight =
-                      totalKg >
-                        0
-                        ? (
-                          residentKg /
-                          totalKg
-                        ) *
-                        totalHeight
-                        : 0;
+                const residentHeight =
+                  totalKg > 0
+                    ? (residentKg / totalKg) * totalHeight
+                    : 0
 
-                    const schoolHeight =
-                      totalKg >
-                        0
-                        ? (
-                          schoolKg /
-                          totalKg
-                        ) *
-                        totalHeight
-                        : 0;
+                const schoolHeight =
+                  totalKg > 0
+                    ? (schoolKg / totalKg) * totalHeight
+                    : 0
 
-                    return (
-                      <div
-                        key={
-                          month.month_start
-                        }
-                        className="flex min-w-20 flex-1 flex-col items-center"
-                      >
-                        <p className="mb-2 text-xs font-black text-zinc-700">
-                          {formatNumber(
-                            totalKg,
-                            0,
-                          )}{" "}
-                          kg
-                        </p>
-
-                        <div
-                          className="flex w-10 flex-col justify-end overflow-hidden rounded-t-xl bg-zinc-100"
-                          style={{
-                            height:
-                              `${totalHeight}px`,
-                          }}
-                          title={`${month.month_label}: ${formatKilograms(
-                            totalKg,
-                          )}`}
-                        >
-                          {schoolHeight >
-                            0 && (
-                              <div
-                                className="w-full bg-emerald-300"
-                                style={{
-                                  height:
-                                    `${schoolHeight}px`,
-                                }}
-                              />
-                            )}
-
-                          {residentHeight >
-                            0 && (
-                              <div
-                                className="w-full bg-green-600"
-                                style={{
-                                  height:
-                                    `${residentHeight}px`,
-                                }}
-                              />
-                            )}
-                        </div>
-
-                        <p className="mt-3 text-center text-[11px] font-semibold text-zinc-500">
-                          {
-                            month.month_label
-                          }
-                        </p>
-                      </div>
-                    );
-                  },
-                )}
-              </div>
-
-
-              <div className="mt-6 flex flex-wrap gap-4 border-t border-zinc-100 pt-4 text-xs font-semibold text-zinc-500">
-                <span className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-green-600" />
-
-                  Resident recovery
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-emerald-300" />
-
-                  School collection
-                </span>
-              </div>
-            </div>
-          )}
-        </Panel>
-
-
-        <Panel
-          icon={
-            PackageCheck
-          }
-          title="Top recovered materials"
-          description="Materials contributing the most weight to city recovery."
-        >
-          {dashboard.materials.length ===
-            0 ? (
-            <EmptyPanel
-              message="No recovered material data is available."
-            />
-          ) : (
-            <div className="mt-6 space-y-4">
-              {dashboard.materials.map(
-                (
-                  material,
-                ) => {
-                  const kilograms =
-                    numberValue(
-                      material.total_kg,
-                    );
-
-                  const width =
-                    Math.max(
-                      3,
-                      (
-                        kilograms /
-                        materialMaximum
-                      ) *
-                      100,
-                    );
-
-                  return (
-                    <div
-                      key={
-                        material.material_id
-                      }
+                return (
+                  <div
+                    key={month.month_start}
+                    className="
+                      flex min-w-0 snap-start
+                      flex-col items-center
+                    "
+                  >
+                    <p
+                      className="
+                        mb-2 whitespace-nowrap
+                        text-[11px] font-black
+                        text-zinc-700 sm:text-xs
+                      "
                     >
-                      <div className="flex items-end justify-between gap-3">
-                        <div>
-                          <p className="font-black text-zinc-900">
-                            {
-                              material.material_name
-                            }
-                          </p>
+                      {formatNumber(totalKg, 0)} kg
+                    </p>
 
-                          <p className="mt-0.5 text-xs text-zinc-500">
-                            {
-                              material.category
-                            }{" "}
-                            ·{" "}
-                            {
-                              material.activity_count
-                            }{" "}
-                            activit
-                            {material.activity_count ===
-                              1
-                              ? "y"
-                              : "ies"}
-                          </p>
-                        </div>
+                    <div className="flex h-[210px] w-full items-end justify-center">
+                      <div
+                        className="
+                          flex w-9 flex-col justify-end
+                          overflow-hidden rounded-t-lg
+                          bg-zinc-100 sm:w-10 sm:rounded-t-xl
+                        "
+                        style={{
+                          height: `${totalHeight}px`,
+                        }}
+                        title={`${month.month_label}: ${formatKilograms(
+                          totalKg,
+                        )}`}
+                        role="img"
+                        aria-label={`${month.month_label}, ${formatKilograms(
+                          totalKg,
+                        )} recovered`}
+                      >
+                        {schoolHeight > 0 && (
+                          <div
+                            className="w-full shrink-0 bg-emerald-300"
+                            style={{
+                              height: `${schoolHeight}px`,
+                            }}
+                            aria-hidden="true"
+                          />
+                        )}
 
-                        <div className="text-right">
-                          <p className="font-black text-green-700">
-                            {formatKilograms(material.total_kg)}
-                          </p>
-
-                          <p className="text-xs text-zinc-400">
-                            {formatNumber(
-                              numberValue(
-                                material.share_percent,
-                              ),
-                              1,
-                            )}
-                            %
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
-                        <div
-                          className="h-full rounded-full bg-green-600"
-                          style={{
-                            width:
-                              `${width}%`,
-                          }}
-                        />
+                        {residentHeight > 0 && (
+                          <div
+                            className="w-full shrink-0 bg-green-600"
+                            style={{
+                              height: `${residentHeight}px`,
+                            }}
+                            aria-hidden="true"
+                          />
+                        )}
                       </div>
                     </div>
-                  );
-                },
-              )}
-            </div>
-          )}
-        </Panel>
-      </section>
 
+                    <p
+                      className="
+                        mt-3 w-full truncate px-1
+                        text-center text-[10px]
+                        font-semibold text-zinc-500
+                        sm:text-[11px]
+                      "
+                      title={month.month_label}
+                    >
+                      {month.month_label}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div
+            className="
+              mt-3 grid grid-cols-1 gap-2
+              border-t border-zinc-100 pt-4
+              text-xs font-semibold text-zinc-500
+              sm:flex sm:flex-wrap sm:gap-4
+            "
+          >
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 shrink-0 rounded-sm bg-green-600"
+                aria-hidden="true"
+              />
+              Resident recovery
+            </span>
+
+            <span className="flex items-center gap-2">
+              <span
+                className="h-3 w-3 shrink-0 rounded-sm bg-emerald-300"
+                aria-hidden="true"
+              />
+              School collection
+            </span>
+          </div>
+        </div>
+      )}
+    </Panel>
+  </div>
+
+  {/* TOP MATERIALS */}
+  <div className="min-w-0">
+    <Panel
+      icon={PackageCheck}
+      title="Top recovered materials"
+      description="Materials contributing the most weight to city recovery."
+    >
+      {dashboard.materials.length === 0 ? (
+        <EmptyPanel message="No recovered material data is available." />
+      ) : (
+        <div className="mt-6 space-y-5">
+          {dashboard.materials.map((material) => {
+            const kilograms = numberValue(material.total_kg)
+
+            const width =
+              materialMaximum > 0
+                ? Math.min(
+                    100,
+                    Math.max(
+                      3,
+                      (kilograms / materialMaximum) * 100,
+                    ),
+                  )
+                : 3
+
+            return (
+              <div
+                key={material.material_id}
+                className="min-w-0"
+              >
+                <div
+                  className="
+                    grid min-w-0
+                    grid-cols-[minmax(0,1fr)_auto]
+                    items-end gap-3
+                  "
+                >
+                  <div className="min-w-0">
+                    <p
+                      className="
+                        line-clamp-2 break-words
+                        text-sm font-black leading-5
+                        text-zinc-900 sm:text-base
+                      "
+                      title={material.material_name}
+                    >
+                      {material.material_name}
+                    </p>
+
+                    <div
+                      className="
+                        mt-1 flex flex-wrap items-center
+                        gap-x-1 gap-y-0.5
+                        text-[11px] text-zinc-500
+                        sm:text-xs
+                      "
+                    >
+                      <span className="break-words">
+                        {material.category}
+                      </span>
+
+                      <span aria-hidden="true">·</span>
+
+                      <span className="whitespace-nowrap">
+                        {material.activity_count} activit
+                        {material.activity_count === 1
+                          ? "y"
+                          : "ies"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 text-right">
+                    <p
+                      className="
+                        whitespace-nowrap text-sm
+                        font-black text-green-700
+                        sm:text-base
+                      "
+                    >
+                      {formatKilograms(material.total_kg)}
+                    </p>
+
+                    <p className="text-[11px] text-zinc-400 sm:text-xs">
+                      {formatNumber(
+                        numberValue(material.share_percent),
+                        1,
+                      )}
+                      %
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-zinc-100">
+                  <div
+                    className="
+                      h-full rounded-full
+                      bg-green-600 transition-[width]
+                      duration-500 ease-out
+                    "
+                    style={{
+                      width: `${width}%`,
+                    }}
+                    role="progressbar"
+                    aria-label={`${material.material_name} recovery share`}
+                    aria-valuenow={numberValue(
+                      material.share_percent,
+                    )}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Panel>
+  </div>
+</section>
 
       {/* BARANGAYS */}
 
