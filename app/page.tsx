@@ -2527,6 +2527,13 @@ sm:flex
                 Contact
               </Link>
 
+              <Link
+                href="/faq"
+                className="block transition hover:text-green-400"
+              >
+                FAQ
+              </Link>
+
             </div>
           </div>
 
