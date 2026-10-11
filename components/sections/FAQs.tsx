@@ -74,20 +74,28 @@ export default function FAQs() {
 
     return (
         <main className='min-h-screen bg-white'>
-
-            <ResourceHeader
-
-                title="Frequently Asked Questions"
-
-                description="Find answers to common questions about Ruixen UI, its features, and how to get started with building your web applications."
-
-            />
-
             <section className="py-16 md:py-24">
                 <div className="mx-auto max-w-5xl px-6">
                     <div className="grid gap-8 md:grid-cols-5 md:gap-12">
 
-                        <div className="md:col-span-5">
+                        <div className="md:col-span-2">
+                            <h2 className="text-foreground text-4xl font-semibold">FAQs</h2>
+                            <p className="text-muted-foreground mt-4 text-balance text-lg">
+                                Here are some of the most common questions we get about Trashure. If you have a question that isn&apos;t answered here, please reach out to our support team.
+                            </p>
+                            <p className="text-muted-foreground mt-6 hidden md:block">
+                                Can&apos;t find what you&apos;re looking for? Reach out to our{' '}
+                                <Link
+                                    href="/contact"
+                                    className="text-primary font-medium hover:underline"
+                                >
+                                Trashure support team
+                                </Link>{' '}
+                                for assistance.
+                            </p>
+                        </div>
+
+                        <div className="md:col-span-3">
 
                             <Accordion>
                                 {faqItems.map((item) => (

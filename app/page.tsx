@@ -24,6 +24,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 import { DownloadApkPrompt } from "@/components/download-apk-prompt";
+import FAQs from "@/components/sections/FAQs";
 export default function Home() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -2360,7 +2361,9 @@ sm:flex
       </section>
 
 
-
+      <section id="faqs">
+        <FAQs></FAQs>
+      </section>
 
 
 
