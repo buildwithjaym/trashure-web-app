@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -61,6 +61,8 @@ export default function CreateAccountPage() {
     const [preview, setPreview] = useState("");
 
     const [avatar, setAvatar] = useState<File | null>(null);
+
+    const [user, setUser] = useState<any>(null);
 
 
 
@@ -142,12 +144,14 @@ export default function CreateAccountPage() {
 
         if (step === 1) {
 
-            if (!form.full_name || !form.email || !form.password) {
+            if (!form.full_name || !form.email) {
 
-                toast.error("Complete your account information.");
+                if (!user && !form.password) {
 
-                return;
+                    toast.error("Complete your account information.");
 
+                    return;
+                }
             }
 
         }
@@ -161,7 +165,6 @@ export default function CreateAccountPage() {
                 toast.error("Add your profile information and photo.");
 
                 return;
-
             }
 
         }
@@ -214,14 +217,13 @@ export default function CreateAccountPage() {
 
             // CREATE AUTH USER
 
-
-            const { data: userData, error: userError } = await supabase.auth.signUp({
+            const { data: userData, error: userError } = !user ? await supabase.auth.signUp({
 
                 email: form.email,
 
                 password: form.password
 
-            });
+            }) : user;
 
 
 
@@ -234,15 +236,15 @@ export default function CreateAccountPage() {
             }
 
 
+            if (!user) {
+                if (!userData.user) {
 
-            if (!userData.user) {
+                    toast.error("Unable to create account.");
 
-                toast.error("Unable to create account.");
+                    return;
 
-                return;
-
+                }
             }
-
 
 
 
@@ -267,7 +269,7 @@ export default function CreateAccountPage() {
 
 
                 const filePath =
-                    `${userData.user.id}/profile.${fileExt}`;
+                    `${!user ? userData.user.id : user.id}/profile.${fileExt}`;
 
 
 
@@ -388,11 +390,32 @@ export default function CreateAccountPage() {
 
     };
 
+    const getUser = async () => {
+        const user = await supabase.auth.getUser();
+        setUser(user.data.user);
 
+        updateField("full_name", user.data.user?.user_metadata.full_name || "");
+        updateField("email", user.data.user?.email || "");
+        updateField("password", user.data.user?.user_metadata.password || "");
+        updateField("age", user.data.user?.user_metadata.age || "");
+        updateField("sex", user.data.user?.user_metadata.sex || "");
+        updateField("barangay", user.data.user?.user_metadata.barangay || "");
+        updateField("city", user.data.user?.user_metadata.city || "");
+        updateField("province", user.data.user?.user_metadata.province || "");
+        updateField("role", user.data.user?.user_metadata.role || "");
 
+        const response = await fetch(user.data.user?.user_metadata.avatar_url || "");
 
+        if (response.ok) {
+            const blob = await response.blob();
+            const file = new File([blob], "avatar.jpg", { type: blob.type });
+            handleImage(file);
+        }
+    }
 
-
+    useEffect(() => {
+        getUser();
+    }, []);
 
     return (
 
