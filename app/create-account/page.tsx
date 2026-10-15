@@ -327,7 +327,7 @@ export default function CreateAccountPage() {
                 .from("profiles")
                 .insert({
 
-                    auth_id: userData.user.id,
+                    auth_id: !user ? userData.user.id : user.id,
 
                     full_name: form.full_name,
 
@@ -373,10 +373,11 @@ export default function CreateAccountPage() {
 
 
         }
-        catch {
+        catch (e) {
 
             toast.error("Something went wrong.");
 
+            console.error(e);
         }
         finally {
 
@@ -391,25 +392,38 @@ export default function CreateAccountPage() {
     };
 
     const getUser = async () => {
-        const user = await supabase.auth.getUser();
-        setUser(user.data.user);
+        try {
+            setLoading(true);
+            const user = await supabase.auth.getUser();
 
-        updateField("full_name", user.data.user?.user_metadata.full_name || "");
-        updateField("email", user.data.user?.email || "");
-        updateField("password", user.data.user?.user_metadata.password || "");
-        updateField("age", user.data.user?.user_metadata.age || "");
-        updateField("sex", user.data.user?.user_metadata.sex || "");
-        updateField("barangay", user.data.user?.user_metadata.barangay || "");
-        updateField("city", user.data.user?.user_metadata.city || "");
-        updateField("province", user.data.user?.user_metadata.province || "");
-        updateField("role", user.data.user?.user_metadata.role || "");
+            if (!user) {
+                setLoading(false);
+                return;
+            }
 
-        const response = await fetch(user.data.user?.user_metadata.avatar_url || "");
+            setUser(user.data.user);
 
-        if (response.ok) {
-            const blob = await response.blob();
-            const file = new File([blob], "avatar.jpg", { type: blob.type });
-            handleImage(file);
+            updateField("full_name", user.data.user?.user_metadata.full_name || "");
+            updateField("email", user.data.user?.email || "");
+            updateField("password", user.data.user?.user_metadata.password || "");
+            updateField("age", user.data.user?.user_metadata.age || "");
+            updateField("sex", user.data.user?.user_metadata.sex || "");
+            updateField("barangay", user.data.user?.user_metadata.barangay || "");
+            updateField("city", user.data.user?.user_metadata.city || "");
+            updateField("province", user.data.user?.user_metadata.province || "");
+            updateField("role", user.data.user?.user_metadata.role || "");
+
+            const response = await fetch(user.data.user?.user_metadata.avatar_url || "");
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const file = new File([blob], "avatar.jpg", { type: blob.type });
+                handleImage(file);
+            }
+        } catch {
+            toast.error("Failed Fetching user data");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -684,7 +698,7 @@ export default function CreateAccountPage() {
                         step < 4
                             ?
 
-                            <button onClick={nextStep} className="ml-auto flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-white">
+                            <button disabled={loading} onClick={nextStep} className="ml-auto flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-white disabled:opacity-60">
 
                                 Next
 
