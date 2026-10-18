@@ -1,35 +1,44 @@
-import { NextResponse } from 'next/server'
-
-// The client you created from the Server-Side Auth instructions
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get('next') ?? '/'
-  if (!next.startsWith('/')) {
-    // if "next" is not a relative URL, use the default
-    next = '/'
+  const { searchParams, origin } = new URL(request.url);
+
+  const code = searchParams.get("code");
+
+  let next = searchParams.get("next") ?? "/profiles";
+  if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
+    next = "/profiles";
   }
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === 'development'
-      if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
+  if (!code) {
+    return NextResponse.redirect(`${origin}/login/auth-code-error?reason=no_code`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    console.error("OAuth exchange failed:", error.message);
+    return NextResponse.redirect(
+      `${origin}/login/auth-code-error?reason=${encodeURIComponent(error.message)}`
+    );
+  }
+
+  // ---- OAuth-only gate ----
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("auth_id", user.id)
+      .maybeSingle();
+
+    if (!profile) {
+      next = "/create-account";
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login/auth-code-error`)
+  return NextResponse.redirect(`${origin}${next}`);
 }

@@ -229,8 +229,8 @@ export default function LoginPage() {
 
 
 
-    const googleLogin = () => {
-        supabase.auth.signInWithOAuth({
+    const googleLogin = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
                 redirectTo: `${window.location.origin}/api/auth/login/google?next=/profiles`,
@@ -240,7 +240,7 @@ export default function LoginPage() {
                 },
             },
         });
-        // toast.info("Google login will be connected soon.");
+        if (error) toast.error(error.message);
     };
 
 
