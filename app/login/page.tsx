@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { access } from "fs";
 
 
 export default function LoginPage() {
@@ -228,10 +229,18 @@ export default function LoginPage() {
 
 
 
-    const googleLogin = () => {
-
-        toast.info("Google login will be connected soon.");
-
+    const googleLogin = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: `${window.location.origin}/api/auth/login/google?next=/profiles`,
+                queryParams: {
+                    access_type: "offline",
+                    prompt: "consent",
+                },
+            },
+        });
+        if (error) toast.error(error.message);
     };
 
 
