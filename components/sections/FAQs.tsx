@@ -1,173 +1,145 @@
-'use client'
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import Link from 'next/link'
-import { motion } from "framer-motion";
-import { ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
-import ResourceHeader from '@/components/ResourceHeader';
+"use client";
+
+import Link from "next/link";
+import { ArrowRight, MessageCircle } from "lucide-react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const faqItems = [
+  {
+    id: "item-1",
+    question: "What is Trashure?",
+    answer:
+      "Trashure helps you discover what to do with items you no longer need. Identify an item's material, then explore ways to recycle, sell, donate, or reuse it instead of simply throwing it away.",
+  },
+  {
+    id: "item-2",
+    question: "How do I use Trashure?",
+    answer:
+      "Take a photo or upload an image of your item. Review the suggested material, confirm or correct the result, and explore the available options for giving your item a second life.",
+  },
+  {
+    id: "item-3",
+    question: "Is Trashure free to use?",
+    answer:
+      "Trashure is designed to be free for residents. You can explore material identification and recovery options without a resident subscription. Available services may depend on participating partners in your area.",
+  },
+  {
+    id: "item-4",
+    question: "What kinds of items can I scan?",
+    answer:
+      "You can explore common materials such as plastic bottles, cans, glass, scrap metal, cardboard, paper, and household items. Electronics and hazardous materials may require special handling.",
+  },
+  {
+    id: "item-5",
+    question: "Can I earn money from my recyclables?",
+    answer:
+      "You may be able to sell recyclable materials through participating recyclers. Prices depend on the material, quantity, condition, and available offers. Review the terms before deciding whether to accept an offer.",
+  },
+  {
+    id: "item-6",
+    question: "Where can I bring or donate my items?",
+    answer:
+      "Explore available junkshops, recycling partners, and community collection drives. Check which materials they accept and confirm their drop-off or pickup arrangements before visiting.",
+  },
+  {
+    id: "item-7",
+    question: "Is my personal information private?",
+    answer:
+      "Please review Trashure's privacy policy to understand how your photos and personal information are handled and when information may be shared with a recycler or community organization.",
+  },
+  {
+    id: "item-8",
+    question: "What if Trashure identifies my item incorrectly?",
+    answer:
+      "AI identification can make mistakes. Review the suggested material and correct it when possible. If you are unsure about an item's composition or safe handling, consult a qualified recycling partner before proceeding.",
+  },
+];
 
 export default function FAQs() {
-    const faqItems = [
-        {
-            id: 'item-1',
-            question: 'What is Trashure?',
-            answer: 'Trashure is a free app that helps you figure out what to do with items you no longer need. Just take a photo, and it tells you whether you can recycle it, sell it, donate it, or reuse it, so it stays out of the landfill.',
-        },
-        {
-            id: 'item-2',
-            question: 'How do I use it?',
-            answer: 'Open the app, snap a photo of your item, and Trashure will identify what it is made of. Confirm the result, then choose what you want to do, recycle, sell, donate, or reuse. It only takes a few seconds.',
-        },
-        {
-            id: 'item-3',
-            question: 'Is it really free?',
-            answer: 'Yes. Trashure is free for residents to use. You can scan items, find junkshops, and sell your recyclables without paying anything.',
-        },
-        {
-            id: 'item-4',
-            question: 'What kinds of items can I scan?',
-            answer: 'You can scan plastic bottles, cans, scrap metal, glass containers, cardboard and paper, old chargers and electronics, and many reusable household materials. If Trashure is unsure, it will ask you to confirm or pick the material yourself.',
-        },
-        {
-            id: 'item-5',
-            question: 'How much can I earn from selling my recyclables?',
-            answer: 'It depends on the material and the junkshop. Once you post an item for sale, nearby recyclers send you their price per kilogram. You can compare offers and accept the one you like best, or cancel anytime.',
-        },
-        {
-            id: 'item-6',
-            question: 'Where can I bring my recyclables?',
-            answer: 'Trashure shows you junkshops and recyclers near you that accept your specific material. You can choose to drop it off yourself, request a pickup, or either, whichever is more convenient.',
-        },
-        {
-            id: 'item-7',
-            question: 'Can I donate instead of selling?',
-            answer: 'Absolutely. Trashure lists active collection drives from schools and community organizations near you. If your material matches what they need, you can donate it directly to a good cause.',
-        },
-        {
-            id: 'item-8',
-            question: 'How do I know which items are safe to reuse?',
-            answer: 'Trashure flags hazardous items, like certain electronics or chemical containers, and gives you safe handling instructions. Reuse ideas are only shown for items that are safe to handle at home.',
-        },
-        {
-            id: 'item-9',
-            question: 'Is my information private?',
-            answer: 'Yes. Your photos and personal details are kept private. Only you and the recycler or organization you choose to work with can see your scan and contact information.',
-        },
-        {
-            id: 'item-10',
-            question: 'What if Trashure gets my item wrong?',
-            answer: 'No problem, you are always in control. If the AI guesses the wrong material, you can correct it manually before choosing what to do with your item. Trashure never makes a final decision without your confirmation.',
-        },
-        {
-            id: 'item-11',
-            question: 'Do I need a special phone or app to use it?',
-            answer: 'No. Trashure works right in your web browser on any phone, tablet, or computer. You do not need to install anything.',
-        },
-        {
-            id: 'item-12',
-            question: 'How does my recycling actually help?',
-            answer: 'Every item you recover through Trashure is tracked. Your city can see how many kilograms of waste were diverted from landfills, which helps keep your community cleaner and supports local recycling programs.',
-        },
-    ];
+  return (
+    <section
+      id="faqs"
+      aria-labelledby="faqs-heading"
+      className="scroll-mt-20 bg-white px-5 py-16 sm:px-8 sm:py-20 lg:py-24"
+    >
+      <div className="mx-auto max-w-7xl">
+        <div className="grid items-start gap-10 lg:grid-cols-[0.85fr_1.4fr] lg:gap-20">
+          {/* FAQ introduction */}
+          <div className="lg:sticky lg:top-28">
+            <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-4 py-2 text-xs font-semibold tracking-wider text-green-700">
+              FREQUENTLY ASKED QUESTIONS
+            </span>
 
+            <h2
+              id="faqs-heading"
+              className="mt-5 text-3xl font-bold leading-tight tracking-tight text-zinc-900 sm:text-4xl"
+            >
+              Everything you need to know about{" "}
+              <span className="text-green-600">Trashure.</span>
+            </h2>
 
-    return (
-        <main className='min-h-screen bg-white'>
-            <section className="py-16 md:py-24">
-                <div className="mx-auto max-w-5xl px-6">
-                    <div className="grid gap-8 md:grid-cols-5 md:gap-12">
+            <p className="mt-5 max-w-md text-sm leading-7 text-zinc-600 sm:text-base">
+              Have questions about scanning, recycling, selling, or donating?
+              Find simple answers to help you get started.
+            </p>
 
-                        <div className="md:col-span-2">
-                            <h2 className="text-foreground text-4xl font-semibold">FAQs</h2>
-                            <p className="text-muted-foreground mt-4 text-balance text-lg">
-                                Here are some of the most common questions we get about Trashure. If you have a question that isn&apos;t answered here, please reach out to our support team.
-                            </p>
-                            <p className="text-muted-foreground mt-6 hidden md:block">
-                                Can&apos;t find what you&apos;re looking for? Reach out to our{' '}
-                                <Link
-                                    href="/contact"
-                                    className="text-primary font-medium hover:underline"
-                                >
-                                Trashure support team
-                                </Link>{' '}
-                                for assistance.
-                            </p>
-                        </div>
+            {/* Support link */}
+            <div className="mt-7 flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50 text-green-600">
+                <MessageCircle className="h-5 w-5" />
+              </span>
 
-                        <div className="md:col-span-3">
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">
+                  Still need help?
+                </p>
 
-                            <Accordion>
-                                {faqItems.map((item) => (
-                                    <AccordionItem
-                                        key={item.id}
-                                        value={item.id}
-                                        className="border-b border-gray-200 dark:border-gray-600">
-                                        <AccordionTrigger className="cursor-pointer text-base font-medium hover:no-underline">{item.question}</AccordionTrigger>
-                                        <AccordionContent>
-                                            <BlurredStagger text={item.answer} />
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                ))}
-                            </Accordion>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    )
-}
+                <p className="mt-1 text-sm leading-6 text-zinc-500">
+                  Our team is happy to help with your questions.
+                </p>
 
-
-export const BlurredStagger = ({
-    text = "built by ruixen.com",
-}: {
-    text: string;
-}) => {
-    const headingText = text;
-
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.015,
-            },
-        },
-    };
-
-    const letterAnimation = {
-        hidden: {
-            opacity: 0,
-            filter: "blur(10px)",
-        },
-        show: {
-            opacity: 1,
-            filter: "blur(0px)",
-        },
-    };
-
-    return (
-        <>
-            <div className="w-full">
-                <motion.p
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="text-base leading-relaxed break-words whitespace-normal"
+                <Link
+                  href="/contact"
+                  className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 transition hover:text-green-800"
                 >
-                    {headingText.split("").map((char, index) => (
-                        <motion.span
-                            key={index}
-                            variants={letterAnimation}
-                            transition={{ duration: 0.3 }}
-                            className="inline-block"
-                        >
-                            {char === " " ? "\u00A0" : char}
-                        </motion.span>
-                    ))}
-                </motion.p>
+                  Contact our team
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
-        </>
-    );
-};
+          </div>
+
+          {/* FAQ accordion */}
+          <div className="min-w-0">
+            <Accordion className="w-full">
+              {faqItems.map((item) => (
+                <AccordionItem
+                  key={item.id}
+                  value={item.id}
+                  className="border-b border-green-100"
+                >
+                  <AccordionTrigger className="gap-4 py-5 text-left text-sm font-semibold leading-6 text-zinc-800 hover:text-green-700 hover:no-underline sm:py-6 sm:text-base [&>svg]:text-green-600">
+                    {item.question}
+                  </AccordionTrigger>
+
+                  <AccordionContent>
+                    <p className="max-w-2xl pb-5 text-sm leading-7 text-zinc-600 sm:pb-6 sm:text-base">
+                      {item.answer}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
