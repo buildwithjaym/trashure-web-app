@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://trashure-web-app.vercel.app";
+const siteUrl = "https://www.trashure-ai.online";
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -11,7 +11,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const siteUrl = "https://trashure-web-app.vercel.app";
+const siteUrl = "https://www.trashure-ai.online";
 
 const siteName = "Trashure";
 
