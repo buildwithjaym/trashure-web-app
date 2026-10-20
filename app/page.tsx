@@ -27,50 +27,64 @@ import {
   X,
 } from "lucide-react";
 import { DownloadApkPrompt } from "@/components/download-apk-prompt";
-export default function Home() {
+import FAQs from "@/components/sections/FAQs";
+const primaryButton =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-6 py-3 text-center text-sm font-semibold leading-5 text-white shadow-lg shadow-green-600/15 transition hover:shadow-xl hover:shadow-green-600/25";
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+const secondaryButton =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-green-200 bg-white px-6 py-3 text-center text-sm font-semibold leading-5 text-green-700 transition hover:border-green-400 hover:bg-green-50";
 
-  const problems = [
-    {
-      title: "Lost Recognition",
-      description:
-        "People throw away materials because they cannot identify their hidden potential.",
-    },
-    {
-      title: "Lost Opportunities",
-      description:
-        "Reusable resources disappear before reaching people and organizations that need them.",
-    },
-    {
-      title: "Lost Data",
-      description:
-        "Communities lack accurate information to create smarter waste solutions.",
-    },
-  ];
+const navigation = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Why Trashure", href: "#benefits" },
+  { label: "Dashboard", href: "#dashboard" },
+];
 
+const samples = [
+  {
+    name: "Plastic bottle",
+    material: "PET plastic",
+    tip: "Empty, rinse, and keep it dry. Check your local recycler’s accepted materials.",
+  },
+  {
+    name: "Aluminum can",
+    material: "Aluminum",
+    tip: "Empty and rinse the can. Keep it separate from mixed household waste.",
+  },
+  {
+    name: "Cardboard",
+    material: "Corrugated cardboard",
+    tip: "Remove packing tape, flatten the box, and keep it clean and dry.",
+  },
+];
 
-  const solutions = [
-    {
-      title: "AI Recognition",
-      description:
-        "Identify materials instantly and understand their recovery potential.",
-      icon: Brain,
-    },
-    {
-      title: "Circular Recommendations",
-      description:
-        "Discover whether materials should be reused, sold, donated, or recycled.",
-      icon: Recycle,
-    },
-    {
-      title: "Impact Measurement",
-      description:
-        "Transform community actions into meaningful sustainability insights.",
-      icon: BarChart3,
-    },
-  ];
-
+const recoveryPaths = [
+  {
+    icon: Recycle,
+    title: "Recycle",
+    description:
+      "Learn how to prepare your materials and find junkshops that accept them.",
+  },
+  {
+    icon: Coins,
+    title: "Sell",
+    description:
+      "Connect with accepting recyclers, receive offers, and choose who to work with.",
+  },
+  {
+    icon: Gift,
+    title: "Donate",
+    description:
+      "Find active school and community collection drives that need your materials.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Reuse",
+    description:
+      "Discover practical ways to give safe, nonhazardous items a second life.",
+  },
+];
 
 const processSteps = [
   {
@@ -808,14 +822,8 @@ export default function Home() {
         </div>
       </section>
 
-
-
-
-
-
-      {/* Final CTA */}
-
-
+      {/* FAQ section */}
+      <FAQs />
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 sm:pb-20">
         <div className="relative isolate overflow-hidden rounded-[32px] bg-gradient-to-r from-green-600 to-emerald-800 px-6 py-14 text-center text-white sm:px-12 sm:py-16">
