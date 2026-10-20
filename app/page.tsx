@@ -1,2558 +1,924 @@
+"use client";
 
-"use client"
+import Link from "next/link";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import {
-  Menu,
-  X,
   ArrowRight,
   BarChart3,
   Brain,
+  Building2,
   Camera,
+  CheckCircle2,
   Coins,
+  Gift,
+  GraduationCap,
   Handshake,
+  ImageIcon,
   Leaf,
+  Lightbulb,
+  Menu,
   Recycle,
   ScanLine,
+  ShieldCheck,
   Sparkles,
+  Sun,
   Upload,
-
+  Users,
+  X,
 } from "lucide-react";
-
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
 import { DownloadApkPrompt } from "@/components/download-apk-prompt";
-export default function Home() {
+import FAQs from "@/components/sections/FAQs";
+const primaryButton =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-6 py-3 text-center text-sm font-semibold leading-5 text-white shadow-lg shadow-green-600/15 transition hover:shadow-xl hover:shadow-green-600/25";
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+const secondaryButton =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-green-200 bg-white px-6 py-3 text-center text-sm font-semibold leading-5 text-green-700 transition hover:border-green-400 hover:bg-green-50";
 
-  const problems = [
-    {
-      title: "Lost Recognition",
-      description:
-        "People throw away materials because they cannot identify their hidden potential.",
-    },
-    {
-      title: "Lost Opportunities",
-      description:
-        "Reusable resources disappear before reaching people and organizations that need them.",
-    },
-    {
-      title: "Lost Data",
-      description:
-        "Communities lack accurate information to create smarter waste solutions.",
-    },
-  ];
+const navigation = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Why Trashure", href: "#benefits" },
+  { label: "Dashboard", href: "#dashboard" },
+];
 
+const samples = [
+  {
+    name: "Plastic bottle",
+    material: "PET plastic",
+    tip: "Empty, rinse, and keep it dry. Check your local recycler’s accepted materials.",
+  },
+  {
+    name: "Aluminum can",
+    material: "Aluminum",
+    tip: "Empty and rinse the can. Keep it separate from mixed household waste.",
+  },
+  {
+    name: "Cardboard",
+    material: "Corrugated cardboard",
+    tip: "Remove packing tape, flatten the box, and keep it clean and dry.",
+  },
+];
 
-  const solutions = [
-    {
-      title: "AI Recognition",
-      description:
-        "Identify materials instantly and understand their recovery potential.",
-      icon: Brain,
-    },
-    {
-      title: "Circular Recommendations",
-      description:
-        "Discover whether materials should be reused, sold, donated, or recycled.",
-      icon: Recycle,
-    },
-    {
-      title: "Impact Measurement",
-      description:
-        "Transform community actions into meaningful sustainability insights.",
-      icon: BarChart3,
-    },
-  ];
+const recoveryPaths = [
+  {
+    icon: Recycle,
+    title: "Recycle",
+    description:
+      "Learn how to prepare your materials and find junkshops that accept them.",
+  },
+  {
+    icon: Coins,
+    title: "Sell",
+    description:
+      "Connect with accepting recyclers, receive offers, and choose who to work with.",
+  },
+  {
+    icon: Gift,
+    title: "Donate",
+    description:
+      "Find active school and community collection drives that need your materials.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Reuse",
+    description:
+      "Discover practical ways to give safe, nonhazardous items a second life.",
+  },
+];
 
+const processSteps = [
+  {
+    icon: Camera,
+    title: "Capture your item",
+    description: "Take a clear photo or upload an image of your material.",
+  },
+  {
+    icon: Brain,
+    title: "Confirm the material",
+    description: "Review the AI suggestion and correct it when needed.",
+  },
+  {
+    icon: Coins,
+    title: "Choose your next step",
+    description: "Explore available recycling, selling, donation, or reuse options.",
+  },
+  {
+    icon: Handshake,
+    title: "Complete the recovery",
+    description: "Connect with the right people and return the material to circulation.",
+  },
+];
 
-  const processSteps = [
-    {
-      number: "01",
-      label: "Capture",
-      title: "Scan the Item",
-      description:
-        "Take a photo or upload an image of the material you want to recover.",
-      detail: "Fast visual input",
-      icon: Camera,
-      numberStyle:
-        "from-emerald-950 via-emerald-700 to-emerald-400 shadow-emerald-950/20",
-      iconStyle: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-      accentStyle: "from-emerald-500 to-teal-400",
-    },
-    {
-      number: "02",
-      label: "Analyze",
-      title: "Identify the Material",
-      description:
-        "Trashure AI detects the item, material type, condition, and recovery potential.",
-      detail: "AI material profile",
-      icon: Brain,
-      numberStyle:
-        "from-slate-950 via-teal-900 to-teal-500 shadow-teal-950/20",
-      iconStyle: "bg-teal-50 text-teal-700 ring-teal-100",
-      accentStyle: "from-teal-500 to-cyan-400",
-    },
-    {
-      number: "03",
-      label: "Decide",
-      title: "Choose the Best Value Path",
-      description:
-        "Receive practical options to reuse, sell, donate, or recycle the material.",
-      detail: "Clear next actions",
-      icon: Coins,
-      numberStyle:
-        "from-amber-800 via-amber-500 to-yellow-300 shadow-amber-900/20",
-      iconStyle: "bg-amber-50 text-amber-700 ring-amber-100",
-      accentStyle: "from-amber-500 to-yellow-300",
-    },
-    {
-      number: "04",
-      label: "Recover",
-      title: "Return It to Circulation",
-      description:
-        "Connect the material to people, partners, or programs that can use it again.",
-      detail: "Less waste, more value",
-      icon: Recycle,
-      numberStyle:
-        "from-green-950 via-green-700 to-lime-500 shadow-green-950/20",
-      iconStyle: "bg-lime-50 text-green-700 ring-lime-100",
-      accentStyle: "from-green-600 to-lime-400",
-    },
-  ];
+function MaterialIllustration({ index }: { index: number }) {
+  return (
+    <svg
+      viewBox="0 0 300 320"
+      role="img"
+      aria-label={`Illustration of ${samples[index].name}`}
+      className="h-full w-full drop-shadow-xl"
+    >
+      <defs>
+        <linearGradient id="trashure-material-gradient">
+          <stop stopColor="#82bfa0" />
+          <stop offset="0.35" stopColor="#f0fff5" />
+          <stop offset="0.7" stopColor="#b8ddc8" />
+          <stop offset="1" stopColor="#659d7c" />
+        </linearGradient>
+      </defs>
 
+      <ellipse
+        cx="150"
+        cy="287"
+        rx="68"
+        ry="12"
+        fill="#14532d"
+        opacity="0.12"
+      />
+
+      {index === 0 && (
+        <g transform="rotate(12 150 160)">
+          <rect x="129" y="25" width="42" height="28" rx="6" fill="#22c55e" />
+          <path
+            d="M133 53V76C133 91 99 104 99 127V256Q99 280 124 281H176Q201 280 201 256V127C201 104 167 91 167 76V53Z"
+            fill="url(#trashure-material-gradient)"
+            stroke="#69a985"
+            strokeWidth="2"
+          />
+          <path
+            d="M105 139H195M105 235H195M110 251H190M117 266H183"
+            stroke="#69a985"
+            strokeWidth="3"
+            opacity="0.5"
+          />
+          <path
+            d="M116 126V248"
+            stroke="white"
+            strokeWidth="6"
+            strokeLinecap="round"
+            opacity="0.8"
+          />
+          <rect x="100" y="155" width="100" height="65" rx="3" fill="#15803d" />
+          <text x="150" y="180" textAnchor="middle" fill="#bbf7d0" fontSize="10" letterSpacing="3">
+            ANOTHER
+          </text>
+          <text x="150" y="204" textAnchor="middle" fill="white" fontSize="23" fontWeight="700">
+            LIFE.
+          </text>
+        </g>
+      )}
+
+      {index === 1 && (
+        <g transform="rotate(-10 150 160)">
+          <rect
+            x="94"
+            y="73"
+            width="112"
+            height="207"
+            rx="21"
+            fill="url(#trashure-material-gradient)"
+            stroke="#789786"
+            strokeWidth="2"
+          />
+          <ellipse cx="150" cy="73" rx="54" ry="12" fill="#e0eee5" stroke="#789786" strokeWidth="3" />
+          <ellipse cx="150" cy="74" rx="16" ry="5" fill="#587665" />
+          <path d="M112 101V247" stroke="white" strokeWidth="5" opacity="0.7" />
+          <rect x="95" y="137" width="110" height="83" fill="#059669" />
+          <text x="150" y="168" textAnchor="middle" fill="#a7f3d0" fontSize="11" letterSpacing="2">
+            MADE TO
+          </text>
+          <text x="150" y="195" textAnchor="middle" fill="white" fontSize="22" fontWeight="700">
+            RETURN.
+          </text>
+        </g>
+      )}
+
+      {index === 2 && (
+        <g>
+          <path
+            d="M65 119L150 78L236 119V249L150 289L65 249Z"
+            fill="#c6a16a"
+            stroke="#80603a"
+            strokeWidth="2"
+          />
+          <path d="M150 159L236 119V249L150 289Z" fill="#b18b55" />
+          <path d="M65 119L150 159L236 119M150 159V289" fill="none" stroke="#80603a" strokeWidth="2" />
+          <path d="M109 98L194 139V172L173 183V150L88 110Z" fill="#ead6b2" />
+          <text x="106" y="218" textAnchor="middle" fill="#166534" fontSize="38">
+            ↺
+          </text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
+function ScannerPreview() {
+  const [selected, setSelected] = useState(0);
+  const [phase, setPhase] = useState<"idle" | "scanning" | "complete">("idle");
+  const [progress, setProgress] = useState(0);
+  const [image, setImage] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const input = useRef<HTMLInputElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
+  const stream = useRef<MediaStream | null>(null);
+  const requestId = useRef(0);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      requestId.current += 1;
+      stream.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (cameraOpen && video.current && stream.current) {
+      video.current.srcObject = stream.current;
+    }
+  }, [cameraOpen]);
+
+  useEffect(() => {
+    if (!image) return;
+    return () => URL.revokeObjectURL(image);
+  }, [image]);
+
+  useEffect(() => {
+    if (phase !== "scanning") return;
+    const started = performance.now();
+    const timer = window.setInterval(() => {
+      const next = Math.min(100, Math.floor((performance.now() - started) / 26));
+      setProgress(next);
+      if (next === 100) {
+        window.clearInterval(timer);
+        setPhase("complete");
+      }
+    }, 50);
+    return () => window.clearInterval(timer);
+  }, [phase]);
+
+  function closeCamera() {
+    requestId.current += 1;
+    stream.current?.getTracks().forEach((track) => track.stop());
+    stream.current = null;
+    setCameraOpen(false);
+    setCameraLoading(false);
+  }
+
+  function reset(index: number) {
+    closeCamera();
+    setSelected(index);
+    setImage(null);
+    setPhase("idle");
+    setProgress(0);
+    setError("");
+  }
+
+  function uploadPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Choose a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Choose an image smaller than 8 MB.");
+      return;
+    }
+
+    closeCamera();
+    setImage(URL.createObjectURL(file));
+    setPhase("idle");
+    setProgress(0);
+    setError("");
+  }
+
+  async function openCamera() {
+    const request = ++requestId.current;
+    setCameraLoading(true);
+    setError("");
+
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Unavailable");
+      const next = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false,
+      });
+
+      if (!mounted.current || request !== requestId.current) {
+        next.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      stream.current?.getTracks().forEach((track) => track.stop());
+      stream.current = next;
+      setImage(null);
+      setPhase("idle");
+      setProgress(0);
+      setCameraOpen(true);
+    } catch {
+      if (mounted.current && request === requestId.current) {
+        setError("Camera unavailable. Allow camera access on HTTPS or upload a photo instead.");
+      }
+    } finally {
+      if (mounted.current && request === requestId.current) {
+        setCameraLoading(false);
+      }
+    }
+  }
+
+  function capturePhoto() {
+    const element = video.current;
+    if (!element?.videoWidth) {
+      setError("The camera is still loading. Try again in a moment.");
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 1600 / Math.max(element.videoWidth, element.videoHeight));
+    canvas.width = Math.round(element.videoWidth * scale);
+    canvas.height = Math.round(element.videoHeight * scale);
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.drawImage(element, 0, 0, canvas.width, canvas.height);
+
+    const request = requestId.current;
+    canvas.toBlob((blob) => {
+      if (!blob || !mounted.current || request !== requestId.current) return;
+      setImage(URL.createObjectURL(blob));
+      closeCamera();
+      setPhase("idle");
+      setProgress(0);
+      setError("");
+    }, "image/jpeg", 0.85);
+  }
+
+  const busy = phase === "scanning" || cameraLoading;
 
   return (
+    <div id="scanner" className="scroll-mt-28 overflow-hidden rounded-[28px] border border-green-100 bg-white shadow-[0_24px_80px_-24px_rgba(22,101,52,0.25)]">
+      <div className="flex items-center justify-between gap-3 border-b border-green-50 px-5 py-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600">
+            <ScanLine className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-sm font-bold">Trashure AI Scanner</p>
+            <p className="mt-0.5 text-[10px] text-zinc-500">See the potential in your item</p>
+          </div>
+        </div>
+        <span className="rounded-full bg-green-50 px-2.5 py-1 text-[8px] font-bold tracking-wider text-green-700">
+          DEMO
+        </span>
+      </div>
 
-    <main className="min-h-screen overflow-hidden bg-white text-zinc-900">
+      <div className="grid grid-cols-3 gap-1 p-3">
+        {samples.map((sample, index) => (
+          <button
+            key={sample.name}
+            type="button"
+            aria-pressed={!image && !cameraOpen && selected === index}
+            onClick={() => reset(index)}
+            className={`min-h-11 rounded-xl px-2 py-2 text-[10px] font-semibold transition sm:text-xs ${
+              !image && !cameraOpen && selected === index
+                ? "bg-green-50 text-green-700"
+                : "text-zinc-500 hover:bg-zinc-50"
+            }`}
+          >
+            {sample.name}
+          </button>
+        ))}
+      </div>
 
-
-      {/* Navbar */}
-
-      <nav
-        className="
-        fixed
-        top-0
-        z-50
-        w-full
-        bg-white/70
-        backdrop-blur-xl
-        "
-      >
-
+      <div className="relative mx-4 h-[300px] overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100/70">
         <div
-          className="
-          mx-auto
-          flex
-          max-w-7xl
-          items-center
-          justify-between
-          px-5
-          py-5
-          sm:px-8
-          "
-        >
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(22,163,74,.05) 1px, transparent 1px),linear-gradient(90deg,rgba(22,163,74,.05) 1px,transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
 
-          <div className="flex items-center gap-3">
-            {/* Logo */}
-            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-green-50 shadow-sm">
-              <img
-                src="/logo.png"
-                alt="Trashure Logo"
-                className="h-full w-full object-contain"
-              />
-            </div>
+        <span className="absolute left-4 top-4 z-10 rounded-md bg-white/80 px-2 py-1 font-mono text-[8px] tracking-widest text-green-700">
+          {cameraOpen ? "LIVE CAMERA" : image ? "YOUR PHOTO · PREVIEW" : "SAMPLE OBJECT"}
+        </span>
 
-            {/* Text */}
-            <div className="flex flex-col">
-              <h1 className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-700 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+        {cameraOpen ? (
+          <video ref={video} autoPlay muted playsInline className="absolute inset-0 h-full w-full object-contain" />
+        ) : image ? (
+          <img
+            src={image}
+            alt="Your material preview"
+            className="absolute inset-0 h-full w-full object-contain"
+            onError={() => {
+              setImage(null);
+              setPhase("idle");
+              setError("This image could not be opened. Try another image.");
+            }}
+          />
+        ) : (
+          <div className="absolute inset-x-7 bottom-0 top-3">
+            <MaterialIllustration index={selected} />
+          </div>
+        )}
+
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-12 bottom-12 top-12 sm:inset-x-16">
+          <span className="absolute left-0 top-0 h-6 w-6 rounded-tl-lg border-l-2 border-t-2 border-green-500" />
+          <span className="absolute right-0 top-0 h-6 w-6 rounded-tr-lg border-r-2 border-t-2 border-green-500" />
+          <span className="absolute bottom-0 left-0 h-6 w-6 rounded-bl-lg border-b-2 border-l-2 border-green-500" />
+          <span className="absolute bottom-0 right-0 h-6 w-6 rounded-br-lg border-b-2 border-r-2 border-green-500" />
+          {phase === "scanning" && <div className="trashure-scan-beam" />}
+        </div>
+
+        <span className="absolute bottom-4 left-4 rounded-md bg-white/80 px-2 py-1 font-mono text-[8px] tracking-widest text-green-700">
+          {phase === "scanning" ? "SCANNING SURFACE" : phase === "complete" ? "PREVIEW COMPLETE" : "READY TO EXPLORE"}
+        </span>
+      </div>
+
+      <div className="p-5">
+        <div role="status" aria-live="polite" className="flex min-h-12 items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
+            {phase === "complete" ? <CheckCircle2 className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
+          </span>
+          <div>
+            <p className="text-sm font-semibold">
+              {phase === "scanning"
+                ? "Exploring the material…"
+                : phase === "complete"
+                  ? image ? "Your photo is ready." : samples[selected].material
+                  : cameraOpen ? "Frame your item." : "Try your first sample scan."}
+            </p>
+            <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">
+              {phase === "complete"
+                ? image ? "Continue to the app for AI identification." : "Illustrative result. Confirm the material in the app."
+                : "Select a sample, upload a photo, or use your camera."}
+            </p>
+          </div>
+        </div>
+
+        {phase === "scanning" && (
+          <div
+            role="progressbar"
+            aria-label="Scan animation progress"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            className="mt-4 h-1 overflow-hidden rounded-full bg-green-50"
+          >
+            <div className="h-full bg-gradient-to-r from-green-400 to-emerald-600" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+
+        {phase === "complete" && !image && (
+          <p className="mt-4 rounded-xl border border-green-100 bg-green-50 p-3 text-xs leading-relaxed text-green-800">
+            {samples[selected].tip}
+          </p>
+        )}
+
+        {cameraOpen ? (
+          <button type="button" onClick={capturePhoto} className={`${primaryButton} mt-5 w-full`}>
+            <Camera className="h-4 w-4 shrink-0" />
+            Capture photo
+          </button>
+        ) : phase === "complete" && image ? (
+          <Link href="/profiles/resident/scan" className={`${primaryButton} mt-5 w-full`}>
+            Continue to AI scanner
+            <ArrowRight className="h-4 w-4 shrink-0" />
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setProgress(0);
+              setPhase("scanning");
+              setError("");
+            }}
+            className={`${primaryButton} mt-5 w-full disabled:cursor-wait disabled:opacity-70`}
+          >
+            <ScanLine className="h-4 w-4 shrink-0" />
+            {phase === "scanning"
+              ? `Scanning ${progress}%`
+              : phase === "complete" ? "Scan again"
+              : image ? "Preview scan effect" : "Try a sample scan"}
+          </button>
+        )}
+
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => input.current?.click()}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-2 py-2 text-xs font-medium text-zinc-600 transition hover:border-green-300 hover:bg-green-50 disabled:opacity-50"
+          >
+            <Upload className="h-4 w-4 shrink-0" />
+            Upload photo
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={cameraOpen ? closeCamera : openCamera}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-2 py-2 text-xs font-medium text-zinc-600 transition hover:border-green-300 hover:bg-green-50 disabled:opacity-50"
+          >
+            <Camera className="h-4 w-4 shrink-0" />
+            {cameraLoading ? "Opening…" : cameraOpen ? "Close camera" : "Use camera"}
+          </button>
+        </div>
+
+        <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadPhoto} hidden />
+
+        {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-xs text-red-700">{error}</p>}
+
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-zinc-400">
+          <ShieldCheck className="h-3 w-3 shrink-0" />
+          Demo photos stay in your browser.
+        </p>
+
+        {image && phase === "complete" && (
+          <p className="mt-2 text-center text-[10px] leading-relaxed text-zinc-500">
+            Select your photo again in the app. This demo previews the scan effect without identifying or uploading your image.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Home() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    <main className="trashure-page min-h-screen overflow-x-clip bg-white text-zinc-900 selection:bg-green-200">
+      <header className="sticky top-0 z-50 border-b border-green-100 bg-white/95 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+          <Link href="/" aria-label="Trashure home" className="flex shrink-0 items-center gap-3">
+            <img src="/logo.png" alt="" className="h-11 w-11 rounded-xl bg-green-50 object-contain" />
+            <div>
+              <span className="bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-xl font-black tracking-tight text-transparent sm:text-2xl">
                 TRASHURE
-              </h1>
-
-              <p className="text-sm text-zinc-500">
-                Turn Trash into Treasure
-              </p>
+              </span>
+              <p className="text-[10px] text-zinc-500">Turn Trash into Treasure</p>
             </div>
-          </div>
+          </Link>
 
-          <div className="hidden items-center gap-7 text-sm font-medium text-zinc-600 md:flex">
-            <a
-              href="#features"
-              className="transition hover:text-green-600"
-            >
-              Features
-            </a>
-
-            <a
-              href="#how-it-works"
-              className="transition hover:text-green-600"
-            >
-              How It Works
-            </a>
-
-            <a
-              href="#benefits"
-              className="transition hover:text-green-600"
-            >
-              Why Trashure
-            </a>
-
-            <a
-              href="#dashboard"
-              className="transition hover:text-green-600"
-            >
-              Dashboard
-            </a>
-
-            <Link
-              href="/about-the-developer"
-              className="transition hover:text-green-600"
-            >
-              About Developer
-            </Link>
-          </div>
+          <nav aria-label="Main navigation" className="hidden items-center gap-6 text-xs font-medium text-zinc-600 lg:flex">
+            {navigation.map((item) => (
+              <a key={item.href} href={item.href} className="transition hover:text-green-600">{item.label}</a>
+            ))}
+            <Link href="/about-the-developer" className="hover:text-green-600">About developer</Link>
+          </nav>
 
           <div className="flex items-center gap-3">
-
-            <Link href="/login">
-
-              <Button
-                className="
-hidden
-rounded-full
-bg-gradient-to-r
-from-green-500
-to-emerald-700
-px-8
-py-6
-text-white
-shadow-xl
-shadow-green-500/40
-transition
-hover:-translate-y-1
-hover:shadow-green-500/60
-sm:flex
-"
-              >
-
-                Start Your Journey
-
-                <ArrowRight className="ml-2 h-4 w-4" />
-
-              </Button>
-
+            <Link href="/login" className="hidden h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-5 text-sm font-semibold text-white sm:inline-flex">
+              Get started <ArrowRight className="h-4 w-4" />
             </Link>
-
-
             <button
+              type="button"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="rounded-xl p-2 text-green-700 md:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-green-700 lg:hidden"
             >
               {mobileOpen ? <X /> : <Menu />}
             </button>
-
           </div>
-
-          {mobileOpen && (
-            <div className="absolute left-0 top-full w-full border-t border-green-100 bg-white/95 p-6 shadow-2xl backdrop-blur-xl md:hidden">
-              <div className="flex flex-col gap-2 text-zinc-700">
-                <Link
-                  href="#features"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
-                >
-                  Features
-                </Link>
-
-                <Link
-                  href="#how-it-works"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
-                >
-                  How It Works
-                </Link>
-
-                <Link
-                  href="#benefits"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
-                >
-                  Why Trashure
-                </Link>
-
-                <Link
-                  href="#dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
-                >
-                  Dashboard
-                </Link>
-
-                <Link
-                  href="/about-the-developer"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base font-medium transition hover:bg-green-50 hover:text-green-600"
-                >
-                  About Developer
-                </Link>
-
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="mt-3"
-                >
-                  <Button className="w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 py-6 text-white shadow-lg shadow-green-500/30 transition hover:-translate-y-1">
-                    Start Your Journey
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-
         </div>
 
-      </nav>
+        {mobileOpen && (
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="grid gap-1 border-t border-green-100 bg-white px-5 py-4 lg:hidden">
+            {navigation.map((item) => (
+              <a key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="rounded-xl px-4 py-3 text-sm hover:bg-green-50">
+                {item.label}
+              </a>
+            ))}
+            <Link href="/about-the-developer" className="rounded-xl px-4 py-3 text-sm hover:bg-green-50">About developer</Link>
+            <Link href="/login" className={`${primaryButton} mt-3`}>Start your journey <ArrowRight className="h-4 w-4" /></Link>
+          </nav>
+        )}
+      </header>
 
-
-
-
-      {/* Hero Section */}
-
-
-      <section
-        id="home"
-        className="
-        relative
-        overflow-hidden
-        bg-gradient-to-br
-        from-white
-        via-green-50
-        to-white
-        pb-28
-        pt-40
-        "
-      >
-
-
-        <div
-          className="
-          absolute
-          left-0
-          top-20
-          h-96
-          w-96
-          rounded-full
-          bg-green-300/30
-          blur-3xl
-          "
-        />
-
-
-        <div
-          className="
-          absolute
-          bottom-0
-          right-0
-          h-80
-          w-80
-          rounded-full
-          bg-emerald-300/20
-          blur-3xl
-          "
-        />
-
-
-        <div
-          className="
-          mx-auto
-          grid
-          max-w-7xl
-          gap-14
-          px-5
-          sm:px-8
-          lg:grid-cols-2
-          lg:items-center
-          "
-        >
-
-
+      <section id="home" className="relative isolate bg-gradient-to-br from-white via-green-50/80 to-white">
+        <div aria-hidden="true" className="pointer-events-none absolute -left-20 top-12 -z-10 h-80 w-80 rounded-full bg-green-200/30 blur-3xl" />
+        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.12fr_1fr] lg:gap-16 lg:py-24">
           <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-white/80 px-4 py-2 text-[10px] font-semibold text-green-700 sm:text-xs">
+              <Sparkles className="h-4 w-4 shrink-0" />
+              AI-powered circular economy platform
+            </span>
 
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-
-              <Sparkles className="mr-2 h-4 w-4" />
-
-              AI-Powered Circular Economy Platform
-
-            </Badge>
-
-
-
-            <h1
-              className="
-              mt-8
-              text-5xl
-              font-bold
-              leading-tight
-              tracking-tight
-              sm:text-6xl
-              lg:text-7xl
-              "
-            >
-
-              What if waste
-
-              <br />
-
-              was just a missed
-
-              <span
-                className="
-                block
-                bg-gradient-to-r
-                from-green-500
-                via-emerald-500
-                to-green-700
-                bg-clip-text
-                text-transparent
-                "
-              >
+            <h1 className="mt-7 text-[clamp(3rem,5.6vw,5rem)] font-bold leading-[1.08] tracking-[-0.045em]">
+              What if waste<br />
+              was a missed<br />
+              <span className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-700 bg-clip-text text-transparent">
                 opportunity?
               </span>
-
             </h1>
 
-
-
-            <p
-              className="
-              mt-7
-              max-w-xl
-              text-lg
-              leading-relaxed
-              text-zinc-600
-              "
-            >
-
-              Every day, valuable materials are thrown away because
-              we do not know what they can become.
-
-              Trashure uses artificial intelligence to recognize materials
-              before they become waste and connects them to their next purpose.
-
+            <p className="mt-6 max-w-lg text-base leading-8 text-zinc-600">
+              A bottle. A box. Something you almost threw away.
+              Trashure helps you see what it is—and what it can become.
+            </p>
+            <p className="mt-3 max-w-lg text-sm leading-7 text-zinc-500">
+              Identify materials, confirm the result, and find a practical way to recycle, sell, donate, or reuse them.
             </p>
 
-
-
-            <div
-              className="
-              mt-10
-              flex
-              flex-col
-              gap-4
-              sm:flex-row
-              "
-            >
-
-
-              <Link href="/login">
-                <Button className="group w-full rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-7 py-5 text-sm font-semibold text-white shadow-xl shadow-green-500/30 transition duration-300 hover:-translate-y-1 hover:shadow-green-500/50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
-                  <ScanLine className="mr-2 h-4 w-4 transition group-hover:scale-110" />
-                  Start Scanning Materials
-                </Button>
+            <div className="mt-8 grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+              <Link href="/login" className={`${primaryButton} w-full`}>
+                <ScanLine className="h-4 w-4 shrink-0" />
+                Start scanning
+                <ArrowRight className="h-4 w-4 shrink-0" />
               </Link>
-
-
-
-              <Link href="/how-it-works">
-                <Button className="group w-full rounded-full border border-green-200 bg-white px-7 py-5 text-sm font-semibold text-green-700 transition duration-300 hover:-translate-y-1 hover:border-green-300 hover:bg-green-50 sm:w-auto sm:px-10 sm:py-6 sm:text-base">
-                  How It Works
-                  <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
-                </Button>
-              </Link>
-
+              <a href="#scanner" className={`${secondaryButton} w-full`}>
+                <Sparkles className="h-4 w-4 shrink-0" />
+                Try the scanner demo
+              </a>
             </div>
 
-
-
+            <div className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-zinc-500">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-green-600" />
+              <p>AI assists. You confirm. Your community takes it further.</p>
+            </div>
           </div>
 
-
-
-
-
-          {/* AI Preview Card */}
-
-
-          <Card
-            className="
-            animate-[float_6s_ease-in-out_infinite]
-            rounded-[32px]
-            border-none
-            bg-white/80
-            p-6
-            shadow-2xl
-            shadow-green-900/10
-            backdrop-blur-xl
-            sm:p-10
-            "
-          >
-
-            <div
-              className="
-              rounded-[28px]
-              bg-gradient-to-br
-              from-green-100
-              to-white
-              p-8
-              "
-            >
-
-
-              <div
-                className="
-                flex
-                justify-center
-                "
-              >
-
-                <div
-                  className="
-                  rounded-3xl
-                  bg-white
-                  p-8
-                  shadow-xl
-                  shadow-green-900/10
-                  "
-                >
-
-                  <Camera
-                    className="
-                    h-16
-                    w-16
-                    text-green-600
-                    "
-                  />
-
-                </div>
-
-
-              </div>
-
-
-
-              <h2
-                className="
-                mt-8
-                text-center
-                text-2xl
-                font-bold
-                "
-              >
-
-                Trashure AI Scanner
-
-              </h2>
-
-
-
-              <p
-                className="
-                mt-3
-                text-center
-                text-zinc-600
-                "
-              >
-
-                One scan reveals what your material can become.
-
-              </p>
-
-
-
-              <div
-                className="
-                mt-8
-                rounded-3xl
-                bg-white
-                p-6
-                shadow-sm
-                "
-              >
-
-                <p className="text-sm text-zinc-500">
-                  AI Detection Result
-                </p>
-
-
-                <h3 className="mt-3 text-xl font-bold">
-                  PET Plastic Bottle
-                </h3>
-
-
-                <Badge
-                  className="
-                  mt-3
-                  bg-green-100
-                  text-green-700
-                  "
-                >
-                  96% Confidence
-                </Badge>
-
-
-
-                <div
-                  className="
-                  mt-6
-                  grid
-                  grid-cols-3
-                  gap-3
-                  "
-                >
-
-                  <div className="rounded-2xl bg-green-50 p-3 text-center text-sm">
-                    ♻
-                    <br />
-                    Recycle
-                  </div>
-
-                  <div className="rounded-2xl bg-green-50 p-3 text-center text-sm">
-                    🌱
-                    <br />
-                    Reuse
-                  </div>
-
-                  <div className="rounded-2xl bg-green-50 p-3 text-center text-sm">
-                    💰
-                    <br />
-                    Sell
-                  </div>
-
-
-                </div>
-
-
-              </div>
-
-
-            </div>
-
-
-          </Card>
-
-
-        </div>
-
-
-      </section>
-
-      {/* Problem Section */}
-
-      <section id="problem" className="py-28">
-
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
-
-          <div className="mx-auto max-w-3xl text-center">
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-              The Challenge
-            </Badge>
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              tracking-tight
-              sm:text-5xl
-              "
-            >
-
-              Waste does not begin
-              <br />
-              in the landfill.
-
-            </h2>
-
-
-            <p
-              className="
-              mt-5
-              text-lg
-              leading-relaxed
-              text-zinc-600
-              "
-            >
-
-              It begins when valuable materials lose their purpose.
-
-              A bottle, a box, or a can does not become useless because
-              it has no value. It becomes waste because the information
-              needed to recover its value is missing.
-
+          <div className="mx-auto w-full max-w-[460px]">
+            <p className="mb-4 flex items-center justify-end gap-2 text-xs font-medium text-green-700">
+              <Leaf className="h-4 w-4" />
+              A second life starts here.
             </p>
-
-
-          </div>
-
-
-
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            md:grid-cols-3
-            "
-          >
-
-            {problems.map((problem) => (
-
-              <Card
-                key={problem.title}
-                className="
-                rounded-[28px]
-                border-none
-                bg-gradient-to-br
-                from-white
-                to-green-50
-                p-8
-                shadow-lg
-                shadow-green-900/5
-                "
-              >
-
-                <div
-                  className="
-                  flex
-                  h-12
-                  w-12
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-green-100
-                  text-green-700
-                  "
-                >
-                  <Sparkles className="h-6 w-6" />
-                </div>
-
-
-                <h3
-                  className="
-                  mt-6
-                  text-xl
-                  font-bold
-                  "
-                >
-
-                  {problem.title}
-
-                </h3>
-
-
-                <p
-                  className="
-                  mt-3
-                  leading-relaxed
-                  text-zinc-600
-                  "
-                >
-
-                  {problem.description}
-
-                </p>
-
-
-              </Card>
-
-            ))}
-
-
-          </div>
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-      {/* Solution Section */}
-
-
-      <section
-        id="solution"
-        className="
-        bg-gradient-to-br
-        from-green-50
-        via-white
-        to-green-50
-        py-28
-        "
-      >
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div
-            className="
-            mx-auto
-            max-w-3xl
-            text-center
-            "
-          >
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-600
-              px-4
-              py-2
-              text-white
-              "
-            >
-              The Trashure Solution
-            </Badge>
-
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              Giving every material
-              <br />
-              another possibility.
-
-            </h2>
-
-
-            <p
-              className="
-              mt-5
-              text-lg
-              text-zinc-600
-              "
-            >
-
-              Trashure transforms waste management from a disposal system
-              into a circular economy ecosystem.
-
-            </p>
-
-
-          </div>
-
-
-
-
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            md:grid-cols-3
-            "
-          >
-
-
-            {solutions.map((solution) => (
-
-              <Card
-                key={solution.title}
-                className="
-                rounded-[32px]
-                border-none
-                bg-white
-                p-8
-                shadow-xl
-                shadow-green-900/5
-                "
-              >
-
-
-                <div
-                  className="
-                  flex
-                  h-14
-                  w-14
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-green-100
-                  "
-                >
-
-                  <solution.icon
-                    className="
-                    h-7
-                    w-7
-                    text-green-600
-                    "
-                  />
-
-                </div>
-
-
-
-                <h3
-                  className="
-                  mt-7
-                  text-xl
-                  font-bold
-                  "
-                >
-
-                  {solution.title}
-
-                </h3>
-
-
-                <p
-                  className="
-                  mt-3
-                  leading-relaxed
-                  text-zinc-600
-                  "
-                >
-
-                  {solution.description}
-
-                </p>
-
-
-
-              </Card>
-
-
-            ))}
-
-
-
-          </div>
-
-
-
-        </div>
-
-
-      </section>
-
-      {/* Features Section */}
-
-      <section
-        id="features"
-        className="
-  py-28
-  bg-white
-  "
-      >
-
-        <div
-          className="
-    mx-auto
-    max-w-7xl
-    px-5
-    sm:px-8
-    "
-        >
-
-          {/* Header */}
-
-          <div className="mx-auto max-w-3xl text-center">
-
-            <Badge
-              className="
-        rounded-full
-        bg-green-100
-        px-4
-        py-2
-        text-green-700
-        "
-            >
-              Powerful Features
-            </Badge>
-
-
-            <h2
-              className="
-        mt-6
-        text-4xl
-        font-bold
-        tracking-tight
-        sm:text-5xl
-        "
-            >
-
-              Turning everyday waste
-
-              <br />
-
-              into intelligent decisions.
-
-            </h2>
-
-
-            <p
-              className="
-        mt-5
-        text-lg
-        leading-relaxed
-        text-zinc-600
-        "
-            >
-
-              Trashure combines artificial intelligence and circular economy
-              intelligence to help people discover the hidden value of materials
-              before they become waste.
-
-            </p>
-
-          </div>
-
-
-
-          {/* Feature Cards */}
-
-
-          <div
-            className="
-      mt-14
-      grid
-      gap-6
-      md:grid-cols-2
-      lg:grid-cols-4
-      "
-          >
-
-
-            {[
-              {
-                title: "AI Material Scanner",
-                description:
-                  "Identify materials instantly through AI-powered recognition and understand their recovery potential.",
-                value:
-                  "Know what you have.",
-                icon: Brain,
-              },
-
-
-              {
-                title: "Smart Recovery Paths",
-                description:
-                  "Receive recommendations whether materials should be reused, sold, donated, or recycled.",
-                value:
-                  "Know what to do next.",
-                icon: Recycle,
-              },
-
-
-              {
-                title: "Material Value Discovery",
-                description:
-                  "Reveal the economic and environmental value hidden inside discarded materials.",
-                value:
-                  "Waste becomes opportunity.",
-                icon: Coins,
-              },
-
-
-              {
-                title: "Impact Intelligence",
-                description:
-                  "Transform community actions into sustainability insights through meaningful data.",
-                value:
-                  "Measure real impact.",
-                icon: BarChart3,
-              },
-
-
-            ].map((feature) => (
-
-              <Card
-                key={feature.title}
-                className="
-          group
-          relative
-          overflow-hidden
-          rounded-[32px]
-          border
-          border-green-100
-          bg-white
-          p-8
-          shadow-lg
-          shadow-green-900/5
-          transition
-          duration-300
-          hover:-translate-y-2
-          hover:border-green-200
-          hover:shadow-xl
-          "
-              >
-
-
-                {/* Background Glow */}
-
-                <div
-                  className="
-            absolute
-            -right-10
-            -top-10
-            h-32
-            w-32
-            rounded-full
-            bg-green-100
-            opacity-60
-            blur-3xl
-            transition
-            group-hover:bg-emerald-200
-            "
-                />
-
-
-
-                <div
-                  className="
-            relative
-            "
-                >
-
-
-                  {/* Icon */}
-
-                  <div
-                    className="
-              flex
-              h-14
-              w-14
-              items-center
-              justify-center
-              rounded-2xl
-              bg-gradient-to-br
-              from-green-100
-              to-emerald-50
-              "
-                  >
-
-                    <feature.icon
-                      className="
-                h-7
-                w-7
-                text-green-600
-                "
-                    />
-
-                  </div>
-
-
-
-                  <h3
-                    className="
-              mt-7
-              text-xl
-              font-bold
-              "
-                  >
-
-                    {feature.title}
-
-                  </h3>
-
-
-
-                  <p
-                    className="
-              mt-4
-              leading-relaxed
-              text-zinc-600
-              "
-                  >
-
-                    {feature.description}
-
-                  </p>
-
-
-
-                  {/* Bottom Value */}
-
-                  <div
-                    className="
-              mt-6
-              rounded-2xl
-              bg-green-50
-              px-4
-              py-3
-              text-sm
-              font-semibold
-              text-green-700
-              "
-                  >
-
-                    {feature.value}
-
-                  </div>
-
-
-                </div>
-
-
-              </Card>
-
-            ))}
-
-
-          </div>
-
-
-        </div>
-
-      </section>
-
-
-
-
-      {/* Benefits Section */}
-
-
-
-      <section id="benefits" className="py-28">
-
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div className="text-center">
-
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-              Why Trashure
-            </Badge>
-
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              More than recycling.
-
-              <br />
-
-              A smarter way to manage resources.
-
-            </h2>
-
-
-          </div>
-
-
-
-
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            md:grid-cols-2
-            lg:grid-cols-4
-            "
-          >
-
-
-
-            {[
-
-              {
-                title: "Residents",
-                text: "Know before you throw. Discover the value of everyday materials.",
-                icon: Leaf
-              },
-
-              {
-                title: "Schools",
-                text: "Turn reusable materials into innovation and learning projects.",
-                icon: Sparkles
-              },
-
-              {
-                title: "Recyclers",
-                text: "Connect cleaner materials with recovery opportunities.",
-                icon: Coins
-              },
-
-              {
-                title: "LGUs",
-                text: "Use real insights to build smarter sustainability programs.",
-                icon: BarChart3
-              }
-
-
-            ].map((item) => (
-
-
-              <Card
-                key={item.title}
-                className="
-                rounded-[30px]
-                border-none
-                bg-white
-                p-8
-                shadow-lg
-                shadow-green-900/5
-                "
-              >
-
-
-                <item.icon
-                  className="
-                  h-10
-                  w-10
-                  text-green-600
-                  "
-                />
-
-
-                <h3
-                  className="
-                  mt-6
-                  text-xl
-                  font-bold
-                  "
-                >
-
-                  {item.title}
-
-                </h3>
-
-
-                <p
-                  className="
-                  mt-3
-                  text-zinc-600
-                  "
-                >
-
-                  {item.text}
-
-                </p>
-
-
-              </Card>
-
-
-
-            ))}
-
-
-
-          </div>
-
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-
-
-      {/* How Trashure Works */}
-
-      <section
-        id="how-it-works"
-        className="relative overflow-hidden bg-zinc-950 py-28 text-white"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.10),transparent_28%)]" />
-        <div className="absolute left-1/2 top-0 h-px w-[82%] -translate-x-1/2 bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
-
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-emerald-300 shadow-sm shadow-emerald-950/40">
-              <Sparkles className="mr-2 h-4 w-4" />
-              How Trashure Works
-            </Badge>
-
-            <h2 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
-              Four clear steps from discarded item
-              <span className="block bg-gradient-to-r from-emerald-300 via-lime-200 to-amber-200 bg-clip-text text-transparent">
-                to recovered value.
-              </span>
-            </h2>
-
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-300">
-              Trashure identifies what an item is, reveals what value remains,
-              and recommends the most useful circular action so fewer materials
-              are treated as waste.
-            </p>
-          </div>
-
-          <div className="relative mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {processSteps.map((item, index) => (
-              <div key={item.number} className="relative">
-                <Card className="group relative h-full overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.06] p-7 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-2 hover:border-white/20 hover:bg-white/[0.09]">
-                  <div
-                    className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accentStyle}`}
-                  />
-                  <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/[0.05] blur-2xl transition duration-300 group-hover:bg-white/[0.09]" />
-
-                  <div className="relative flex items-start justify-between gap-4">
-                    <div
-                      className={`flex h-[74px] w-[74px] shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${item.numberStyle} text-white shadow-xl ring-1 ring-white/20`}
-                    >
-                      <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">
-                        Step
-                      </span>
-                      <span className="mt-0.5 text-3xl font-black leading-none tracking-tight">
-                        {item.number}
-                      </span>
-                    </div>
-
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-2xl ring-1 ${item.iconStyle}`}
-                    >
-                      <item.icon className="h-6 w-6" />
-                    </div>
-                  </div>
-
-                  <p className="relative mt-7 text-xs font-bold uppercase tracking-[0.22em] text-emerald-300">
-                    {item.label}
-                  </p>
-
-                  <h3 className="relative mt-3 text-2xl font-bold leading-tight">
-                    {item.title}
-                  </h3>
-
-                  <p className="relative mt-4 leading-relaxed text-zinc-300">
-                    {item.description}
-                  </p>
-
-                  <div className="relative mt-7 flex items-center gap-2 border-t border-white/10 pt-5 text-sm font-medium text-zinc-200">
-                    <span
-                      className={`h-2.5 w-2.5 rounded-full bg-gradient-to-r ${item.accentStyle}`}
-                    />
-                    {item.detail}
-                  </div>
-                </Card>
-
-                {index < processSteps.length - 1 && (
-                  <div className="absolute -right-4 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-emerald-300/20 bg-zinc-900 text-emerald-300 shadow-lg xl:flex">
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-400/[0.07] px-6 py-5 text-center sm:flex-row sm:text-left">
-            <Recycle className="h-6 w-6 shrink-0 text-emerald-300" />
-            <p className="text-sm leading-relaxed text-zinc-300">
-              Each completed action keeps useful materials moving through the
-              economy instead of ending their journey in a landfill.
-            </p>
+            <ScannerPreview />
           </div>
         </div>
       </section>
 
-
-      {/* Circular Economy Actions */}
-
-
-
-      <section className="py-28">
-
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div className="text-center">
-
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-              Circular Economy
-            </Badge>
-
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              One material.
-
-              <br />
-
-              Multiple possibilities.
-
-            </h2>
-
-
-          </div>
-
-
-
-
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            sm:grid-cols-2
-            lg:grid-cols-4
-            "
-          >
-
-
-
-            {[
-              {
-                title: "Reuse",
-                text: "Extend the life of materials through creativity and innovation.",
-                icon: Leaf
-              },
-
-              {
-                title: "Sell",
-                text: "Recover economic value from recyclable resources.",
-                icon: Coins
-              },
-
-              {
-                title: "Donate",
-                text: "Connect useful materials with communities.",
-                icon: Handshake
-              },
-
-              {
-                title: "Recycle",
-                text: "Return materials back into the production cycle.",
-                icon: Recycle
-              }
-
-            ].map((item) => (
-
-
-              <Card
-                key={item.title}
-                className="
-                rounded-[32px]
-                border-none
-                bg-gradient-to-br
-                from-white
-                to-green-50
-                p-8
-                text-center
-                "
-              >
-
-                <item.icon
-                  className="
-                  mx-auto
-                  h-12
-                  w-12
-                  text-green-600
-                  "
-                />
-
-
-                <h3
-                  className="
-                  mt-6
-                  text-xl
-                  font-bold
-                  "
-                >
-
-                  {item.title}
-
-                </h3>
-
-
-                <p
-                  className="
-                  mt-3
-                  text-sm
-                  text-zinc-600
-                  "
-                >
-
-                  {item.text}
-
-                </p>
-
-
-              </Card>
-
-
-            ))}
-
-
-          </div>
-
-
-        </div>
-
-
-      </section>
-
-      {/* AI Scanner Showcase */}
-
-
-      <section
-        className="
-        bg-gradient-to-br
-        from-green-50
-        via-white
-        to-green-50
-        py-28
-        "
-      >
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div
-            className="
-            grid
-            gap-14
-            lg:grid-cols-2
-            lg:items-center
-            "
-          >
-
-
-            <div>
-
-
-              <Badge
-                className="
-                rounded-full
-                bg-green-100
-                px-4
-                py-2
-                text-green-700
-                "
-              >
-
-                <Sparkles className="mr-2 h-4 w-4" />
-
-                Trashure AI
-
-              </Badge>
-
-
-
-              <h2
-                className="
-                mt-6
-                text-4xl
-                font-bold
-                sm:text-5xl
-                "
-              >
-
-                Your intelligent
-
-                <br />
-
-                material assistant.
-
-              </h2>
-
-
-
-              <p
-                className="
-                mt-6
-                text-lg
-                leading-relaxed
-                text-zinc-600
-                "
-              >
-
-                Trashure does more than recognize objects.
-
-                It understands what materials are made of,
-                what value they still hold, and what action
-                creates the best circular outcome.
-
-              </p>
-
-
-
-              <div
-                className="
-                mt-8
-                space-y-4
-                "
-              >
-
-
-                {[
-                  "Identify unknown materials",
-                  "Discover recovery opportunities",
-                  "Receive circular recommendations",
-                  "Measure environmental impact",
-                ].map((item) => (
-
-                  <div
-                    key={item}
-                    className="
-                    flex
-                    items-center
-                    gap-3
-                    "
-                  >
-
-                    <div
-                      className="
-                      flex
-                      h-7
-                      w-7
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-green-100
-                      "
-                    >
-
-                      <Sparkles
-                        className="
-                        h-4
-                        w-4
-                        text-green-600
-                        "
-                      />
-
-                    </div>
-
-
-                    <p className="text-zinc-700">
-                      {item}
-                    </p>
-
-
-                  </div>
-
-
-                ))}
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-
-
-            <Card
-              className="
-              rounded-[36px]
-              border-none
-              bg-white
-              p-8
-              shadow-2xl
-              shadow-green-900/10
-              "
-            >
-
-
-              <div
-                className="
-                rounded-[30px]
-                bg-gradient-to-br
-                from-green-100
-                to-white
-                p-8
-                "
-              >
-
-
-                <div
-                  className="
-                  flex
-                  items-center
-                  justify-center
-                  rounded-3xl
-                  bg-white
-                  p-10
-                  shadow-lg
-                  "
-                >
-
-                  <Camera
-                    className="
-                    h-20
-                    w-20
-                    text-green-600
-                    "
-                  />
-
-                </div>
-
-
-
-                <div
-                  className="
-                  mt-8
-                  rounded-3xl
-                  bg-white
-                  p-6
-                  "
-                >
-
-                  <p
-                    className="
-                    text-sm
-                    text-zinc-500
-                    "
-                  >
-
-                    Trashure AI Analysis
-
-                  </p>
-
-
-
-                  <h3
-                    className="
-                    mt-3
-                    text-2xl
-                    font-bold
-                    "
-                  >
-
-                    Plastic Bottle
-
-                  </h3>
-
-
-
-                  <div
-                    className="
-                    mt-5
-                    grid
-                    gap-3
-                    sm:grid-cols-2
-                    "
-                  >
-
-                    <div
-                      className="
-                      rounded-2xl
-                      bg-green-50
-                      p-4
-                      "
-                    >
-
-                      <p className="text-sm text-zinc-500">
-                        Material
-                      </p>
-
-                      <p className="font-semibold">
-                        PET Plastic
-                      </p>
-
-                    </div>
-
-
-                    <div
-                      className="
-                      rounded-2xl
-                      bg-green-50
-                      p-4
-                      "
-                    >
-
-                      <p className="text-sm text-zinc-500">
-                        Recovery
-                      </p>
-
-                      <p className="font-semibold text-green-700">
-                        High
-                      </p>
-
-                    </div>
-
-
-                  </div>
-
-
-
-                  <div
-                    className="
-                    mt-5
-                    rounded-2xl
-                    bg-green-600
-                    p-4
-                    text-center
-                    text-white
-                    "
-                  >
-
-                    Recommended:
-                    <br />
-
-                    Reuse • Sell • Donate • Recycle
-
-                  </div>
-
-
-                </div>
-
-
-              </div>
-
-
-            </Card>
-
-
-
-          </div>
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-      {/* UVP Section */}
-
-
-
-      <section className="py-28">
-
-
-        <div
-          className="
-          mx-auto
-          max-w-6xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div className="text-center">
-
-
-            <Badge
-              className="
-              rounded-full
-              bg-green-100
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-
-              Unique Value Proposition
-
-            </Badge>
-
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              We don't just identify waste.
-
-              <br />
-
-              We reveal possibilities.
-
-            </h2>
-
-
-          </div>
-
-
-
-
-          <div
-            className="
-            mt-14
-            grid
-            gap-6
-            md:grid-cols-2
-            "
-          >
-
-
-            <Card
-              className="
-              rounded-[32px]
-              border-none
-              bg-zinc-50
-              p-10
-              "
-            >
-
-              <h3
-                className="
-                text-2xl
-                font-bold
-                text-zinc-500
-                "
-              >
-
-                Traditional Approach
-
-              </h3>
-
-
-              <div className="mt-8 space-y-4 text-zinc-600">
-
-
-                <p>
-                  Identify material
-                </p>
-
-
-                <p>
-                  ↓
-                </p>
-
-
-                <p>
-                  Throw away or recycle
-                </p>
-
-
-              </div>
-
-
-            </Card>
-
-
-
-
-            <Card
-              className="
-              rounded-[32px]
-              border-none
-              bg-gradient-to-br
-              from-green-500
-              to-emerald-700
-              p-10
-              text-white
-              "
-            >
-
-              <h3
-                className="
-                text-2xl
-                font-bold
-                "
-              >
-
-                Trashure Approach
-
-              </h3>
-
-
-
-              <div className="mt-8 space-y-4">
-
-
-                <p>
-                  Identify material
-                </p>
-
-
-                <p>
-                  ↓
-                </p>
-
-
-                <p>
-                  Understand value
-                </p>
-
-
-                <p>
-                  ↓
-                </p>
-
-
-                <p>
-                  Reuse • Sell • Donate • Recycle
-                </p>
-
-
-              </div>
-
-
-            </Card>
-
-
-          </div>
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-
-      {/* LGU Dashboard */}
-
-
-
-      <section
-        id="dashboard"
-        className="
-        bg-green-50
-        py-28
-        "
-      >
-
-
-        <div
-          className="
-          mx-auto
-          max-w-7xl
-          px-5
-          sm:px-8
-          "
-        >
-
-
-          <div className="text-center">
-
-
-            <Badge
-              className="
-              rounded-full
-              bg-white
-              px-4
-              py-2
-              text-green-700
-              "
-            >
-
-              LGU Intelligence
-
-            </Badge>
-
-
-
-            <h2
-              className="
-              mt-6
-              text-4xl
-              font-bold
-              sm:text-5xl
-              "
-            >
-
-              Individual actions.
-
-              <br />
-
-              City-wide intelligence.
-
-            </h2>
-
-
-
-            <p
-              className="
-              mx-auto
-              mt-5
-              max-w-2xl
-              text-zinc-600
-              "
-            >
-
-              Every scan creates anonymous material insights
-              that help cities design smarter sustainability programs.
-
-            </p>
-
-
-          </div>
-
-
-
-
-
-          <Card
-            className="
-            mt-14
-            rounded-[36px]
-            border-none
-            bg-white
-            p-8
-            shadow-xl
-            "
-          >
-
-
-            <div
-              className="
-              grid
-              gap-6
-              md:grid-cols-3
-              "
-            >
-
-
-              {[
-                ["Plastic Recovered", "2,500 kg"],
-                ["Active Communities", "25 Barangays"],
-                ["Waste Prevented", "4.5 Tons"],
-              ].map(([label, value]) => (
-
-
-                <div
-                  key={label}
-                  className="
-                  rounded-3xl
-                  bg-green-50
-                  p-8
-                  "
-                >
-
-                  <p className="text-zinc-500">
-                    {label}
-                  </p>
-
-
-                  <h3
-                    className="
-                    mt-3
-                    text-3xl
-                    font-bold
-                    text-green-700
-                    "
-                  >
-
-                    {value}
-
-                  </h3>
-
-
-                </div>
-
-
-              ))}
-
-
-            </div>
-
-
-          </Card>
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-
-      {/* Final CTA */}
-
-
-
-      <section
-        className="
-        bg-gradient-to-r
-        from-green-600
-        to-emerald-700
-        py-28
-        text-center
-        text-white
-        "
-      >
-
-
-        <div
-          className="
-          mx-auto
-          max-w-5xl
-          px-5
-          "
-        >
-
-
-          <h2
-            className="
-            text-4xl
-            font-bold
-            sm:text-6xl
-            "
-          >
-
-            Before you throw it away...
-
-            <br />
-
-            Ask what it can become.
-
-          </h2>
-
-
-
-          <Button
-            className="
-            mt-10
-            rounded-full
-            bg-white
-            px-12
-            py-7
-            text-base
-            text-green-700
-            shadow-xl
-            hover:bg-white
-            "
-          >
-
-            <Upload className="mr-2" />
-
-            Discover Your Material
-
-          </Button>
-
-
-        </div>
-
-
-      </section>
-
-
-
-
-
-
-      {/* Footer */}
-
-      <footer
-        id="about"
-        className="bg-zinc-950 py-16 text-zinc-300"
-      >
-
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 md:grid-cols-4 sm:px-8">
-
-          <div>
-            <div className="flex items-center gap-3">
-              <img
-                src="/logo.png"
-                alt="Trashure"
-                className="h-12 w-12 rounded-xl object-contain bg-white p-1"
-              />
-
-              <h2 className="text-3xl font-black text-green-400">
-                TRASHURE
-              </h2>
-            </div>
-
-            <p className="mt-5 text-sm leading-relaxed text-zinc-400">
-              AI-powered circular economy platform turning discarded materials
-              into valuable resources.
-            </p>
-          </div>
-
-
-          <div>
-            <h3 className="font-bold text-white">Platform</h3>
-            <div className="mt-5 space-y-3 text-sm">
-              <p>AI Scanner</p>
-              <p>Material Intelligence</p>
-              <p>Partner Network</p>
-              <p>LGU Dashboard</p>
-            </div>
-          </div>
-
-
-          <div>
-            <h3 className="font-bold text-white">Community</h3>
-            <div className="mt-5 space-y-3 text-sm">
-              <p>Residents</p>
-              <p>Schools</p>
-              <p>Recyclers</p>
-              <p>LGU Partners</p>
-            </div>
-          </div>
-
-
-          <div>
-            <h3 className="font-bold text-white">
-              Resources
-            </h3>
-
-            <div className="mt-5 space-y-3 text-sm">
-
-              <Link
-                href="/documentation"
-                className="block transition hover:text-green-400"
-              >
-                Documentation
-              </Link>
-
-
-              <Link
-                href="/privacy"
-                className="block transition hover:text-green-400"
-              >
-                Privacy Policy
-              </Link>
-
-
-              <Link
-                href="/terms"
-                className="block transition hover:text-green-400"
-              >
-                Terms
-              </Link>
-
-
-              <Link
-                href="/contact"
-                className="block transition hover:text-green-400"
-              >
-                Contact
-              </Link>
-
-            </div>
-          </div>
-
-        </div>
-
-
-        <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-4 border-t border-zinc-800 px-5 pt-8 text-sm sm:px-8 md:flex-row">
-
-          <p>
-            © 2026 Trashure. All rights reserved.
-          </p>
-
-          <p>
-            Developed by
-            <span className="ml-1 font-semibold text-green-400">
-              Jaymar Maruji
+      <div className="border-y border-green-100">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-6">
+          <span className="text-[9px] font-bold tracking-widest text-zinc-400">FIND THE POTENTIAL IN</span>
+          {["Plastic", "Paper & cardboard", "Metal", "Glass", "Reusables"].map((label) => (
+            <span key={label} className="flex items-center gap-2 text-xs text-zinc-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400" />{label}
             </span>
-          </p>
-
+          ))}
         </div>
+      </div>
 
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:gap-20">
+        <div>
+          <p className="text-xs font-bold tracking-[0.16em] text-green-600">THE OPPORTUNITY</p>
+          <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Valuable materials.<br />Missing connections.</h2>
+          <p className="mt-5 max-w-lg text-sm leading-8 text-zinc-500">
+            Materials lose their value when people don’t know what they are, who needs them, or where to bring them. Trashure connects those missing pieces.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {[
+            { icon: Brain, title: "Recognize what you have", text: "Understand the likely material before deciding what to do." },
+            { icon: Handshake, title: "Find its next destination", text: "Discover accepting recyclers and active collection drives." },
+            { icon: BarChart3, title: "Make recovery visible", text: "Turn completed recovery into useful community records." },
+          ].map((item) => (
+            <article key={item.title} className="flex items-start gap-4 rounded-2xl border border-green-100 bg-green-50/40 p-5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-green-600 ring-1 ring-green-100"><item.icon className="h-5 w-5" /></span>
+              <div><h3 className="font-semibold">{item.title}</h3><p className="mt-2 text-sm leading-7 text-zinc-500">{item.text}</p></div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="features" className="scroll-mt-24 border-y border-green-100 bg-gradient-to-b from-green-50 to-white px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <p className="text-xs font-bold tracking-[0.16em] text-green-600">YOUR RECOVERY OPTIONS</p>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">One item.<span className="block text-green-600">Four ways forward.</span></h2>
+            </div>
+            <p className="max-w-sm text-sm leading-7 text-zinc-500">The right option depends on your material, its condition, and what’s available nearby.</p>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {recoveryPaths.map((path, index) => (
+              <article key={path.title} className="rounded-3xl border border-green-100 bg-white p-6 transition hover:border-green-300 hover:shadow-lg hover:shadow-green-900/5">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 text-green-600"><path.icon className="h-6 w-6" /></span>
+                  <span className="font-mono text-xs text-green-400">0{index + 1}</span>
+                </div>
+                <h3 className="mt-7 text-2xl font-bold">{path.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-zinc-500">{path.description}</p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-6 flex items-start justify-center gap-2 text-xs leading-relaxed text-zinc-500">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+            Partner availability, prices, and drives come from platform records.
+          </p>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="scroll-mt-20 bg-gradient-to-br from-green-950 via-emerald-950 to-green-900 px-5 py-16 text-white sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-xs font-bold tracking-[0.16em] text-green-400">HOW IT WORKS</p>
+          <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">From your camera<br /><span className="text-green-300">to a clear next step.</span></h2>
+          <p className="mt-5 max-w-xl text-sm leading-8 text-green-100/60">A simple process that keeps you in control—from the first photo to the final recovery.</p>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {processSteps.map((step, index) => (
+              <article key={step.title} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-700 font-mono text-sm font-bold">0{index + 1}</span>
+                  <step.icon className="h-6 w-6 text-green-400" />
+                </div>
+                <h3 className="mt-7 text-lg font-semibold">{step.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-green-100/60">{step.description}</p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-7 flex items-start gap-2 text-xs leading-relaxed text-green-100/75"><ShieldCheck className="h-4 w-4 shrink-0 text-green-400" />AI suggests the material. You review and confirm it.</p>
+        </div>
+      </section>
+
+      {/* New section */}
+      <section id="before-you-scan" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-16 sm:px-8 sm:py-24">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p className="text-xs font-bold tracking-[0.16em] text-green-600">BEFORE YOU SCAN</p>
+            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">A clearer photo.<br /><span className="text-green-600">A better starting point.</span></h2>
+          </div>
+          <p className="max-w-sm text-sm leading-7 text-zinc-500">Help Trashure see your item clearly with a few simple photo habits.</p>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {[
+            { icon: Sun, title: "Use good lighting", text: "Choose a well-lit area and avoid strong shadows or glare." },
+            { icon: ImageIcon, title: "Keep one item in focus", text: "Place your item against a simple background so its shape and details are visible." },
+            { icon: CheckCircle2, title: "Review the suggestion", text: "Check the identified material and correct it if it doesn’t match your item." },
+          ].map((tip) => (
+            <article key={tip.title} className="rounded-3xl border border-green-100 bg-gradient-to-br from-green-50/70 to-white p-6">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-green-600 shadow-sm ring-1 ring-green-100"><tip.icon className="h-6 w-6" /></span>
+              <h3 className="mt-5 text-lg font-semibold">{tip.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-zinc-500">{tip.text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl border border-green-100 bg-green-50/60 p-5 sm:flex-row sm:items-center">
+          <p className="text-sm text-green-800">Have an item nearby? Try the scanner preview above.</p>
+          <a href="#scanner" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-green-700 ring-1 ring-green-200 transition hover:bg-green-100">
+            Try a scan <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </section>
+
+      <section id="benefits" className="scroll-mt-24 border-y border-green-100 bg-green-50/40 px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-bold tracking-[0.16em] text-green-600">BUILT AROUND YOUR COMMUNITY</p>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Better connections.<span className="block text-green-600">More useful outcomes.</span></h2>
+            <p className="mt-5 text-sm leading-8 text-zinc-500">Designed for communities like Isabela City, Philippines. Connect the people with materials to the people who can put them to use.</p>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {[
+              { icon: Users, title: "For residents", text: "Find a clear next step for materials at home." },
+              { icon: Building2, title: "For recyclers", text: "Discover opportunities matching the materials you accept." },
+              { icon: GraduationCap, title: "For schools", text: "Connect collection drives with community contributions." },
+              { icon: BarChart3, title: "For local government", text: "Monitor completed recovery and participation." },
+            ].map((role) => (
+              <article key={role.title} className="flex items-start gap-4 rounded-3xl border border-green-100 bg-white p-6 sm:p-8">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600"><role.icon className="h-6 w-6" /></span>
+                <div><h3 className="text-lg font-semibold">{role.title}</h3><p className="mt-2 text-sm leading-7 text-zinc-500">{role.text}</p></div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboard" className="mx-auto grid max-w-7xl scroll-mt-24 items-center gap-10 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:gap-20">
+        <div>
+          <p className="text-xs font-bold tracking-[0.16em] text-green-600">RECOVERY YOU CAN TRACK</p>
+          <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Turn local action<br />into meaningful insight.</h2>
+          <p className="mt-5 text-sm leading-8 text-zinc-500">Understand what’s being recovered, where participation is happening, and how materials move through the community.</p>
+          <Link href="/login" className={`${primaryButton} mt-7 w-full sm:w-auto`}>Access your dashboard <ArrowRight className="h-4 w-4 shrink-0" /></Link>
+        </div>
+        <div className="rounded-[28px] border border-green-100 bg-white p-6 shadow-xl shadow-green-900/5">
+          <div className="flex items-center gap-3 border-b border-green-50 pb-5"><BarChart3 className="h-6 w-6 text-green-600" /><h3 className="font-semibold">Community monitoring</h3></div>
+          <div className="mt-5 space-y-3">
+            {[
+              { title: "Recovered materials", text: "Track completed recovery and recorded collection weights." },
+              { title: "Barangay participation", text: "See where community recovery activity takes place." },
+              { title: "Reporting periods", text: "Explore activity within your selected timeframe." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl bg-green-50/60 p-4"><p className="text-sm font-semibold">{item.title}</p><p className="mt-2 text-xs leading-relaxed text-zinc-500">{item.text}</p></div>
+             ))}
+          </div>
+
+          <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-green-800">
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            Impact is based on completed recovery, not just scans. Estimated
+            and actual weights are disclosed.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ section */}
+      <FAQs />
+
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 sm:pb-20">
+        <div className="relative isolate overflow-hidden rounded-[32px] bg-gradient-to-r from-green-600 to-emerald-800 px-6 py-14 text-center text-white sm:px-12 sm:py-16">
+          <Recycle aria-hidden="true" className="pointer-events-none absolute -right-12 -top-8 -z-10 h-80 w-80 -rotate-12 text-white/[0.06]" />
+          <p className="text-xs font-semibold tracking-wider text-green-100">THE NEXT CHAPTER STARTS WITH YOU</p>
+          <h2 className="mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-5xl">See potential.<br />Where others see waste.</h2>
+          <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-green-50/80">Start with one item. Discover a better destination.</p>
+          <Link href="/login" className="mt-8 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-bold text-green-700 transition hover:bg-green-50 sm:w-auto">
+            Start your Trashure journey <ArrowRight className="h-4 w-4 shrink-0" />
+          </Link>
+          <p className="mt-5 text-xs text-green-100/70">Scan it. Confirm it. Recover it.</p>
+        </div>
+      </section>
+
+      <footer className="bg-zinc-950 px-5 pb-8 pt-12 text-zinc-400 sm:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <Link href="/" className="flex items-center gap-3">
+              <img src="/logo.png" alt="" className="h-10 w-10 rounded-xl bg-white object-contain" />
+              <span className="text-2xl font-black tracking-tight text-green-400">TRASHURE</span>
+            </Link>
+            <p className="mt-5 max-w-xs text-sm leading-7">Turn materials into useful resources, meaningful connections, and measurable community action.</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">Platform</h3>
+            <div className="mt-5 grid gap-3 text-sm">
+              {navigation.map((item) => <a key={item.href} href={item.href} className="hover:text-green-400">{item.label}</a>)}
+              <Link href="/about-the-developer" className="hover:text-green-400">About developer</Link>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">Resources</h3>
+            <div className="mt-5 grid gap-3 text-sm">
+              {[
+                { label: "Documentation", href: "/documentation" },
+                { label: "Privacy policy", href: "/privacy" },
+                { label: "Terms", href: "/terms" },
+                { label: "Contact", href: "/contact" },
+              ].map((item) => <Link key={item.href} href={item.href} className="hover:text-green-400">{item.label}</Link>)}
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-3 border-t border-zinc-800 pt-7 text-xs sm:flex-row">
+          <p>© {new Date().getFullYear()} Trashure. All rights reserved.</p>
+          <p>Developed by <span className="font-semibold text-green-400">Team Aureloop</span></p>
+        </div>
       </footer>
 
       <DownloadApkPrompt />
+
+      <style jsx global>{`
+        .trashure-page a:focus-visible,
+        .trashure-page button:focus-visible {
+          outline: 3px solid #22c55e;
+          outline-offset: 4px;
+        }
+
+        .trashure-scan-beam {
+          position: absolute;
+          left: -18px;
+          right: -18px;
+          height: 2px;
+          background: #22c55e;
+          box-shadow: 0 0 12px #22c55e, 0 0 24px rgba(34, 197, 94, 0.4);
+          animation: trashure-scan-sweep 1.25s ease-in-out infinite alternate;
+        }
+
+        .trashure-scan-beam::before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 65px;
+          background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.22));
+        }
+
+        @keyframes trashure-scan-sweep {
+          from { top: 0; }
+          to { top: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .trashure-scan-beam {
+            animation: none;
+            top: 50%;
+          }
+
+          .trashure-page *,
+          .trashure-page *::before,
+          .trashure-page *::after {
+            transition: none !important;
+          }
+        }
+      `}</style>
     </main>
-
   );
-
 }
