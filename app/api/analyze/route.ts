@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const base64Image = imageBuffer.toString("base64");
 
     const model = gemini.getGenerativeModel({
-      model: "gemini-3.1-flash-lite",
+      model: "gemini-3.5-flash-lite",
     });
 
     const result = await model.generateContent([
