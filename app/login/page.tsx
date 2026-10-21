@@ -54,6 +54,46 @@ export default function LoginPage() {
 
   const [cooldown, setCooldown] = useState(0);
 
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  // Redirect already-signed-in users away from the login page.
+
+  useEffect(() => {
+
+    let active = true;
+
+    const check = async () => {
+
+      const {
+
+        data: { user },
+
+      } = await supabase.auth.getUser();
+
+      if (!active) return;
+
+      if (user) {
+
+        router.replace("/profiles");
+
+        return;
+
+      }
+
+      setCheckingSession(false);
+
+    };
+
+    void check();
+
+    return () => {
+
+      active = false;
+
+    };
+
+  }, [router, supabase]);
+
   useEffect(() => {
 
     if (cooldown <= 0) return;
@@ -210,6 +250,22 @@ export default function LoginPage() {
 
   };
 
+  if (checkingSession) {
+
+    return (
+
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white via-green-50 to-emerald-100">
+
+        <Loader2 className="animate-spin text-green-600" size={32} aria-hidden="true" />
+
+        <span className="sr-only">Checking your session...</span>
+
+      </main>
+
+    );
+
+  }
+
   return (
 
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50 to-emerald-100 px-4 py-10">
@@ -282,7 +338,17 @@ export default function LoginPage() {
 
             <div>
 
-              <label htmlFor="login-password" className="text-sm font-medium text-zinc-700">Password</label>
+              <div className="flex items-center justify-between">
+
+                <label htmlFor="login-password" className="text-sm font-medium text-zinc-700">Password</label>
+
+                <Link href="/forgot-password" className="rounded-md text-sm font-medium text-green-600 transition hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500">
+
+                  Forgot password?
+
+                </Link>
+
+              </div>
 
               <div className="relative mt-2">
 
