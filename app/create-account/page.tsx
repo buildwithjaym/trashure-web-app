@@ -83,7 +83,6 @@ export default function CreateAccountPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // ---- Load existing session (OAuth prefill) --------------------------------
   useEffect(() => {
     let cancelled = false;
 
@@ -95,6 +94,21 @@ export default function CreateAccountPage() {
 
         if (cancelled || !user) return;
 
+        // If a signed-in user already has a profile, don't let them
+        // re-run onboarding. Send them straight to their dashboard.
+        const { data: existingProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("auth_id", user.id)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (existingProfile) {
+          router.replace("/profiles");
+          return;
+        }
+
         setAuthUser(user);
 
         const meta = (user.user_metadata ?? {}) as Record<string, string | undefined>;
@@ -103,10 +117,8 @@ export default function CreateAccountPage() {
           ...prev,
           full_name: meta.full_name ?? meta.name ?? prev.full_name,
           email: user.email ?? prev.email,
-          // password is intentionally never prefilled from metadata
         }));
 
-        // Try to reuse the OAuth avatar (Google sets avatar_url/picture)
         const avatarUrl = meta.avatar_url ?? meta.picture;
         if (avatarUrl) {
           try {
@@ -118,7 +130,7 @@ export default function CreateAccountPage() {
               if (!cancelled) handleImage(file);
             }
           } catch {
-            // silent — user can still upload manually
+            // silent — user can upload manually
           }
         }
       } finally {
@@ -126,12 +138,12 @@ export default function CreateAccountPage() {
       }
     };
 
-    loadSession();
+    void loadSession();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [router, supabase]);
 
   // Free the object URL when the preview changes or on unmount
   useEffect(() => {
@@ -327,11 +339,10 @@ export default function CreateAccountPage() {
             return (
               <div key={item} className="flex flex-col items-center gap-2">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                    active || done
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${active || done
                       ? "bg-green-600 text-white"
                       : "bg-green-100 text-green-700"
-                  }`}
+                    }`}
                 >
                   {done ? <Check size={18} /> : index + 1}
                 </div>
@@ -459,11 +470,10 @@ export default function CreateAccountPage() {
               <button
                 key={role.value}
                 onClick={() => updateField("role", role.value)}
-                className={`w-full rounded-2xl border p-5 text-left transition ${
-                  form.role === role.value
+                className={`w-full rounded-2xl border p-5 text-left transition ${form.role === role.value
                     ? "border-green-600 bg-green-50"
                     : "border-zinc-200 hover:border-green-300"
-                }`}
+                  }`}
               >
                 <h3 className="font-bold">{role.title}</h3>
                 <p className="mt-1 text-sm text-zinc-500">{role.description}</p>
