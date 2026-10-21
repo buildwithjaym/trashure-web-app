@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
 
   let next = searchParams.get("next") ?? "/profiles";
-  if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
+  if (!next.startsWith("/")) {
     next = "/profiles";
   }
 
