@@ -698,14 +698,14 @@ function LguMonitoringContent() {
 
       <section
         id="overview"
-        className="scroll-mt-28 overflow-hidden rounded-[30px] border border-green-100 bg-white shadow-sm"
+        className="scroll-mt-28 overflow-hidden rounded-[30px] border border-emerald-100/80 bg-white shadow-sm"
       >
         <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-green-100/70 blur-2xl" />
+          <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full bg-emerald-100/70 blur-2xl" />
 
           <div className="relative">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-green-200 bg-green-50 text-green-700 hover:bg-green-50">
+              <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
                 <Building2 className="mr-1.5 h-3.5 w-3.5" />
 
                 {
@@ -732,7 +732,7 @@ function LguMonitoringContent() {
 
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-zinc-500">
               <span className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-green-600" />
+                <CalendarDays className="h-4 w-4 text-emerald-600" />
 
                 {formatDate(
                   dashboard.period.start_date,
@@ -744,7 +744,7 @@ function LguMonitoringContent() {
               </span>
 
               <span className="flex items-center gap-2">
-                <Clock3 className="h-4 w-4 text-green-600" />
+                <Clock3 className="h-4 w-4 text-emerald-600" />
 
                 Updated{" "}
                 {formatDateTime(
@@ -768,7 +768,7 @@ function LguMonitoringContent() {
                     .value as PeriodPreset,
                 )
               }
-              className="h-11 min-w-48 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
+              className="h-11 min-w-48 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-green-500/20"
             >
               <option value="30">
                 Last 30 days
@@ -799,7 +799,7 @@ function LguMonitoringContent() {
                   true,
                 )
               }
-              className="h-11 rounded-full border-green-200 bg-white text-green-700 hover:bg-green-50"
+              className="h-11 rounded-full border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50"
             >
               <RefreshCcw
                 className={`mr-2 h-4 w-4 ${refreshing
@@ -1041,7 +1041,7 @@ function LguMonitoringContent() {
 
                         {residentHeight > 0 && (
                           <div
-                            className="w-full shrink-0 bg-green-600"
+                            className="w-full shrink-0 bg-emerald-600"
                             style={{
                               height: `${residentHeight}px`,
                             }}
@@ -1078,7 +1078,7 @@ function LguMonitoringContent() {
           >
             <span className="flex items-center gap-2">
               <span
-                className="h-3 w-3 shrink-0 rounded-sm bg-green-600"
+                className="h-3 w-3 shrink-0 rounded-sm bg-emerald-600"
                 aria-hidden="true"
               />
               Resident recovery
@@ -1173,7 +1173,7 @@ function LguMonitoringContent() {
                     <p
                       className="
                         whitespace-nowrap text-sm
-                        font-black text-green-700
+                        font-black text-emerald-700
                         sm:text-base
                       "
                     >
@@ -1194,7 +1194,7 @@ function LguMonitoringContent() {
                   <div
                     className="
                       h-full rounded-full
-                      bg-green-600 transition-[width]
+                      bg-emerald-600 transition-[width]
                       duration-500 ease-out
                     "
                     style={{
@@ -1289,7 +1289,7 @@ function LguMonitoringContent() {
                       className="grid gap-3 border-b border-zinc-100 px-5 py-4 last:border-b-0 md:grid-cols-[60px_minmax(180px,1fr)_minmax(220px,1.4fr)_130px_150px] md:items-center"
                     >
                       <div className="flex items-center justify-between md:block">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-50 text-sm font-black text-green-700">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-sm font-black text-emerald-700">
                           {index +
                             1}
                         </span>
@@ -1312,7 +1312,7 @@ function LguMonitoringContent() {
                       <div>
                         <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
                           <div
-                            className="h-full rounded-full bg-green-600"
+                            className="h-full rounded-full bg-emerald-600"
                             style={{
                               width:
                                 `${width}%`,
@@ -1338,7 +1338,7 @@ function LguMonitoringContent() {
                           Recovered
                         </span>
 
-                        <p className="font-black text-green-700">
+                        <p className="font-black text-emerald-700">
                           {formatKilograms(barangay.total_kg)}
                         </p>
                       </div>
@@ -1546,7 +1546,7 @@ function LguMonitoringContent() {
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${activity.source_type ===
                         "school_collection"
                         ? "bg-blue-50 text-blue-600"
-                        : "bg-green-50 text-green-600"
+                        : "bg-emerald-50 text-emerald-600"
                         }`}>
                         {activity.source_type ===
                           "school_collection" ? (
@@ -1588,7 +1588,7 @@ function LguMonitoringContent() {
                     </div>
 
 
-                    <p className="font-black text-green-700 lg:text-right">
+                    <p className="font-black text-emerald-700 lg:text-right">
                       {formatKilograms(
                         activity.weight_kg,
                       )}
@@ -1618,9 +1618,9 @@ function LguMonitoringContent() {
 
       {/* FOOTNOTE */}
 
-      <section className="rounded-[24px] border border-green-100 bg-white p-5 shadow-sm">
+      <section className="rounded-[24px] border border-emerald-100 bg-white p-5 shadow-sm">
         <div className="flex items-start gap-3">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
 
           <div>
             <p className="font-black text-zinc-900">
@@ -1669,16 +1669,16 @@ function MetricCard({
 }) {
   return (
     <article
-      className={`rounded-[26px] border p-5 shadow-sm ${featured
-        ? "border-green-600 bg-green-600 text-white"
-        : "border-green-100 bg-white text-zinc-900"
+      className={`rounded-[26px] border p-5 shadow-sm transition-shadow duration-200 hover:shadow-md ${featured
+        ? "border-emerald-600 bg-emerald-600 text-white"
+        : "border-emerald-100 bg-white text-zinc-900"
         }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p
             className={`text-sm font-semibold ${featured
-              ? "text-green-100"
+              ? "text-emerald-100"
               : "text-zinc-500"
               }`}
           >
@@ -1693,7 +1693,7 @@ function MetricCard({
         <div
           className={`flex h-12 w-12 items-center justify-center rounded-2xl ${featured
             ? "bg-white/15 text-white"
-            : "bg-green-50 text-green-600"
+            : "bg-emerald-50 text-emerald-600"
             }`}
         >
           <Icon className="h-6 w-6" />
@@ -1702,7 +1702,7 @@ function MetricCard({
 
       <p
         className={`mt-4 text-xs leading-5 ${featured
-          ? "text-green-50"
+          ? "text-emerald-50"
           : "text-zinc-500"
           }`}
       >
@@ -1726,8 +1726,8 @@ function CompactMetric({
   value: number;
 }) {
   return (
-    <article className="flex items-center gap-4 rounded-[22px] border border-green-100 bg-white p-4 shadow-sm">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+    <article className="flex items-center gap-4 rounded-[22px] border border-emerald-100/80 bg-white p-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
         <Icon className="h-5 w-5" />
       </div>
 
@@ -1763,9 +1763,9 @@ function Panel({
   ReactNode;
 }) {
   return (
-    <section className="rounded-[28px] border border-green-100 bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-[28px] border border-emerald-100/80 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
           <Icon className="h-5 w-5" />
         </div>
 
@@ -1844,7 +1844,7 @@ function PartnerList({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
                   <Icon className="h-5 w-5" />
                 </div>
 
@@ -1873,7 +1873,7 @@ function PartnerList({
                 </div>
               </div>
 
-              <p className="shrink-0 font-black text-green-700">
+              <p className="shrink-0 font-black text-emerald-700">
                 {
                   item.weightLabel
                 }
@@ -1882,7 +1882,7 @@ function PartnerList({
 
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100">
               <div
-                className="h-full rounded-full bg-green-600"
+                className="h-full rounded-full bg-emerald-600"
                 style={{
                   width:
                     `${Math.max(
@@ -1910,8 +1910,8 @@ function EmptyPanel({
   message: string;
 }) {
   return (
-    <div className="mt-6 rounded-2xl border border-dashed border-green-200 bg-green-50 px-5 py-10 text-center">
-      <Scale className="mx-auto h-7 w-7 text-green-600" />
+    <div className="mt-6 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50 px-5 py-10 text-center">
+      <Scale className="mx-auto h-7 w-7 text-emerald-600" />
 
       <p className="mt-3 text-sm font-semibold text-zinc-500">
         {message}
@@ -1948,7 +1948,7 @@ function MonitoringErrorState({
           onClick={
             onRetry
           }
-          className="mt-6 rounded-full bg-green-600 hover:bg-green-700"
+          className="mt-6 rounded-full bg-emerald-600 hover:bg-emerald-700"
         >
           <RefreshCcw className="mr-2 h-4 w-4" />
 
@@ -1963,7 +1963,7 @@ function MonitoringErrorState({
 function MonitoringPageSkeleton() {
   return (
     <div className="space-y-7">
-      <Skeleton className="h-72 rounded-[30px] bg-green-100" />
+      <Skeleton className="h-72 rounded-[30px] bg-emerald-100" />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({
@@ -1978,7 +1978,7 @@ function MonitoringPageSkeleton() {
               key={
                 index
               }
-              className="h-40 rounded-[26px] bg-green-100"
+              className="h-40 rounded-[26px] bg-emerald-100"
             />
           ),
         )}
@@ -1997,21 +1997,21 @@ function MonitoringPageSkeleton() {
               key={
                 index
               }
-              className="h-24 rounded-[22px] bg-green-100"
+              className="h-24 rounded-[22px] bg-emerald-100"
             />
           ),
         )}
       </div>
 
-      <Skeleton className="h-24 rounded-[24px] bg-green-100" />
+      <Skeleton className="h-24 rounded-[24px] bg-emerald-100" />
 
       <div className="grid gap-5 xl:grid-cols-2">
-        <Skeleton className="h-[520px] rounded-[28px] bg-green-100" />
+        <Skeleton className="h-[520px] rounded-[28px] bg-emerald-100" />
 
-        <Skeleton className="h-[520px] rounded-[28px] bg-green-100" />
+        <Skeleton className="h-[520px] rounded-[28px] bg-emerald-100" />
       </div>
 
-      <Skeleton className="h-[560px] rounded-[28px] bg-green-100" />
+      <Skeleton className="h-[560px] rounded-[28px] bg-emerald-100" />
     </div>
   );
 }
