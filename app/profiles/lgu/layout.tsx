@@ -423,10 +423,10 @@ export default function LguLayout({
 
 
   return (
-    <div className="min-h-screen bg-[#f3fff7] text-zinc-900">
+    <div className="min-h-screen bg-[#f5faf6] text-zinc-900">
       {/* DESKTOP SIDEBAR */}
 
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[284px] border-r border-green-100 bg-white lg:flex lg:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[280px] border-r border-emerald-100/80 bg-white shadow-[8px_0_32px_rgba(16,185,129,0.035)] lg:flex lg:flex-col">
         <LguSidebarContent
           profile={
             profile
@@ -463,7 +463,7 @@ export default function LguLayout({
       {/* MOBILE DRAWER */}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] flex w-[min(88vw,320px)] flex-col border-r border-green-100 bg-white shadow-2xl transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 left-0 z-[60] flex w-[min(88vw,320px)] flex-col border-r border-emerald-100 bg-white shadow-2xl transition-transform duration-300 lg:hidden ${
           mobileMenuOpen
             ? "translate-x-0"
             : "-translate-x-full"
@@ -504,8 +504,8 @@ export default function LguLayout({
 
       {/* MAIN */}
 
-      <div className="min-h-screen lg:pl-[284px]">
-        <header className="sticky top-0 z-30 border-b border-green-100 bg-white/95 backdrop-blur">
+      <div className="min-h-screen lg:pl-[280px]">
+        <header className="sticky top-0 z-30 border-b border-emerald-100 bg-white/95 backdrop-blur">
           <div className="flex min-h-[78px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-3">
               <button
@@ -516,7 +516,7 @@ export default function LguLayout({
                     true,
                   )
                 }
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 lg:hidden"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100 lg:hidden"
               >
                 <Menu className="h-5 w-5" />
               </button>
@@ -524,11 +524,11 @@ export default function LguLayout({
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="truncate text-lg font-black text-zinc-900 sm:text-xl">
+                  <h1 className="truncate text-lg font-black tracking-tight text-zinc-900 sm:text-xl">
                     City Waste Monitoring
                   </h1>
 
-                  <span className="hidden rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-green-700 sm:inline-flex">
+                  <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-emerald-700 sm:inline-flex">
                     Read only
                   </span>
                 </div>
@@ -563,7 +563,7 @@ export default function LguLayout({
                       !open,
                   )
                 }
-                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white p-1.5 pr-2 transition hover:border-green-200 hover:bg-green-50"
+                className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white p-1.5 pr-2 transition hover:border-emerald-200 hover:bg-emerald-50"
               >
                 {profile.avatar_url ? (
                   <img
@@ -576,7 +576,7 @@ export default function LguLayout({
                     className="h-9 w-9 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-xs font-black text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-xs font-black text-white">
                     {getInitials(
                       profile.full_name,
                     )}
@@ -590,7 +590,7 @@ export default function LguLayout({
                     }
                   </p>
 
-                  <p className="text-[10px] font-semibold text-green-700">
+                  <p className="text-[10px] font-semibold text-emerald-700">
                     LGU Administrator
                   </p>
                 </div>
@@ -600,8 +600,8 @@ export default function LguLayout({
 
 
               {profileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-green-100 bg-white p-2 shadow-xl">
-                  <div className="rounded-xl bg-green-50 p-3">
+                <div className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-emerald-100 bg-white p-2 shadow-xl">
+                  <div className="rounded-xl bg-emerald-50 p-3">
                     <p className="truncate font-black text-zinc-900">
                       {
                         profile.full_name
@@ -622,7 +622,7 @@ export default function LguLayout({
                         "/profiles/lgu#overview",
                       )
                     }
-                    className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-zinc-600 hover:bg-green-50 hover:text-green-700"
+                    className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-zinc-600 hover:bg-emerald-50 hover:text-emerald-700"
                   >
                     <UserRound className="h-4 w-4" />
 
@@ -675,7 +675,7 @@ function LguSidebarContent({
 }) {
   return (
     <>
-      <div className="border-b border-green-100 p-5">
+      <div className="border-b border-emerald-100 p-5">
         <a
           href="/profiles/lgu#overview"
           onClick={
@@ -683,21 +683,21 @@ function LguSidebarContent({
           }
           className="flex items-center gap-3"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-green-100 bg-green-50">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50/80">
             <img
               src="/logo.png"
               alt="Trashure"
-              className="h-full w-full object-contain p-1.5"
+              className="h-full w-full object-contain"
             />
           </div>
 
           <div>
-            <p className="text-lg font-black text-zinc-900">
+            <p className="text-lg font-black tracking-tight text-zinc-900">
               Trashure
             </p>
 
-            <p className="text-xs font-bold text-green-700">
-              LGU Monitoring
+            <p className="text-xs font-bold text-emerald-700">
+              LGU MONITORING
             </p>
           </div>
         </a>
@@ -705,9 +705,9 @@ function LguSidebarContent({
 
 
       <div className="p-4">
-        <div className="rounded-[22px] border border-green-100 bg-green-50 p-4">
+        <div className="rounded-[24px] border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-green-700 shadow-sm">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm">
               <Building2 className="h-5 w-5" />
             </div>
 
@@ -724,7 +724,7 @@ function LguSidebarContent({
             </div>
           </div>
 
-          <div className="mt-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-green-700">
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-emerald-700">
             <ShieldCheck className="h-4 w-4" />
 
             Monitoring access only
@@ -757,9 +757,9 @@ function LguSidebarContent({
                   onClick={
                     onNavigate
                   }
-                  className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold text-zinc-600 transition hover:bg-green-50 hover:text-green-700"
+                  className="group flex items-center gap-3 rounded-2xl border border-transparent px-3 py-3 text-sm font-bold text-zinc-600 transition duration-200 hover:border-emerald-100 hover:bg-emerald-50 hover:text-emerald-700"
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-105" />
 
                   {
                     item.label
@@ -773,7 +773,7 @@ function LguSidebarContent({
 
         <div className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
           <div className="flex items-center gap-2 text-zinc-700">
-            <Recycle className="h-4 w-4 text-green-600" />
+            <Recycle className="h-4 w-4 text-emerald-600" />
 
             <p className="text-sm font-black">
               What is counted?
@@ -788,7 +788,7 @@ function LguSidebarContent({
       </nav>
 
 
-      <div className="border-t border-green-100 p-4">
+      <div className="border-t border-emerald-100 p-4">
         <Button
           type="button"
           variant="outline"
@@ -818,11 +818,11 @@ function LguLayoutSkeleton({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#f3fff7]">
-      <aside className="fixed inset-y-0 left-0 hidden w-[284px] border-r border-green-100 bg-white p-5 lg:block">
-        <Skeleton className="h-12 w-40 bg-green-100" />
+    <div className="min-h-screen bg-[#f5faf6]">
+      <aside className="fixed inset-y-0 left-0 hidden w-[280px] border-r border-emerald-100 bg-white p-5 lg:block">
+        <Skeleton className="h-12 w-40 bg-emerald-100" />
 
-        <Skeleton className="mt-8 h-28 rounded-[22px] bg-green-100" />
+        <Skeleton className="mt-8 h-28 rounded-[22px] bg-emerald-100" />
 
         <div className="mt-8 space-y-3">
           {Array.from({
@@ -837,7 +837,7 @@ function LguLayoutSkeleton({
                 key={
                   index
                 }
-                className="h-12 rounded-2xl bg-green-100"
+                className="h-12 rounded-2xl bg-emerald-100"
               />
             ),
           )}
@@ -845,12 +845,12 @@ function LguLayoutSkeleton({
       </aside>
 
 
-      <div className="lg:pl-[284px]">
-        <header className="h-[78px] border-b border-green-100 bg-white px-4 py-4 sm:px-6 lg:px-8">
+      <div className="lg:pl-[280px]">
+        <header className="h-[78px] border-b border-emerald-100 bg-white px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-10 w-64 max-w-[60vw] bg-green-100" />
+            <Skeleton className="h-10 w-64 max-w-[60vw] bg-emerald-100" />
 
-            <Skeleton className="h-11 w-36 rounded-full bg-green-100" />
+            <Skeleton className="h-11 w-36 rounded-full bg-emerald-100" />
           </div>
         </header>
 
