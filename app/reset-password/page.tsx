@@ -1,232 +1,327 @@
+
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   ArrowLeft,
+  Check,
   Eye,
   EyeOff,
+  KeyRound,
   Loader2,
   Lock,
+  Mail,
   ShieldCheck,
+  X,
 } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/client";
+const rules = [
+  { label: "8+ characters", test: (v: string) => v.length >= 8 },
+  { label: "Uppercase", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "Lowercase", test: (v: string) => /[a-z]/.test(v) },
+  { label: "Number", test: (v: string) => /\d/.test(v) },
+  { label: "Special character", test: (v: string) => /[^A-Za-z0-9]/.test(v) },
+];
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const supabase = createClient();
 
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(true);
-  const [signedIn, setSignedIn] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get("email")?.trim().toLowerCase() ?? "";
 
-    const check = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      router.replace("/forgot-password");
+      return;
+    }
 
-      if (!active) return;
+    setEmail(value);
+    setReady(true);
+  }, [router]);
 
-      if (!user) {
-        toast.error("Please verify your email first.");
-        router.replace("/forgot-password");
-        return;
-      }
+  const checks = rules.map((rule) => ({
+    label: rule.label,
+    valid: rule.test(password),
+  }));
 
-      setSignedIn(true);
-      setChecking(false);
-    };
+  const validPassword =
+    password.length <= 128 && checks.every((rule) => rule.valid);
 
-    void check();
+  const matches = confirm.length > 0 && password === confirm;
+  const mismatch = confirm.length > 0 && password !== confirm;
 
-    return () => {
-      active = false;
-    };
-  }, [router, supabase]);
+  const canSubmit =
+    ready &&
+    /^\d{6}$/.test(otp) &&
+    validPassword &&
+    matches &&
+    !loading;
 
   const handleSubmit = async () => {
-    if (!password) {
-      toast.error("Password is required.");
-      return;
-    }
-
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters.");
-      return;
-    }
-
-    if (password !== confirm) {
-      toast.error("Passwords do not match.");
-      return;
-    }
+    if (!canSubmit) return;
 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp, password }),
+      });
 
-      if (error) {
-        toast.error(error.message);
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error ?? "Unable to reset password.");
         return;
       }
 
-      await supabase.auth.signOut();
-
-      toast.success("Password updated. Please sign in.");
+      toast.success("Password updated successfully.");
       router.replace("/login");
     } catch {
-      toast.error("Something went wrong.");
+      toast.error("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50 to-emerald-100 px-4">
-      <div className="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-green-300/30 blur-3xl" />
+    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-br from-white via-green-50 to-emerald-100 px-3 py-5 sm:px-5">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-green-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-emerald-300/25 blur-3xl" />
 
-      <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-emerald-300/30 blur-3xl" />
+      <section className="relative z-10 w-full max-w-[420px] rounded-2xl border border-green-100 bg-white/95 p-5 shadow-xl shadow-emerald-900/10 sm:p-6">
+        <Link
+          href="/forgot-password"
+          className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-emerald-700"
+        >
+          <ArrowLeft size={15} />
+          Back
+        </Link>
 
-      <div className="relative z-10 grid w-full max-w-5xl items-center gap-8 lg:grid-cols-2">
-        <div className="hidden lg:block">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-3xl bg-white shadow-lg">
+        <div className="mb-5 mt-3 text-center">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-green-100 bg-white shadow-sm">
             <img
               src="/logo.png"
-              alt="Trashure Logo"
+              alt="Trashure"
               className="h-full w-full object-contain"
             />
           </div>
 
-          <h1 className="mt-8 text-5xl font-black leading-tight text-zinc-900">
-            Start
-            <br />
-            Fresh.
+          <h1 className="mt-3 text-[23px] font-extrabold tracking-tight text-zinc-900 sm:text-2xl">
+            Reset Password
           </h1>
 
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-zinc-600">
-            You&apos;re verified. Choose a new password to secure your Trashure
-            account.
+          <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+            Verify your code and create a new password.
           </p>
         </div>
 
-        <section className="mx-auto w-full max-w-md rounded-3xl border border-green-100 bg-white/90 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
-          <div className="mb-5 flex justify-center lg:hidden">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-md">
-              <img
-                src="/logo.png"
-                alt="Trashure Logo"
-                className="h-full w-full object-contain"
+        <form
+          className="space-y-3.5"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleSubmit();
+          }}
+        >
+          <div>
+            <label
+              htmlFor="recovery-email"
+              className="text-xs font-semibold text-zinc-700"
+            >
+              Email address
+            </label>
+
+            <div className="relative mt-1.5">
+              <Mail
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                id="recovery-email"
+                value={email}
+                type="email"
+                readOnly
+                className="h-10 w-full cursor-not-allowed rounded-lg border border-zinc-200 bg-zinc-50 pl-9 pr-9 text-sm text-zinc-500 outline-none"
+              />
+              <Lock
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
               />
             </div>
           </div>
 
-          <Link
-            href="/login"
-            className="flex items-center gap-2 text-sm text-zinc-500 transition hover:text-green-600"
-          >
-            <ArrowLeft size={18} />
-            Back to login
-          </Link>
+          <div>
+            <label
+              htmlFor="recovery-otp"
+              className="text-xs font-semibold text-zinc-700"
+            >
+              Verification code
+            </label>
 
-          <h2 className="mt-6 text-center text-3xl font-black text-zinc-900">
-            Set a New Password
-          </h2>
-
-          <p className="mt-2 text-center text-sm text-zinc-500">
-            Choose a strong password for your Trashure account.
-          </p>
-
-          {checking ? (
-            <div className="mt-10 flex justify-center">
-              <Loader2 className="animate-spin text-green-600" size={28} />
+            <div className="relative mt-1.5">
+              <KeyRound
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                id="recovery-otp"
+                value={otp}
+                onChange={(event) =>
+                  setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="000000"
+                maxLength={6}
+                disabled={loading}
+                className="h-10 w-full rounded-lg border border-zinc-200 pl-9 pr-3 text-base font-semibold tracking-[0.3em] outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              />
             </div>
-          ) : signedIn ? (
-            <div className="mt-7 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-zinc-700">
-                  New Password
-                </label>
+          </div>
 
-                <div className="relative mt-2">
-                  <Lock
-                    className="absolute left-4 top-3.5 text-zinc-400"
-                    size={18}
-                  />
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="new-password"
+                className="text-xs font-semibold text-zinc-700"
+              >
+                New password
+              </label>
+              <span className="text-[11px] tabular-nums text-zinc-400">
+                {password.length}/128
+              </span>
+            </div>
 
-                  <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter new password"
-                    autoComplete="new-password"
-                    disabled={loading}
-                    className="w-full rounded-xl border border-zinc-200 py-3 pl-11 pr-11 outline-none transition focus:ring-2 focus:ring-green-500 disabled:bg-zinc-50"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3.5 text-zinc-400"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-zinc-700">
-                  Confirm Password
-                </label>
-
-                <div className="relative mt-2">
-                  <Lock
-                    className="absolute left-4 top-3.5 text-zinc-400"
-                    size={18}
-                  />
-
-                  <input
-                    value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Re-enter new password"
-                    autoComplete="new-password"
-                    disabled={loading}
-                    className="w-full rounded-xl border border-zinc-200 py-3 pl-11 outline-none transition focus:ring-2 focus:ring-green-500 disabled:bg-zinc-50"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 rounded-xl bg-green-50 p-3 text-xs leading-relaxed text-green-800">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-                Use at least 8 characters. Mix letters, numbers, and symbols for
-                a stronger password.
-              </div>
-
+            <div className="relative mt-1.5">
+              <Lock
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                id="new-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="New password"
+                maxLength={128}
+                disabled={loading}
+                className="h-10 w-full rounded-lg border border-zinc-200 pl-9 pr-10 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              />
               <button
                 type="button"
-                disabled={loading}
-                onClick={handleSubmit}
-                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-emerald-700 py-3.5 font-semibold text-white shadow-lg shadow-green-500/30 transition hover:-translate-y-1 disabled:opacity-60"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? "Hide passwords" : "Show passwords"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-emerald-700"
               >
-                {loading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  "Update password"
-                )}
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
-          ) : null}
-        </section>
-      </div>
+
+            <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1.5 rounded-lg bg-zinc-50 p-2.5">
+              {checks.map((rule) => (
+                <div key={rule.label} className="flex items-center gap-1.5">
+                  {rule.valid ? (
+                    <Check size={13} className="shrink-0 text-emerald-600" />
+                  ) : (
+                    <X size={13} className="shrink-0 text-zinc-300" />
+                  )}
+                  <span
+                    className={`text-[11px] ${
+                      rule.valid ? "text-emerald-700" : "text-zinc-500"
+                    }`}
+                  >
+                    {rule.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirm-password"
+              className="text-xs font-semibold text-zinc-700"
+            >
+              Confirm password
+            </label>
+
+            <div className="relative mt-1.5">
+              <Lock
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                id="confirm-password"
+                value={confirm}
+                onChange={(event) => setConfirm(event.target.value)}
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="Confirm new password"
+                maxLength={128}
+                disabled={loading}
+                aria-invalid={mismatch}
+                className={`h-10 w-full rounded-lg border pl-9 pr-3 text-sm outline-none focus:ring-2 ${
+                  mismatch
+                    ? "border-red-300 focus:ring-red-100"
+                    : matches
+                      ? "border-emerald-300 focus:ring-emerald-100"
+                      : "border-zinc-200 focus:ring-emerald-500/15"
+                }`}
+              />
+            </div>
+
+            {confirm.length > 0 && (
+              <p
+                aria-live="polite"
+                className={`mt-1 flex items-center gap-1 text-[11px] ${
+                  matches ? "text-emerald-700" : "text-red-600"
+                }`}
+              >
+                {matches ? <Check size={12} /> : <X size={12} />}
+                {matches ? "Passwords match" : "Passwords do not match"}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-2.5 text-[11px] leading-relaxed text-emerald-800">
+            <ShieldCheck size={15} className="mt-0.5 shrink-0" />
+            Your code expires in 5 minutes. Never share it.
+          </div>
+
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-700 text-sm font-bold text-white shadow-md shadow-green-600/15 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={17} className="animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Reset password"
+            )}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-[11px] text-zinc-400">
+          Trashure · Team Aureloop
+        </p>
+      </section>
     </main>
   );
 }
