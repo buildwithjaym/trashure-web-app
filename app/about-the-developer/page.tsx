@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Sparkles,
   UserRound,
+  Users,
+  Microscope,
   Workflow,
 } from "lucide-react";
 
@@ -177,7 +179,7 @@ export default function AboutTheDeveloperPage() {
           <div className="order-2 lg:order-1">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-300">
               <UserRound className="h-4 w-4" />
-              Solo developer behind Trashure
+              Product lead and developer
             </div>
 
             <h1 className="mt-7 text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
@@ -189,9 +191,10 @@ export default function AboutTheDeveloperPage() {
 
             <p className="mt-7 max-w-2xl text-lg leading-8 text-zinc-300 sm:text-xl">
               I am <strong className="font-semibold text-white">Jaymar Maruji</strong>,
-              the solo developer and product builder behind Trashure. I designed
-              and developed the platform to explore how artificial intelligence
-              can help people recognize value before an item becomes waste.
+              the lead developer and product builder behind Trashure. I designed
+              and developed the platform with contributions from a small team. Together,
+              we explore how artificial intelligence can help people recognize
+              value before an item becomes waste.
             </p>
 
             <p className="mt-5 max-w-2xl leading-7 text-zinc-400">
@@ -264,7 +267,7 @@ export default function AboutTheDeveloperPage() {
                     fill
                     priority
                     sizes="(max-width: 1024px) 90vw, 430px"
-                    className="object-cover object-center"
+                    className="object-cover object-top"
                   />
 
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent px-6 pb-6 pt-28">
@@ -280,10 +283,10 @@ export default function AboutTheDeveloperPage() {
 
               <div className="absolute -bottom-5 -left-3 rounded-2xl border border-emerald-400/20 bg-[#0d1912]/95 px-5 py-4 shadow-xl backdrop-blur-xl sm:-left-8">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-400">
-                  Built independently
+                  Product-led development
                 </p>
                 <p className="mt-1 text-sm font-semibold text-white">
-                  One developer. One product vision.
+                  A shared team. One product vision.
                 </p>
               </div>
             </div>
@@ -343,14 +346,100 @@ export default function AboutTheDeveloperPage() {
                 </p>
 
                 <p>
-                  As a solo developer, I handled the product concept, interface,
-                  application architecture, database, authentication, security,
-                  AI workflow, testing, and deployment. Each part of the platform
-                  was developed around one principle: technology should make
-                  sustainable action easier to understand and easier to perform.
+                  I lead the product concept and engineering of Trashure, including its
+                  interface, application architecture, database, authentication,
+                  security, AI workflow, testing, and deployment. Our contributors
+                  support the project through research and development. We share
+                  one principle: technology should make sustainable action easier
+                  to understand and easier to perform.
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* Team and contributors */}
+      <section className="relative border-y border-white/10 bg-white/[0.025] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">
+              <Users className="h-7 w-7" />
+            </div>
+            <p className="mt-6 text-sm font-bold uppercase tracking-[0.22em] text-emerald-400">
+              The people behind the work
+            </p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-5xl">
+              Different strengths. One shared purpose.
+            </h2>
+            <p className="mt-5 leading-7 text-zinc-400 sm:text-lg">
+              Trashure is led by its developer and supported by contributors
+              whose work helps shape the research, ideas, and implementation
+              behind the platform.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-12 grid max-w-4xl gap-5 md:grid-cols-2">
+            <article className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1710] p-5 transition hover:border-emerald-400/25 sm:p-6">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/[0.06] sm:aspect-[5/4]">
+                <Image
+                  src="/angel.jpg"
+                  alt="Angel May F. Moreno"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 420px"
+                  className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="mt-5 flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
+                  <Microscope className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    Angel May F. Moreno
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-emerald-300">
+                    Researcher
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-zinc-400">
+                Supports Trashure through research that informs the project’s
+                direction, helps frame the problem, and contributes context for
+                building a useful sustainability-focused platform.
+              </p>
+            </article>
+
+            <article className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1710] p-5 transition hover:border-emerald-400/25 sm:p-6">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/[0.06] sm:aspect-[5/4]">
+                <Image
+                  src="/jainal.jpg"
+                  alt="Julmunir A. Jainal"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 420px"
+                  className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="mt-5 flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
+                  <Code2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    Julmunir A. Jainal
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-emerald-300">
+                    Assistant Developer
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-zinc-400">
+                Contributes development support to the project, helping move
+                ideas toward implementation and supporting the continued
+                improvement of the Trashure experience.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -430,21 +519,21 @@ export default function AboutTheDeveloperPage() {
           <div className="lg:sticky lg:top-32">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-300">
               <Workflow className="h-4 w-4" />
-              Independent product development
+              Collaborative product development
             </div>
 
             <h2 className="mt-6 text-3xl font-black tracking-tight sm:text-5xl">
-              One developer,
+              One product vision,
               <span className="block text-emerald-400">
-                full product ownership.
+                strengthened by a team.
               </span>
             </h2>
 
             <p className="mt-6 max-w-xl leading-7 text-zinc-400">
-              Building independently required me to work across product strategy,
-              design, engineering, security, testing, and deployment. It also
-              allowed the platform to maintain a consistent vision from the
-              original idea to the working application.
+              Leading Trashure means bringing product strategy, design, engineering,
+              security, testing, and deployment together under one consistent
+              vision. Research and development contributions from the team help
+              strengthen the product and the decisions behind it.
             </p>
 
             <a
@@ -603,7 +692,7 @@ export default function AboutTheDeveloperPage() {
           </p>
 
           <p className="mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-400">
-            Jaymar Maruji · Solo Developer
+            Jaymar Maruji · Lead Developer
           </p>
         </div>
       </section>
