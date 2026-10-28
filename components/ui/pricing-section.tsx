@@ -11,7 +11,7 @@ const plans = [
     badge: "Community",
     basicPrice: "FREE",
     basicFeatures: [
-      "AI waste identification",
+      "Limited AI waste identification",
       "Segregation guidance",
       "Nearby junkshop discovery",
     ],
