@@ -36,7 +36,7 @@ const plans = [
       "Customer referrals",
       "Basic transaction records",
     ],
-    proPrice: "₱299",
+    proPrice: "₱199",
     proPeriod: "/ month",
     proFeatures: [
       "Enhanced business visibility",
