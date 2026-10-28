@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { DownloadApkPrompt } from "@/components/download-apk-prompt";
 import FAQs from "@/components/sections/FAQs";
+import PricingSection from "@/components/ui/pricing-section";
+
 const primaryButton =
   "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-700 px-6 py-3 text-center text-sm font-semibold leading-5 text-white shadow-lg shadow-green-600/15 transition hover:shadow-xl hover:shadow-green-600/25";
 
@@ -821,6 +823,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+ {/* Role-based freemium pricing */}
+      <PricingSection />
 
       {/* FAQ section */}
       <FAQs />
